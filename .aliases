@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+# Better navigation
+alias ..="cd .."
+alias ...="cd ../.."
+alias cdp="cd ~/Projects"
+
+# Shortcuts
+alias g="git"
+alias mv='mv -v'
+alias rm='rm -i -v'
+alias cp='cp -v'
+alias lock="pmset sleepnow"
+alias gith="git --help"
+alias h="historie"
+alias dot='/usr/bin/git --git-dir="$HOME"/.files --work-tree="$HOME"'
+
+
+# File size
+alias fs="stat -f \"%z bytes\""
+
+# List all files colorized in long format
+alias ls="ls -hlAFG ${colorflag}"
+alias ll="ls -hlaFG ${colorflag}"
+alias lsd='ls -l | grep "^d"' # only directories
+
+# Always enable colored `grep` output
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
+# Enable aliases to be sudo’ed
+alias sudo='sudo '
+
+
+# Google Chrome
+alias chrome='open -a "Google Chrome"'
+alias canary='open -a "Google Chrome Canary"'
+
+# IP addresses
+alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias localip="ipconfig getifaddr en0"
+
+
+# Print each PATH entry on a separate line
+alias path='echo -e ${PATH//:/\\n}'
+
+alias chmox='chmod -x'
+
+alias where=which # sometimes i forget
+
+
+# Git
+alias unpush="git push -f origin HEAD^:master"
+
+# Recursively delete `.DS_Store` files
+alias cleanup_dsstore="find . -name '*.DS_Store' -type f -ls -delete"
+
+alias update="brew -v update; brew upgrade --force-bottle --cleanup; brew cleanup; brew cask cleanup; brew prune; brew doctor; npm-check -g -u"
+
+function cdl {
+	cd "$1" && ls
+}

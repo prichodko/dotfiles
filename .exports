@@ -1,0 +1,11 @@
+# vim ftw
+export EDITOR="vim"
+
+# Don’t clear the screen after quitting a manual page
+export MANPAGER="less -X"
+
+# Use UTF-8 and prefer US English
+export LC_ALL="en_US.UTF-8"
+export LANG="en_US"
+
+export HOMEBREW_CASK_OPTS="--appdir=/Applications"

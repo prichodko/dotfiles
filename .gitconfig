@@ -1,0 +1,50 @@
+[user]
+    name = Pavel Prichodko
+    email = prichodko.p@gmail.com
+[core]
+    pager = less -r
+    editor = /usr/bin/vim
+    attributesfile = ~/.gitattributes
+[alias]
+    a = add .
+    b = branch
+    bb = branch -vv
+    c = commit
+    ca = commit --amend --no-edit
+    co = checkout
+    d = diff
+    f = fetch
+    st = status -s
+    g = log --graph --decorate --oneline --date-order
+    h = help
+    ai = add --interactive
+    ci = clean --interactive
+    r = rebase
+    ri = rebase -i
+    p = push
+    r = remote
+    rr = remote -vv
+    last = log -2 --stat --abbrev-commit --relative-date HEAD
+    unstage = reset HEAD --
+    staged = ls-files --stage --abbrev
+    untrack = rm --cached
+    l = log --decorate --oneline -10
+    logp = log --decorate --graph --abbrev-commit --relative-date --all
+    list = config -l
+    cm = commit -m
+[merge]
+    ff = only
+    tool = vscode
+[credential]
+    helper = osxkeychain
+[diff]
+    tool = vscode
+[difftool "vscode"]
+    cmd = code --wait --diff $LOCAL $REMOTE
+[mergetool "vscode"]
+    cmd = code --wait --diff $LOCAL $REMOTE
+[color]
+    diff = auto
+[pull]
+    ff = only
+    rebase = true
