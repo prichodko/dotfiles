@@ -1,7 +1,7 @@
 # env
 export VOLTA_HOME="$HOME/.volta"
 export BUN_INSTALL="$HOME/.bun"
-export GPG_TTY=$(tty)
+[ -t 0 ] && export GPG_TTY=$(tty)
 
 # PATH
 export PATH="$VOLTA_HOME/bin:$BUN_INSTALL/bin:$HOME/.cargo/bin:$HOME/.lmstudio/bin:$PATH"
@@ -9,7 +9,7 @@ export PATH="$VOLTA_HOME/bin:$BUN_INSTALL/bin:$HOME/.cargo/bin:$HOME/.lmstudio/b
 # history
 HISTSIZE=10000
 HISTFILESIZE=10000
-HISTCONTROL=ignoredups
+HISTCONTROL=ignoredups:ignorespace
 shopt -s histappend
 
 # options

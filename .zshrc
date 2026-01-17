@@ -8,7 +8,8 @@ eval "$(starship init zsh)"
 
 # options
 setopt AUTO_CD CORRECT
-setopt SHARE_HISTORY HIST_IGNORE_DUPS
+setopt SHARE_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE
+export GPG_TTY=$(tty)
 HISTSIZE=10000
 SAVEHIST=10000
 HISTFILE=~/.zsh_history
@@ -20,4 +21,5 @@ HISTFILE=~/.zsh_history
 [ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
 
 # syntax highlighting (must be last)
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+[ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && \
+  source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
