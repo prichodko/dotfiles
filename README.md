@@ -28,7 +28,9 @@ dot push
 
 ## tracked
 
-- `.zshrc` `.zshenv` `.zprofile` - shell
+- `.aliases` - shared aliases
+- `.zshrc` `.zshenv` `.zprofile` - zsh
+- `.bashrc` `.bash_profile` - bash
 - `.gitconfig` `.gitignore` - git
 - `.ssh/config` - ssh hosts
 - `.config/zed/` - editor
