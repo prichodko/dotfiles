@@ -6,24 +6,24 @@ bare git repo, no symlinks
 
 ```sh
 git clone --bare git@github.com:prichodko/dotfiles.git $HOME/dotfiles
-alias dotfiles='git --git-dir=$HOME/dotfiles --work-tree=$HOME'
-dotfiles checkout
-dotfiles config status.showUntrackedFiles no
+alias dot='git --git-dir=$HOME/dotfiles --work-tree=$HOME'
+dot checkout
+dot config status.showUntrackedFiles no
 ```
 
 if checkout fails (existing files), back them up:
 ```sh
-dotfiles checkout 2>&1 | grep -E "\s+\." | awk '{print $1}' | xargs -I{} mv {} {}.bak
-dotfiles checkout
+dot checkout 2>&1 | grep -E "\s+\." | awk '{print $1}' | xargs -I{} mv {} {}.bak
+dot checkout
 ```
 
 ## usage
 
 ```sh
-dotfiles status
-dotfiles add ~/.zshrc
-dotfiles commit -m "msg"
-dotfiles push
+dot status
+dot add ~/.zshrc
+dot commit -m "msg"
+dot push
 ```
 
 ## tracked
