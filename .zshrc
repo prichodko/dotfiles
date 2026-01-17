@@ -6,11 +6,12 @@ zmodload -i zsh/complist
 # prompt
 eval "$(starship init zsh)"
 
-# history
+# options
+setopt AUTO_CD CORRECT
+setopt SHARE_HISTORY HIST_IGNORE_DUPS
 HISTSIZE=10000
 SAVEHIST=10000
 HISTFILE=~/.zsh_history
-setopt SHARE_HISTORY HIST_IGNORE_DUPS
 
 # navigation
 alias ..='cd ..'
@@ -33,3 +34,6 @@ alias dot='git --git-dir=$HOME/dotfiles --work-tree=$HOME'
 
 # bun completions
 [ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
+
+# syntax highlighting (must be last)
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
