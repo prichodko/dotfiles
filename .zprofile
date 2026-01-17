@@ -1,4 +1,10 @@
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-export GPG_TTY=$(tty)
-gpgconf --launch gpg-agent
+path=(
+  $VOLTA_HOME/bin
+  $BUN_INSTALL/bin
+  $HOME/.cargo/bin
+  $HOME/.lmstudio/bin
+  $path
+)
+typeset -U path
