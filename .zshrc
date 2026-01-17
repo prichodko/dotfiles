@@ -13,24 +13,8 @@ HISTSIZE=10000
 SAVEHIST=10000
 HISTFILE=~/.zsh_history
 
-# navigation
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ll='ls -la'
-alias cdp='cd ~/Projects'
-
-# tools
-alias y='yarn'
-alias p='pnpm'
-alias pi='pnpm install'
-alias b='bun'
-alias bi='bun install'
-alias br='bun run'
-alias bd='bun dev'
-alias g='git'
-alias gs='git status'
-alias cc='claude --dangerously-skip-permissions'
-alias dot='git --git-dir=$HOME/dotfiles --work-tree=$HOME'
+# aliases
+[ -f ~/.aliases ] && source ~/.aliases
 
 # bun completions
 [ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
