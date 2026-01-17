@@ -1,0 +1,77 @@
+[user]
+	name = Pavel
+	email = 14926950+prichodko@users.noreply.github.com
+	signingkey = 8E4C82D464215E83
+[core]
+  pager = less -r
+  editor = /usr/bin/vim
+	excludesfile = /Users/pavel/.gitignore
+[alias]
+  a = add .
+  b = branch
+  bb = branch -vv
+  c = commit
+  ca = commit --amend --no-edit
+  cam = commit -am
+  co = checkout
+  d = diff
+  f = fetch
+  st = status -s
+	g = log --graph --decorate --oneline --date-order
+  h = help
+  ai = add --interactive
+  ci = clean --interactive
+  r = rebase
+  ri = rebase -i
+  p = push
+  r = remote
+  rr = remote -vv
+  l = log --decorate --oneline -n20
+  last = log -2 --stat --abbrev-commit --relative-date HEAD
+  unstage = reset HEAD --
+  staged = ls-files --stage --abbrev
+  untrack = rm --cached
+  oneline = log -10 --pretty=format:\"%h - %cn, %cr : %s\"
+  graph = log --decorate --graph --abbrev-commit --relative-date --all
+  list = config -l
+	cm = commit -m
+	sync = pull --autostash && push
+	undo = reset HEAD~1
+  # stage and commit all the changes
+  c = !git add --all && git commit -m
+  # stage and commit all the changes with WIP as a commit message
+  wip = !git add --all && git commit -m 'WIP'
+	prune = !git branch -vv | grep \": gone]\" | awk \"{print $1}\" | xargs git branch -d
+	pf = push --force-with-lease
+[merge]
+	# ff = only
+	tool = vscode
+[credential]
+	helper = osxkeychain
+[diff]
+  tool = vscode
+[difftool "vscode"]
+  cmd = code --wait --diff $LOCAL $REMOTE
+[mergetool "vscode"]
+  cmd = code --wait --diff $LOCAL $REMOTE
+[color]
+	diff = auto
+[pull]
+	# ff = only
+	# rebase = true
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+[init]
+	defaultBranch = main
+[commit]
+	gpgSign = true
+	sign = true
+[rebase]
+	autoStash = true
+[push]
+	autoSetupRemote = true
+[rerere]
+	enabled = true
