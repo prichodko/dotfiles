@@ -20,3 +20,7 @@ eval "$(starship init bash)"
 
 # aliases
 [ -f ~/.aliases ] && source ~/.aliases
+
+# plugins
+eval "$(fzf --bash)"
+eval "$(zoxide init bash --cmd cd)"

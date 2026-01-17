@@ -17,6 +17,12 @@ HISTFILE=~/.zsh_history
 # aliases
 [ -f ~/.aliases ] && source ~/.aliases
 
+# plugins
+eval "$(fzf --zsh)"
+eval "$(zoxide init zsh --cmd cd)"
+[ -f /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] && \
+  source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
 # bun completions
 [ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
 
