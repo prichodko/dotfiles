@@ -44,3 +44,5 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#555555'
 # syntax highlighting (must be last)
 [ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && \
   source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=white'
+ZSH_HIGHLIGHT_STYLES[command]='fg=green'
