@@ -20,7 +20,7 @@ HISTFILE=~/.zsh_history
 # fzf config
 export FZF_DEFAULT_OPTS='
   --height=40% --layout=reverse --border=rounded
-  --color=bg+:#222,fg+:#f2f2f2,hl:#a6e32d,hl+:#a6e32d
+  --color=bg+:#222222,fg+:#f2f2f2,hl:#a6e32d,hl+:#a6e32d
   --color=info:#67d9f0,prompt:#fa2573,pointer:#c48dff
   --color=marker:#a6e32d,spinner:#c48dff,header:#67d9f0
 '
