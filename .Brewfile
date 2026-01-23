@@ -1,5 +1,6 @@
 tap "anomalyco/tap"
 brew "bat"
+brew "eza"
 brew "fd"
 brew "ffmpeg"
 brew "fnm"
