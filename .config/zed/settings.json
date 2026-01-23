@@ -7,6 +7,19 @@
 // custom settings, run the `open default settings` command
 // from the command palette or from `Zed` application menu.
 {
+  "ssh_connections": [
+    {
+      "host": "my-os.exe.xyz",
+      "args": [],
+      "projects": [
+        {
+          "paths": [
+            "/home/exedev"
+          ]
+        }
+      ]
+    }
+  ],
   "theme": "Ayu Mirage",
   "autosave": "on_window_change",
   "format_on_save": "on"
