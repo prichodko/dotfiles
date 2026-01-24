@@ -16,7 +16,7 @@
   co = checkout
   d = diff
   f = fetch
-  st = status -s
+  s = status -s
 	g = log --graph --decorate --oneline --date-order
   h = help
   ai = add --interactive
