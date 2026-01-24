@@ -1,9 +1,17 @@
 # navigation
 alias ..='cd ..'
 alias ...='cd ../..'
+alias cdp='cd ~/Projects'
+
+# modern replacements
+alias ls='eza'
 alias ll='eza -la --no-permissions'
 alias lt='eza --tree --level=2'
-alias cdp='cd ~/Projects'
+alias rm='trash'
+alias top='btop'
+alias f='fd'
+alias grep='rg'
+alias help='tldr'
 
 # tools
 alias y='yarn'
