@@ -1,6 +1,7 @@
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 path=(
+  $HOME/.local/bin
   $VOLTA_HOME/bin
   $BUN_INSTALL/bin
   $HOME/.cargo/bin

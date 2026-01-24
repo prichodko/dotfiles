@@ -4,7 +4,7 @@ export BUN_INSTALL="$HOME/.bun"
 [ -t 0 ] && export GPG_TTY=$(tty)
 
 # PATH
-export PATH="$VOLTA_HOME/bin:$BUN_INSTALL/bin:$HOME/.cargo/bin:$HOME/.lmstudio/bin:$PATH"
+export PATH="$HOME/.local/bin:$VOLTA_HOME/bin:$BUN_INSTALL/bin:$HOME/.cargo/bin:$HOME/.lmstudio/bin:$PATH"
 
 # history
 HISTSIZE=10000

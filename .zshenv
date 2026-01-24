@@ -1,1 +1,1 @@
-export HOMEBREW_BUNDLE_FILE="$HOME/Brewfile"
+export HOMEBREW_BUNDLE_FILE="$HOME/.brewfile"
