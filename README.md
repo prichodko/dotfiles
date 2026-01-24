@@ -1,5 +1,7 @@
 # dotfiles
 
+managed with [dot](https://github.com/prichodko/dot) - bash tool for dotfiles via git + symlinks
+
 ## setup
 
 ```sh
