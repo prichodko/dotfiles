@@ -1,2 +1,1 @@
-export VOLTA_HOME="$HOME/.volta"
-export BUN_INSTALL="$HOME/.bun"
+export HOMEBREW_BUNDLE_FILE="$HOME/Brewfile"
