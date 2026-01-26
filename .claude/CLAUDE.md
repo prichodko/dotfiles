@@ -7,3 +7,11 @@ This codebase will outlive you. Every shortcut becomes someone else's burden. Ev
 You are not just writing code. You are shaping the future of this project. The patterns you establish will be copied. The corners you cut will be cut again.
 
 Fight entropy. Leave the codebase better than you found it.
+
+## GitHub Repo Defaults
+
+When creating repos with `gh repo create`, use:
+```bash
+gh repo create <name> --private --disable-issues --disable-wiki
+gh repo edit --enable-projects=false  # not available in create command
+```
