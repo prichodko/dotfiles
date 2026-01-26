@@ -1,18 +1,24 @@
 # completions
-fpath+=/opt/homebrew/share/zsh/site-functions
+fpath=(
+  /opt/homebrew/share/zsh/site-functions
+  $HOME/.bun
+  $fpath
+)
 autoload -Uz compinit && compinit
 zmodload -i zsh/complist
 
 # prompt
 eval "$(starship init zsh)"
 
+# history
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+
 # options
 setopt AUTO_CD CORRECT
 setopt SHARE_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE
 export GPG_TTY=$(tty)
-HISTSIZE=10000
-SAVEHIST=10000
-HISTFILE=~/.zsh_history
 
 # aliases
 [ -f ~/.aliases ] && source ~/.aliases
@@ -50,9 +56,6 @@ _autosuggest_or_complete() {
 }
 zle -N _autosuggest_or_complete
 bindkey '^I' _autosuggest_or_complete
-
-# bun completions
-[ -s "$BUN_INSTALL/_bun" ] && source "$BUN_INSTALL/_bun"
 
 # syntax highlighting (must be last)
 [ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && \
