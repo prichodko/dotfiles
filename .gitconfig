@@ -1,7 +1,7 @@
 [user]
 	name = Pavel
 	email = 14926950+prichodko@users.noreply.github.com
-	signingkey = 8E4C82D464215E83
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGB+Q3CovMTbLRI7Vv2nkgHrZsKM3YeiI+hNFFDS935O
 [core]
   pager = less -r
   editor = /usr/bin/vim
@@ -75,3 +75,7 @@
 	autoSetupRemote = true
 [rerere]
 	enabled = true
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
