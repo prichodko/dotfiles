@@ -32,6 +32,7 @@ export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-ran
 # plugins
 eval "$(fzf --zsh)"
 eval "$(zoxide init zsh --cmd cd)"
+eval "$(mise activate zsh)"
 # autosuggestions config
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#555555'
