@@ -6,6 +6,8 @@ fpath=(
 )
 autoload -Uz compinit && compinit
 zmodload -i zsh/complist
+_comp_options+=(globdots)
+source /opt/homebrew/opt/fzf-tab/share/fzf-tab/fzf-tab.zsh
 
 # prompt
 eval "$(starship init zsh)"
@@ -30,9 +32,9 @@ export FZF_DEFAULT_OPTS='
   --color=info:#67d9f0,prompt:#fa2573,pointer:#c48dff
   --color=marker:#a6e32d,spinner:#c48dff,header:#67d9f0
 '
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git'
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude node_modules --exclude vendor --exclude dist --exclude build'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git'
+export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git --exclude node_modules --exclude vendor --exclude dist --exclude build'
 export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 
 # plugins
@@ -40,22 +42,6 @@ eval "$(fzf --zsh)"
 eval "$(zoxide init zsh --cmd cd)"
 eval "$(mise activate zsh)"
 
-# autosuggestions config
-ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#555555'
-[ -f /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] && \
-  source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-
-# tab accepts suggestion if visible, otherwise normal completion
-_autosuggest_or_complete() {
-  if [[ -n "$POSTDISPLAY" ]]; then
-    zle autosuggest-accept
-  else
-    zle expand-or-complete
-  fi
-}
-zle -N _autosuggest_or_complete
-bindkey '^I' _autosuggest_or_complete
 
 # syntax highlighting (must be last)
 [ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && \
