@@ -1,5 +1,20 @@
 [
   {
-    "bindings": {}
-  }
+    "bindings": {
+      "cmd-alt-o": [
+        "agent::NewExternalAgentThread",
+        {
+          "agent": {
+            "custom": {
+              "name": "OpenCode",
+              "command": {
+                "command": "opencode",
+                "args": ["acp"],
+              },
+            },
+          },
+        },
+      ],
+    },
+  },
 ]
