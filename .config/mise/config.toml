@@ -4,4 +4,3 @@ node = "latest"
 
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
-ignored_config_paths = ['["~/.dotfiles/.config/mise/config.toml"]']
