@@ -6,6 +6,7 @@ alias cdp='cd ~/Projects'
 # modern replacements
 alias ls='eza'
 alias ll='eza -la --no-permissions'
+alias lll='eza -la --no-permissions --tree --level=2'
 alias lt='eza --tree --level=2'
 alias rm='trash'
 alias top='btop'
