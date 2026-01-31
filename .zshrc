@@ -8,6 +8,7 @@ autoload -Uz compinit && compinit
 zmodload -i zsh/complist
 _comp_options+=(globdots)
 source /opt/homebrew/opt/fzf-tab/share/fzf-tab/fzf-tab.zsh
+zstyle ':fzf-tab:*' fzf-flags --info=hidden
 
 # prompt
 eval "$(starship init zsh)"
