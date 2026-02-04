@@ -15,3 +15,15 @@ When creating repos with `gh repo create`, use:
 gh repo create <name> --private --disable-issues --disable-wiki
 gh repo edit --enable-projects=false  # not available in create command
 ```
+
+## Code
+
+- No barrel files - import directly from source
+- No default exports - named only
+- Colocate related files in folders (test, styles next to source)
+- Early returns over deep nesting
+- Async/await over .then()
+- Descriptive names over comments
+- Types over runtime checks
+- Composition over inheritance
+- Fail fast - throw early on invalid state
