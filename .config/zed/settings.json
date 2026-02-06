@@ -20,7 +20,7 @@
   },
   "base_keymap": "Cursor",
   "git_panel": {
-    "dock": "right",
+    "dock": "left",
     "tree_view": true,
   },
   "ssh_connections": [
