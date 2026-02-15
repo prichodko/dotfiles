@@ -15,9 +15,24 @@ alias grep='rg'
 alias help='tldr'
 
 # tools
+i() {
+  if [[ -f bun.lock || -f bun.lockb ]]; then
+    bun install
+  elif [[ -f pnpm-lock.yaml ]]; then
+    pnpm install
+  elif [[ -f yarn.lock ]]; then
+    yarn install
+  elif [[ -f package-lock.json ]]; then
+    npm install
+  elif [[ -f package.json ]]; then
+    npm install
+  else
+    echo "No package.json found"
+    return 1
+  fi
+}
 alias y='yarn'
 alias p='pnpm'
-alias pi='pnpm install'
 alias b='bun'
 alias bi='bun install'
 alias br='bun run'
