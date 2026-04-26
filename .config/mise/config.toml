@@ -3,8 +3,15 @@ bun = "latest"
 node = "latest"
 "npm:@openai/codex" = "latest"
 "npm:@mariozechner/pi-coding-agent" = "latest"
+"npm:svgo" = "latest"
+"npm:sharp-cli" = "latest"
+pnpm = "latest"
+"npm:dev3000" = "latest"
+"npm:agent-browser" = "latest"
+"npm:portless" = "latest"
 
 [settings]
+trusted_config_paths = ["/Users/pavel/.codex", "/Users/pavel/Projects"]
 idiomatic_version_file_enable_tools = ["node"]
 
 [settings.npm]

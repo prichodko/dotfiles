@@ -20,7 +20,34 @@
   {
     "context": "Workspace",
     "bindings": {
-      "cmd-shift-g": "git_panel::ToggleFocus"
+      "cmd-shift-g": "git_panel::Toggle",
+      "cmd-shift-e": "project_panel::Toggle",
+      "cmd-shift-t": "terminal_panel::Toggle",
+      "alt-t": "pane::ReopenClosedItem",
+    },
+  },
+  {
+    "context": "Dock",
+    "bindings": {
+      "cmd-w": null,
+    },
+  },
+  {
+    "context": "FileFinder || (FileFinder > Picker > Editor) || (FileFinder > Picker > menu)",
+    "bindings": {
+      "cmd-shift-p": "command_palette::Toggle",
+    },
+  },
+  {
+    "context": "ProjectPanel",
+    "bindings": {
+      "ctrl-cmd-c": "project_panel::CollapseAllEntries"
+    }
+  },
+  {
+    "context": "ProjectPanel",
+    "unbind": {
+      "cmd-left": "project_panel::CollapseAllEntries"
     }
   }
 ]

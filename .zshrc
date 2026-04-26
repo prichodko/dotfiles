@@ -40,7 +40,6 @@ export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-ran
 
 # plugins
 eval "$(fzf --zsh)"
-eval "$(zoxide init zsh --cmd cd)"
 eval "$(mise activate zsh)"
 
 
@@ -49,3 +48,10 @@ eval "$(mise activate zsh)"
   source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=white'
 ZSH_HIGHLIGHT_STYLES[command]='fg=green'
+
+# opencode
+export PATH=/Users/pavel/.opencode/bin:$PATH
+
+# zoxide (after everything else to avoid doctor warning)
+export _ZO_DOCTOR=0
+eval "$(zoxide init zsh --cmd cd)"
