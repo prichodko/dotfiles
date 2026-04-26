@@ -1,0 +1,4 @@
+interface:
+  display_name: "PR"
+  short_description: "Open GitHub PRs with title pick + review line."
+  default_prompt: "Use $pr to propose PR titles, let me pick one, open PR with gh, and output a copied :review: one-liner."

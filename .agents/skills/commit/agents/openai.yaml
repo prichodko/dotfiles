@@ -1,0 +1,4 @@
+interface:
+  display_name: "Commit"
+  short_description: "Chunk changes and commit with terse messages."
+  default_prompt: "Use $commit to review my changes, suggest commit chunks/messages, confirm grouping, then commit." 
