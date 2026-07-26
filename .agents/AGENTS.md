@@ -8,14 +8,6 @@ You are not just writing code. You are shaping the future of this project. The p
 
 Fight entropy. Leave the codebase better than you found it.
 
-## GitHub Repo Defaults
-
-When creating repos with `gh repo create`, use:
-```bash
-gh repo create <name> --private --disable-issues --disable-wiki
-gh repo edit --enable-projects=false  # not available in create command
-```
-
 ## Code
 
 - No barrel files - import directly from source
@@ -27,3 +19,9 @@ gh repo edit --enable-projects=false  # not available in create command
 - Types over runtime checks
 - Composition over inheritance
 - Fail fast - throw early on invalid state
+
+## Code navigation
+
+- Use `rg` first for known strings, symbols, and call sites.
+- Use `ast-grep outline` to orient in unfamiliar files.
+- Use `ast-grep run --pattern` for syntax-aware searches.

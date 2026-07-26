@@ -1,6 +1,6 @@
 ---
 name: pr
-description: "Create, update, and share GitHub pull requests with a consistent workflow and output format. Use when asked to prepare PR title/body, open PRs via gh CLI, choose between candidate PR titles with askUserTool, and finish by returning a `:review: <SUBJECT> – <PR_LINK>` one-liner copied to clipboard."
+description: "Create, update, and share GitHub pull requests for an already committed and pushed branch. Use when asked to prepare PR title/body or open or update a PR via gh CLI. Do not commit, push, wait for CI, or repair failures. Finish with a `:review: <SUBJECT> – <PR_LINK>` one-liner copied to the clipboard."
 ---
 
 # PR
@@ -9,14 +9,18 @@ be terse. sacrifice grammar for speed.
 
 Follow this workflow whenever the user asks to open a PR.
 
-## 1. Confirm Branch And Change Scope
+## 1. Confirm Clean, Pushed Branch And Change Scope
 
 Run:
 
 ```bash
 git status --short --branch
 git log --oneline --decorate -n 8
+git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}'
+git rev-list --left-right --count '@{upstream}...HEAD'
 ```
+
+Stop if the worktree is dirty, the branch has no upstream, or local and upstream differ. Ask the user to commit or push separately. Never commit or push in this workflow.
 
 If needed for summary quality, inspect changed files with `git diff --name-only` and targeted diffs.
 
@@ -81,6 +85,8 @@ gh pr edit <pr-number-or-url> --title "<title>" --body "$pr_body"
 ```
 
 If the repo has a different default base branch, use that branch instead of `main`.
+
+Do not wait for CI or repair failing checks. Report only errors from creating or updating the PR.
 
 Backtick safety fix:
 - Do not use legacy backtick command substitution.

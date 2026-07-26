@@ -1,0 +1,7 @@
+interface:
+  display_name: "test-quality"
+  short_description: "Review tests for useful failure signal"
+  default_prompt: "Use $test-quality to review these tests for assertion quality, boundaries, and failure signal."
+
+policy:
+  allow_implicit_invocation: false
