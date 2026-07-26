@@ -40,6 +40,7 @@ export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-ran
 
 # plugins
 eval "$(fzf --zsh)"
+eval "$(atuin init zsh --disable-up-arrow)"
 eval "$(mise activate zsh)"
 
 
@@ -55,3 +56,11 @@ export PATH=/Users/pavel/.opencode/bin:$PATH
 # zoxide (after everything else to avoid doctor warning)
 export _ZO_DOCTOR=0
 eval "$(zoxide init zsh --cmd cd)"
+
+# pnpm
+export PNPM_HOME="/Users/pavel/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

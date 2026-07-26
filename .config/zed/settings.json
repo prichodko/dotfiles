@@ -7,6 +7,7 @@
 // custom settings, run the `open default settings` command
 // from the command palette or from `Zed` application menu.
 {
+  "cli_default_open_behavior": "existing_window",
   "outline_panel": {
     "dock": "right"
   },
@@ -50,8 +51,8 @@
   "when_closing_with_no_tabs": "platform_default",
   "use_system_window_tabs": true,
   "agent": {
-    "sidebar_side": "right",
-    "dock": "right",
+    "sidebar_side": "left",
+    "dock": "left",
     "favorite_models": [],
     "inline_assistant_model": {
       "provider": "copilot_chat",
@@ -72,7 +73,7 @@
   "git_panel": {
     "collapse_untracked_diff": false,
     "sort_by_path": true,
-    "dock": "left",
+    "dock": "right",
     "tree_view": true,
   },
   "project_panel": {
@@ -94,6 +95,15 @@
   "autosave": "on_window_change",
   "format_on_save": "on",
   "agent_servers": {
+    "opencode": {
+      "type": "registry"
+    },
+    "claude-acp": {
+      "type": "registry"
+    },
+    "codex-acp": {
+      "type": "registry"
+    },
     "OpenCode": {
       "type": "custom",
       "command": "opencode",
