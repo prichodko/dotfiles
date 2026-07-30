@@ -1,6 +1,6 @@
 ---
 name: git-audit
-description: Inspect a git repository's history before reading source files. Use this skill when entering an unfamiliar codebase, performing light repo triage, or deciding what code to inspect first. Runs five git-history commands to identify churn hotspots, contributor concentration, bug-prone files, delivery momentum, and firefighting patterns.
+description: Inspect a git repository's history using five commands that identify churn hotspots, contributor concentration, bug-prone files, delivery momentum, and firefighting patterns. Use only when the user explicitly invokes `$git-audit` or explicitly asks to run a git audit.
 ---
 
 # git-audit
@@ -9,14 +9,9 @@ Use git history to build a diagnostic picture of a repository before opening imp
 
 This skill is closely inspired by Ally Piechowski's article ["The Git Commands I Run Before Reading Any Code"](https://piechowski.io/post/git-commands-before-reading-code/) and adapts that workflow into a reusable skill.
 
-## When to use this skill
+## Invocation
 
-Use this skill when:
-- you just entered an unfamiliar repository
-- you want a fast first-pass repo triage
-- you need to choose which files to inspect first
-- you want to estimate maintenance risk before making changes
-- you are auditing a codebase at a high level
+Run only after explicit user invocation. Never auto-invoke for unfamiliar repositories, feature work, triage, or code navigation.
 
 Do not use this skill as proof of code quality by itself. These commands provide signals, not verdicts.
 

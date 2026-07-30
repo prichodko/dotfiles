@@ -2,3 +2,6 @@ interface:
   display_name: "git-audit"
   short_description: "Audit repo history before reading code"
   default_prompt: "Use $git-audit to triage this repository from git history before reading source files."
+
+policy:
+  allow_implicit_invocation: false
