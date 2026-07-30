@@ -55,6 +55,21 @@ trust_level = "trusted"
 [projects."/Users/pavel/Documents/Codex/2026-07-26/i-fe"]
 trust_level = "trusted"
 
+[projects."/Users/pavel/Documents/Codex/2026-07-26/com"]
+trust_level = "trusted"
+
+[projects."/Users/pavel/Documents/Codex/2026-07-28/what"]
+trust_level = "trusted"
+
+[projects."/Users/pavel/Documents/Codex/2026-07-28/can"]
+trust_level = "trusted"
+
+[projects."/Users/pavel/Documents/Codex/2026-07-30/help"]
+trust_level = "trusted"
+
+[projects."/Users/pavel/Documents/Codex/2026-07-30/is"]
+trust_level = "trusted"
+
 [notice]
 hide_full_access_warning = true
 hide_rate_limit_model_nudge = true
@@ -69,6 +84,7 @@ goals = true
 js_repl = false
 workspace_dependencies = true
 remote_plugin = false
+memories = true
 
 [shell_environment_policy]
 inherit = "all"
@@ -125,13 +141,13 @@ enabled = true
 enabled = false
 
 [plugins."documents@openai-primary-runtime"]
-enabled = false
+enabled = true
 
 [plugins."spreadsheets@openai-primary-runtime"]
-enabled = false
+enabled = true
 
 [plugins."presentations@openai-primary-runtime"]
-enabled = false
+enabled = true
 
 [plugins."figma@openai-curated"]
 enabled = true
@@ -143,13 +159,13 @@ enabled = true
 enabled = false
 
 [plugins."pdf@openai-primary-runtime"]
-enabled = false
+enabled = true
 
 [plugins."browser@openai-bundled"]
 enabled = true
 
 [plugins."template-creator@openai-primary-runtime"]
-enabled = false
+enabled = true
 
 [plugins."openai-templates@openai-curated"]
 enabled = false
@@ -169,7 +185,7 @@ source_type = "local"
 source = "/Users/pavel/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
-last_updated = "2026-07-26T11:00:43Z"
+last_updated = "2026-07-28T08:39:42Z"
 source_type = "local"
 source = "/Users/pavel/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
@@ -301,3 +317,7 @@ enabled = false
 
 [apps.connector_openai_plugin_management]
 enabled = false
+
+[memories]
+generate_memories = true
+use_memories = true
