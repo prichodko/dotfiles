@@ -70,6 +70,12 @@ trust_level = "trusted"
 [projects."/Users/pavel/Documents/Codex/2026-07-30/is"]
 trust_level = "trusted"
 
+[projects."/Users/pavel/Documents/Codex/2026-07-31/wh"]
+trust_level = "trusted"
+
+[projects."/Users/pavel/Documents/Codex/2026-08-01/can"]
+trust_level = "trusted"
+
 [notice]
 hide_full_access_warning = true
 hide_rate_limit_model_nudge = true
@@ -81,10 +87,17 @@ hide_rate_limit_model_nudge = true
 hooks = true
 multi_agent = true
 goals = true
-js_repl = false
 workspace_dependencies = true
 remote_plugin = false
 memories = true
+# Allow clarification prompts outside Plan mode.
+default_mode_request_user_input = true
+# Keep long-running tasks aware of wall-clock time.
+current_time_reminder = true
+# Keep the computer awake while a turn runs.
+prevent_idle_sleep = true
+# Add ASCII visualization guidance to CLI sessions.
+terminal_visualization_instructions = true
 
 [shell_environment_policy]
 inherit = "all"
@@ -92,7 +105,7 @@ inherit = "all"
 [shell_environment_policy.set]
 PATH = "/Users/pavel/.local/share/mise/installs/pnpm/11.0.4:/Users/pavel/.local/share/mise/installs/node/22.22.3/bin:/Users/pavel/Library/pnpm:/Users/pavel/.opencode/bin:/Users/pavel/.local/share/mise/installs/bun/latest/bin:/Users/pavel/.local/share/mise/installs/node/latest/bin:/Users/pavel/.local/share/mise/installs/npm-openai-codex/latest/bin:/Users/pavel/.local/share/mise/installs/npm-mariozechner-pi-coding-agent/latest/bin:/Users/pavel/.local/share/mise/installs/npm-svgo/latest/bin:/Users/pavel/.local/share/mise/installs/npm-sharp-cli/latest/bin:/Users/pavel/.local/share/mise/installs/pnpm/latest:/Users/pavel/.local/share/mise/installs/npm-dev3000/latest/bin:/Users/pavel/.local/share/mise/installs/npm-agent-browser/latest/bin:/Users/pavel/.local/share/mise/installs/npm-portless/latest/bin:/Users/pavel/.local/share/mise/installs/npm-tanstack-cli/latest/bin:/Users/pavel/.local/share/mise/installs/npm-hunkdiff/latest/bin:/Users/pavel/.local/share/mise/installs/hk/latest:/Users/pavel/.local/share/mise/installs/npm-ast-grep-cli/latest/bin:/Users/pavel/.local/bin:/bin:/Users/pavel/.cargo/bin:/Users/pavel/.lmstudio/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pkg/env/active/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/Users/pavel/.orbstack/bin:/Applications/Codex.app/Contents/Resources"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "6d25aa7656feac858f3a3bdaea5bcbab0dbfd426c9de8e6931ce90c399ee8e4f,e13fd947e846d3d306e9249dd3c73d14931b6494803dbafb16cef85e6add9506"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "028a14b6eaa6d98dac2aae00764345ab9f244801ed8493d42b9af3be5575006e,f204d340535055781952b10ed396de20b842f00a19e430852f7e121ad1ce91f6"
 NODE_REPL_TRUSTED_CODE_PATHS = "/Users/pavel/.codex"
 
 [tui]
@@ -120,22 +133,24 @@ NODE_REPL_NODE_MODULE_DIRS = "/Applications/ChatGPT.app/Contents/Resources/cua_n
 NODE_REPL_NODE_PATH = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
 NODE_REPL_TRUSTED_CODE_PATHS = "/Users/pavel/.codex"
 CODEX_HOME = "/Users/pavel/.codex"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "6d25aa7656feac858f3a3bdaea5bcbab0dbfd426c9de8e6931ce90c399ee8e4f,e13fd947e846d3d306e9249dd3c73d14931b6494803dbafb16cef85e6add9506"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "028a14b6eaa6d98dac2aae00764345ab9f244801ed8493d42b9af3be5575006e,f204d340535055781952b10ed396de20b842f00a19e430852f7e121ad1ce91f6"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
 NODE_REPL_INSTRUCTIONS_USE_CASE_COMPUTER_USE = "Control desktop apps on macOS through Computer Use."
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.721.41059"
+BROWSER_USE_CODEX_APP_VERSION = "26.727.51351"
+SKY_CUA_SERVICE_PATH = "/Users/pavel/.codex/computer-use/Codex Computer Use.app"
 CODEX_CLI_PATH = "/Applications/ChatGPT.app/Contents/Resources/codex"
 
 [mcp_servers.posthog]
 url = "https://mcp.posthog.com/mcp"
 
 [mcp_servers.computer-use]
-command = "/Users/pavel/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient"
+command = "./Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient"
 args = ["mcp"]
-enabled = true
+cwd = "."
+enabled = false
 
 [plugins."google-calendar@openai-curated"]
 enabled = false
@@ -180,12 +195,12 @@ enabled = true
 enabled = true
 
 [marketplaces.openai-bundled]
-last_updated = "2026-07-26T11:03:50Z"
+last_updated = "2026-08-01T08:02:43Z"
 source_type = "local"
 source = "/Users/pavel/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
-last_updated = "2026-07-28T08:39:42Z"
+last_updated = "2026-08-02T21:58:25Z"
 source_type = "local"
 source = "/Users/pavel/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 

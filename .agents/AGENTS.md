@@ -35,6 +35,10 @@ When working on UI:
 - Avoid duplicate copy. Titles and descriptions should communicate different information.
 - Write copy from the user’s perspective: explain the current state and available next action.
 
+## Browser control
+
+- When controlling Chrome, enumerate all connected profiles and their tabs before acting. Choose only when the explicit profile name and exact URL or title identify one tab. Never fall back to the default profile when multiple profiles are connected; ask when ambiguous.
+
 ## Code navigation
 
 - Use `rg` first for known strings, symbols, and call sites.
