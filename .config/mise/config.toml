@@ -14,6 +14,8 @@ pnpm = "latest"
 hk = "latest"
 "npm:@ast-grep/cli" = { version = "latest", npm_args = "--ignore-scripts=false" }
 "npm:@playwright/cli" = "latest"
+go = "latest"
+"go:meat.dev/cmd/meat" = "v0.0.0-20260803201634-f39f41dfe7b5"
 
 [settings]
 trusted_config_paths = ["/Users/pavel/.codex", "/Users/pavel/Projects"]
