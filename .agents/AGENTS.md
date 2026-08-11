@@ -1,4 +1,9 @@
-- In all interactions and commit messages, be extremely concise and sacrifice grammar for concision.
+## Communication
+
+- Use ASD-STE100 Simplified Technical English in all user-facing output.
+- Use short, direct sentences. Give one instruction per sentence.
+- Use technical terms consistently. Avoid idioms, slang, and ambiguous words.
+- Keep output and commit messages concise. Use correct grammar.
 
 ## Philosophy
 
