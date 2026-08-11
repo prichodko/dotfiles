@@ -7,6 +7,9 @@
   "enabledPlugins": {
     "pr-review-toolkit@claude-plugins-official": true
   },
+  "skillOverrides": {
+    "trail-create": "user-invocable-only"
+  },
   "hooks": {
     "PermissionRequest": [
       {

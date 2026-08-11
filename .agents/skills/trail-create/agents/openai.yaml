@@ -1,0 +1,7 @@
+interface:
+  display_name: "trail:create"
+  short_description: "Commit relevant work and create an Entire trail"
+  default_prompt: "Use $trail-create to create an Entire trail for the current work."
+
+policy:
+  allow_implicit_invocation: false
