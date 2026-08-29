@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+exit "${AUTH_TEST_STATUS:-0}"

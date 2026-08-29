@@ -10,9 +10,6 @@ notify = ["/Users/pavel/.codex/computer-use/Codex Computer Use.app/Contents/Shar
 [projects."/Users/pavel/Projects/prichodko/playground"]
 trust_level = "trusted"
 
-[projects."/Users/pavel/Projects/entire/devenv"]
-trust_level = "trusted"
-
 [projects."/Users/pavel/.config/zed"]
 trust_level = "trusted"
 
@@ -331,7 +328,6 @@ show-context-window-usage = false
 global = "zed"
 
 [desktop.open-in-target-preferences.perPath]
-"/Users/pavel/Projects/entire/devenv" = "zed"
 "/Users/pavel/.codex/worktrees/76e3/entire.io" = "zed"
 
 [apps.connector_20205bf7d4e99a89d7154bb849718324]

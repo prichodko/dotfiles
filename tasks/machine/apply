@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#MISE description="Apply the native mise machine bootstrap"
+
+set -euo pipefail
+
+task_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+source "${task_root}/lib/machine/bootstrap.sh"
+
+profile="$(machine_parse_profile "$@")"
+machine_require_mise
+machine_run_mise "$profile" -C "$task_root" bootstrap --skip-dirty --yes --locked

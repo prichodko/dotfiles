@@ -1,0 +1,47 @@
+[bootstrap.packages]
+"apt:ffmpeg" = { os = "linux" }
+"brew:ffmpeg" = { os = "macos" }
+"brew-cask:1password" = { os = "macos", adopt = true }
+"brew-cask:1password-cli" = { os = "macos", adopt = true }
+"brew-cask:claude" = { os = "macos", adopt = true }
+"brew-cask:cleanshot" = { os = "macos", adopt = true }
+"brew-cask:cursor" = { os = "macos", adopt = true }
+"brew-cask:docker-desktop" = { os = "macos", adopt = true }
+"brew-cask:figma" = { os = "macos", adopt = true }
+"brew-cask:firefox" = { os = "macos", adopt = true }
+"brew-cask:ghostty" = { os = "macos", adopt = true }
+"brew-cask:google-chrome" = { os = "macos", adopt = true }
+"brew-cask:google-chrome@canary" = { os = "macos", adopt = true }
+"brew-cask:httpie-desktop" = { os = "macos", adopt = true }
+"brew-cask:hyperkey" = { os = "macos", adopt = true }
+"brew-cask:karabiner-elements" = { os = "macos", adopt = true }
+"brew-cask:linear" = { os = "macos", adopt = true }
+"brew-cask:lm-studio" = { os = "macos", adopt = true }
+"brew-cask:loom" = { os = "macos", adopt = true }
+"brew-cask:opencode-desktop" = { os = "macos", adopt = true }
+"brew-cask:raycast" = { os = "macos", adopt = true }
+"brew-cask:slack" = { os = "macos", adopt = true }
+"brew-cask:spotify" = { os = "macos", adopt = true }
+"brew-cask:visual-studio-code" = { os = "macos", adopt = true }
+"brew-cask:visual-studio-code@insiders" = { os = "macos", adopt = true }
+"brew-cask:zed" = { os = "macos", adopt = true }
+"brew-cask:zoom" = { os = "macos", adopt = true }
+"brew-cask:font-geist-mono" = { os = "macos", adopt = true }
+"brew-cask:font-hack-nerd-font" = { os = "macos", adopt = true }
+"brew-cask:font-jetbrains-mono" = { os = "macos", adopt = true }
+"brew-cask:font-monaspace" = { os = "macos", adopt = true }
+
+[tools]
+"npm:agent-browser" = "latest"
+"npm:calldiff" = "latest"
+"npm:dev3000" = "latest"
+"npm:hunkdiff" = "latest"
+"go:meat.dev/cmd/meat" = "v0.0.0-20260803201634-f39f41dfe7b5"
+"github:can1357/oh-my-pi" = "latest"
+"aqua:ollama/ollama" = "latest"
+"aqua:anomalyco/opencode" = "latest"
+"npm:@playwright/cli" = "latest"
+"npm:portless" = "latest"
+"npm:sharp-cli" = "latest"
+"npm:svgo" = "latest"
+"npm:@tanstack/cli" = "latest"

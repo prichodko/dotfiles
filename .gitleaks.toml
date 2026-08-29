@@ -1,0 +1,14 @@
+title = "dotfiles secret scanning"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "dotfiles-acceptance-secret"
+description = "Dotfiles secret protection acceptance marker"
+regex = '''DOTFILES_TEST_SECRET_[A-Z0-9]{16}'''
+keywords = ["DOTFILES_TEST_SECRET_"]
+
+[[allowlists]]
+description = "Test-only fake credentials"
+paths = ['''(^|/)tests/fixtures/''', '''(^|/)tests/secret-test\.sh$''']

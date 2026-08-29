@@ -1,5 +1,12 @@
 .DS_Store
 
+# Local state and generated bootstrap files
+.env.mise
+.mise.local.toml
+*.local.lock
+tests/tmp/
+node_modules/
+
 # SSH private keys
 .ssh/id_*
 .ssh/*.pem

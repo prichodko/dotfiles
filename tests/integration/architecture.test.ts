@@ -1,0 +1,76 @@
+import { expect, test } from "bun:test"
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+
+const root = new URL("../../", import.meta.url).pathname
+
+test("removed domain name and Effect internals are absent", () => {
+  const removedName = ["de", "venv"].join("")
+  const nameResult = Bun.spawnSync(["rg", "-n", "--hidden", "--glob", "!.git/**", "--glob", "!node_modules/**", removedName, root])
+  expect(nameResult.exitCode).toBe(1)
+  const internals = Bun.spawnSync(["rg", "-n", "effect/(src|internal)", `${root}/src`, `${root}/tasks`, `${root}/bin`])
+  expect(internals.exitCode).toBe(1)
+})
+
+test("source files have no default exports or barrel files", () => {
+  const exports = Bun.spawnSync(["rg", "-n", "export default", `${root}/src`, `${root}/tasks`, `${root}/bin`])
+  expect(exports.exitCode).toBe(1)
+  const barrels = Bun.spawnSync(["find", `${root}/src`, "-name", "index.ts"])
+  expect(barrels.stdout.toString().trim()).toBe("")
+})
+
+test("repository dependencies are excluded from remote transfer", async () => {
+  const project = await Bun.file(`${root}/mise.toml`).text()
+  expect(project).toContain('"node_modules/**"')
+  const bootstrap = await Bun.file(`${root}/tasks/bootstrap`).text()
+  expect(bootstrap).toContain('persistent_root="${HOME}/.dotfiles"')
+  expect(bootstrap).toContain("MACHINE_BOOTSTRAP_ALLOW_LOCAL_FALLBACK")
+  expect(bootstrap).toContain("bun install --frozen-lockfile --ignore-scripts")
+})
+
+test("bootstrap installs from the persistent checkout", () => {
+  const temporaryHome = mkdtempSync(join(tmpdir(), "machine-bootstrap-"))
+  try {
+    const checkout = join(temporaryHome, ".dotfiles")
+    const binaries = join(temporaryHome, "bin")
+    const log = join(temporaryHome, "bun-pwd")
+    mkdirSync(checkout)
+    mkdirSync(binaries)
+    writeFileSync(join(checkout, "package.json"), "{}\n")
+    const fakeBun = join(binaries, "bun")
+    writeFileSync(fakeBun, "#!/bin/sh\npwd > \"$MACHINE_BOOTSTRAP_TEST_LOG\"\n")
+    chmodSync(fakeBun, 0o755)
+    const result = Bun.spawnSync(["bash", `${root}/tasks/bootstrap`], {
+      cwd: root,
+      env: { ...process.env, HOME: temporaryHome, PATH: `${binaries}:${process.env.PATH}`, MACHINE_BOOTSTRAP_TEST_LOG: log },
+      stdout: "pipe",
+      stderr: "pipe"
+    })
+    expect(result.exitCode).toBe(0)
+    expect(readFileSync(log, "utf8").trim()).toBe(checkout)
+  } finally {
+    rmSync(temporaryHome, { recursive: true, force: true })
+  }
+})
+
+test("process environments extend the inherited environment", async () => {
+  const runner = await Bun.file(`${root}/src/process/effect-command-runner.ts`).text()
+  expect(runner).toContain("extendEnv: true")
+  const processSites = Bun.spawnSync(["rg", "-l", "ChildProcess.make", `${root}/src`])
+  expect(processSites.stdout.toString().trim()).toBe(`${root}/src/process/effect-command-runner.ts`)
+})
+
+test("task entrypoints use the shared runtime", async () => {
+  const typeScriptTasks = [
+    "tasks/dotfiles/check.ts",
+    "tasks/dotfiles/pull.ts",
+    "tasks/dotfiles/sync.ts",
+    "tasks/machine/validate.ts",
+    "tasks/machine/exe/create.ts",
+    "tasks/machine/exe/apply.ts"
+  ]
+  for (const task of typeScriptTasks) expect(await Bun.file(`${root}/${task}`).text()).toContain("runProgram")
+  expect(await Bun.file(`${root}/tasks/machine/apply`).text()).toContain("bootstrap.sh")
+  expect(await Bun.file(`${root}/tasks/bootstrap`).text()).toContain("bun install")
+})

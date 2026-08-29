@@ -1,0 +1,12 @@
+min_version = "2026.8.14"
+
+[settings]
+lockfile = true
+idiomatic_version_file_enable_tools = ["node"]
+trusted_config_paths = ["~/.codex", "~/Projects"]
+
+[settings.npm]
+package_manager = "npm"
+
+[env]
+HK_PKL_BACKEND = "pklr"

@@ -1,0 +1,144 @@
+min_version = "2026.8.14"
+
+[settings]
+experimental = true
+lockfile = true
+dotfiles.root = "~/.dotfiles"
+dotfiles.default_mode = "symlink"
+idiomatic_version_file_enable_tools = ["node"]
+
+[settings.npm]
+package_manager = "npm"
+
+[env]
+HK_PKL_BACKEND = "pklr"
+
+[bootstrap.packages]
+"apt:build-essential" = { os = "linux" }
+"apt:btop" = { os = "linux" }
+"apt:ca-certificates" = { os = "linux" }
+"apt:curl" = { os = "linux" }
+"apt:git" = { os = "linux" }
+"apt:gnupg" = { os = "linux" }
+"apt:openssh-client" = { os = "linux" }
+"apt:tar" = { os = "linux" }
+"apt:unzip" = { os = "linux" }
+"apt:xz-utils" = { os = "linux" }
+"apt:zip" = { os = "linux" }
+"apt:zsh" = { os = "linux" }
+"brew:git" = { os = "macos" }
+"brew:btop" = { os = "macos" }
+"brew:eza" = { os = "macos" }
+"brew:gnupg" = { os = "macos" }
+"brew:mise" = { os = "macos" }
+"brew:pinentry-mac" = { os = "macos" }
+"brew:trash" = { os = "macos" }
+"brew:zsh-syntax-highlighting" = { os = "macos" }
+"brew:fzf-tab" = { os = "macos" }
+
+[bootstrap.repos]
+"~/.dotfiles" = { url = "https://github.com/prichodko/dotfiles.git", ref = "main" }
+
+[bootstrap.mise_shell_activate]
+zprofile = "shims"
+zshrc = "activate"
+bash_profile = "shims"
+bashrc = "activate"
+
+[bootstrap.remote]
+source = "."
+install_mise = true
+exclude = [
+  ".codex/**",
+  ".claude/settings.json",
+  ".ssh/config",
+  ".DS_Store",
+  "node_modules/**",
+  "tests/tmp/**",
+]
+
+[dotfiles]
+"~/.aliases" = { source = "~/.dotfiles/user/common/.aliases" }
+"~/.hushlogin" = { source = "~/.dotfiles/user/common/.hushlogin" }
+"~/.zshenv" = { source = "~/.dotfiles/user/common/.zshenv" }
+"~/.bash_profile/machine" = { block = '''
+[ -f "$HOME/.config/shell/common.sh" ] && source "$HOME/.config/shell/common.sh"
+[ -f "$HOME/.config/shell/platform.sh" ] && source "$HOME/.config/shell/platform.sh"
+''' }
+"~/.bashrc/machine" = { block = '''
+[ -f "$HOME/.config/shell/bash.sh" ] && source "$HOME/.config/shell/bash.sh"
+''' }
+"~/.zprofile/machine" = { block = '''
+[ -f "$HOME/.config/shell/common.sh" ] && source "$HOME/.config/shell/common.sh"
+[ -f "$HOME/.config/shell/platform.sh" ] && source "$HOME/.config/shell/platform.sh"
+''' }
+"~/.zshrc/machine" = { block = '''
+[ -f "$HOME/.config/shell/zsh.sh" ] && source "$HOME/.config/shell/zsh.sh"
+''' }
+"~/.gitconfig" = { source = "~/.dotfiles/user/common/.gitconfig" }
+"~/AGENTS.md" = { source = "~/.dotfiles/user/common/.agents/AGENTS.md" }
+"~/.agents/AGENTS.md" = { source = "~/.dotfiles/user/common/.agents/AGENTS.md" }
+"~/.agents/skills" = { source = "~/.dotfiles/.agents/skills" }
+"~/.claude/CLAUDE.md" = { source = "~/.dotfiles/user/common/.agents/AGENTS.md" }
+"~/.claude/settings.json" = { source = "~/.dotfiles/user/common/.claude/settings.json", mode = "copy" }
+"~/.claude/skills" = { source = "~/.dotfiles/.claude/skills", mode = "symlink-each" }
+"~/.codex/machine.config.toml" = { source = "~/.dotfiles/user/common/.codex/machine.config.toml" }
+"~/.config/git/ignore" = { source = "~/.dotfiles/user/common/.config/git/ignore" }
+"~/.config/mise/config.toml" = { source = "~/.dotfiles/user/common/.config/mise/config.toml" }
+"~/.config/mise/config.full.toml" = { source = "~/.dotfiles/mise.full.toml" }
+"~/.config/mise/conf.d/core.toml" = { source = "~/.dotfiles/mise/conf.d/core.toml" }
+"~/.config/mise/mise.lock" = { source = "~/.dotfiles/mise.lock" }
+"~/.config/mise/mise.full.lock" = { source = "~/.dotfiles/mise.full.lock" }
+"~/.config/mise/miserc.toml" = { source = "~/.dotfiles/user/common/.config/mise/miserc.toml" }
+"~/.config/opencode/opencode.jsonc" = { source = "~/.dotfiles/user/common/.config/opencode/opencode.jsonc" }
+"~/.config/shell/bash.sh" = { source = "~/.dotfiles/user/common/.config/shell/bash.sh" }
+"~/.config/shell/codex.sh" = { source = "~/.dotfiles/user/common/.config/shell/codex.sh" }
+"~/.config/shell/common.sh" = { source = "~/.dotfiles/user/common/.config/shell/common.sh" }
+"~/.config/shell/zsh.sh" = { source = "~/.dotfiles/user/common/.config/shell/zsh.sh" }
+"~/.config/starship.toml" = { source = "~/.dotfiles/user/common/.config/starship.toml" }
+"~/.local/bin/machine" = { source = "~/.dotfiles/bin/machine.ts" }
+
+[tasks."dotfiles:check"]
+description = "Validate managed dotfiles and scan for secrets"
+run = "tasks/dotfiles/check.ts"
+
+[tasks."dotfiles:pull"]
+description = "Pull and apply dotfiles without publishing local changes"
+run = "tasks/dotfiles/pull.ts"
+
+[tasks."dotfiles:sync"]
+description = "Synchronize tracked dotfiles changes between trusted Macs"
+run = "tasks/dotfiles/sync.ts"
+
+[tasks."machine:apply"]
+description = "Apply the native mise machine bootstrap"
+run = "tasks/machine/apply"
+
+[tasks."machine:validate"]
+description = "Validate the complete machine environment"
+run = "tasks/machine/validate.ts"
+
+[tasks."machine:exe:create"]
+description = "Create and bootstrap an Exe machine"
+run = "tasks/machine/exe/create.ts"
+
+[tasks."machine:exe:apply"]
+description = "Update and reapply an Exe machine"
+run = "tasks/machine/exe/apply.ts"
+
+[tasks.bootstrap]
+description = "Install repository TypeScript dependencies"
+file = "tasks/bootstrap"
+
+[tasks.typecheck]
+description = "Type-check TypeScript"
+run = "bun run typecheck"
+
+[tasks.test]
+description = "Run safe tests"
+run = [
+  "bun test",
+  "tests/bootstrap/machine-apply.test.sh",
+  "tests/bootstrap/managed-files.test.sh",
+  "tests/bootstrap/shell-startup.test.sh",
+]

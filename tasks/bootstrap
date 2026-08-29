@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#MISE description="Install repository TypeScript dependencies"
+
+set -euo pipefail
+
+persistent_root="${HOME}/.dotfiles"
+if [[ ! -f "$persistent_root/package.json" ]]; then
+  if [[ "${MACHINE_BOOTSTRAP_ALLOW_LOCAL_FALLBACK:-}" != "1" ]]; then
+    printf 'error: The persistent dotfiles checkout is missing: %s\n' "$persistent_root" >&2
+    exit 1
+  fi
+  persistent_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+fi
+
+cd "$persistent_root"
+bun install --frozen-lockfile --ignore-scripts

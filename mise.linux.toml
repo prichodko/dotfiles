@@ -1,0 +1,3 @@
+[dotfiles]
+"~/.config/git/platform.conf" = { source = "~/.dotfiles/user/linux/.config/git/platform.conf" }
+"~/.config/shell/platform.sh" = { source = "~/.dotfiles/user/linux/.config/shell/linux.sh" }

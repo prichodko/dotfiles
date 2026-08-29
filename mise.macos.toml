@@ -1,0 +1,8 @@
+[dotfiles]
+"~/.config/ghostty/config" = { source = "~/.dotfiles/user/macos/.config/ghostty/config" }
+"~/.config/git/platform.conf" = { source = "~/.dotfiles/user/macos/.config/git/platform.conf" }
+"~/.config/karabiner/karabiner.json" = { source = "~/.dotfiles/user/macos/.config/karabiner/karabiner.json" }
+"~/.config/shell/platform.sh" = { source = "~/.dotfiles/user/macos/.config/shell/macos.sh" }
+"~/.config/zed/keymap.json" = { source = "~/.dotfiles/user/macos/.config/zed/keymap.json" }
+"~/.config/zed/settings.json" = { source = "~/.dotfiles/user/macos/.config/zed/settings.json" }
+"~/.ssh/config" = { source = "~/.dotfiles/user/macos/.ssh/config" }

@@ -1,76 +1,109 @@
-# dotfiles
+# Machine and dotfiles automation
 
-managed with [dot](https://github.com/prichodko/dot) - bash tool for dotfiles via git + symlinks
+This repository manages portable user files, tools, and local or remote machines.
 
-## setup
+It requires mise `2026.8.14` or newer.
+
+## Bootstrap
+
+Clone the repository at `~/.dotfiles`.
+
+Apply the core profile:
 
 ```sh
-dot init https://github.com/prichodko/dotfiles
+mise run machine:apply
 ```
 
-## cli
+Apply the full profile:
 
-### shell enhancements
+```sh
+mise run machine:apply full
+```
 
-| tool                    | what it does                                |
-| ----------------------- | ------------------------------------------- |
-| starship                | minimal prompt with git info                |
-| fzf                     | fuzzy finder (Ctrl+R history, Ctrl+T files) |
-| zsh-autosuggestions     | fish-like suggestions                       |
-| zsh-syntax-highlighting | command highlighting                        |
+The apply task runs `mise bootstrap --skip-dirty --yes --locked`.
 
-### modern replacements
+The final bootstrap task installs the pinned TypeScript dependencies with Bun.
 
-| alias  | tool       | replaces | notes                           |
-| ------ | ---------- | -------- | ------------------------------- |
-| `ls`   | eza        | ls       | colored output, icons           |
-| `ll`   | eza -la    | ls -la   | long list                       |
-| `lt`   | eza --tree | tree     | tree view (2 levels)            |
-| `rm`   | trash      | rm       | moves to Trash (safer)          |
-| `top`  | btop       | top/htop | better process viewer           |
-| `f`    | fd         | find     | fast, respects .gitignore       |
-| `grep` | rg         | grep     | ripgrep, much faster            |
-| `help` | tldr       | man      | quick command examples          |
-| `cd`   | zoxide     | cd       | smart jump, learns frecency     |
-| `cat`  | bat        | -        | not aliased, use `bat` directly |
+## Dotfiles tasks
 
-### shortcuts
+```sh
+mise run dotfiles:check
+mise run dotfiles:pull
+mise run dotfiles:sync
+```
 
-| alias | command       |
-| ----- | ------------- |
-| `..`  | cd ..         |
-| `...` | cd ../..      |
-| `cdp` | cd ~/Projects |
-| `g`   | git           |
-| `gs`  | git status    |
-| `y`   | yarn          |
-| `p`   | pnpm          |
-| `pi`  | pnpm install  |
-| `b`   | bun           |
-| `bi`  | bun install   |
-| `br`  | bun run       |
-| `bd`  | bun dev       |
+`dotfiles:check` validates TypeScript, Shell, mise configuration, locks, managed links, and secrets.
 
-### other tools
+`dotfiles:pull` requires a clean tracked tree.
 
-| tool     | what it does                |
-| -------- | --------------------------- |
-| gh       | GitHub CLI                  |
-| mise     | version manager (node, bun) |
-| jq       | JSON processor              |
-| ffmpeg   | video/audio processing      |
-| websocat | websocket client            |
+It fast-forwards and applies `origin/main`.
 
-## tracked files
+It preserves untracked files.
 
-- `.zshrc` `.zshenv` `.zprofile` - zsh config
-- `.bashrc` `.bash_profile` - bash config
-- `.aliases` - shell aliases
-- `.gitconfig` `.gitignore` - git config
-- `.ssh/config` - ssh hosts
-- `.config/starship.toml` - prompt
-- `.config/zed/` - zed editor
-- `.config/karabiner/` - keyboard remapping
-- `.config/opencode/` - opencode config
-- `.claude/` - claude config
-- `.brewfile` - homebrew packages
+It never commits or pushes.
+
+`dotfiles:sync` runs only on macOS.
+
+It stages modified and deleted tracked files only.
+
+It tests a rebase in an isolated worktree before it changes live `main`.
+
+It keeps a conflict worktree for inspection.
+
+It pushes without force.
+
+It retries one push race.
+
+## Machine tasks
+
+```sh
+mise run machine:validate
+mise run machine:validate full
+mise run machine:exe:create -- work
+mise run machine:exe:create -- work --profile full
+mise run machine:exe:apply -- work
+mise run machine:exe:apply -- work --profile full
+```
+
+Remote machine names are dynamic.
+
+The `local` name is reserved for the current machine.
+
+The tasks do not copy credentials.
+
+Complete remote authentication manually.
+
+## Machine command
+
+The managed `~/.local/bin/machine` link points to `~/.dotfiles/bin/machine.ts`.
+
+```text
+machine create <name> [--profile core|full] [--cpu 2] [--memory 8GB] [--disk 25GB]
+machine apply [target] [--profile core|full]
+machine validate [target] [--profile core|full]
+machine list [--json]
+machine status [target] [--json]
+machine shell <name> [-- <command>...]
+machine remove <name> [--yes]
+```
+
+Create and remote apply require clean local `main` that matches `origin/main`.
+
+A failed create keeps the remote machine.
+
+Only `machine remove` deletes a remote machine.
+
+Removal requires confirmation in a terminal.
+
+Removal requires `--yes` without a terminal.
+
+## Development
+
+```sh
+bun install --frozen-lockfile --ignore-scripts
+mise run typecheck
+mise run test
+mise run dotfiles:check
+```
+
+The TypeScript tests do not connect to Exe or push to GitHub.

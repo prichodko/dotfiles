@@ -1,0 +1,46 @@
+# navigation
+alias ..='cd ..'
+alias ...='cd ../..'
+alias cdp='cd ~/Projects'
+
+# modern replacements
+alias ls='eza'
+alias ll='eza -la --no-permissions'
+alias lll='eza -la --no-permissions --tree --level=2'
+alias lt='eza --tree --level=2'
+alias rm='trash'
+alias top='btop'
+alias f='fd'
+alias grep='rg'
+alias help='tldr'
+
+# tools
+i() {
+  if [[ -f bun.lock || -f bun.lockb ]]; then
+    bun install
+  elif [[ -f pnpm-lock.yaml ]]; then
+    pnpm install
+  elif [[ -f yarn.lock ]]; then
+    yarn install
+  elif [[ -f package-lock.json ]]; then
+    npm install
+  elif [[ -f package.json ]]; then
+    npm install
+  else
+    echo "No package.json found"
+    return 1
+  fi
+}
+alias y='yarn'
+alias p='pnpm'
+alias b='bun'
+alias bi='bun install'
+alias br='bun run'
+alias bd='bun dev'
+alias g='git'
+alias gs='git status'
+alias cc='claude --dangerously-skip-permissions'
+alias ccc='claude --dangerously-skip-permissions --continue'
+alias ccf='claude --dangerously-skip-permissions --continue --fork-session'
+alias c='codex -c model_reasoning_effort="high" --dangerously-bypass-approvals-and-sandbox -c model_reasoning_summary="detailed" -c model_supports_reasoning_summaries=true'
+alias o='opencode'
