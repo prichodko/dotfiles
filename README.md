@@ -97,6 +97,26 @@ Removal requires confirmation in a terminal.
 
 Removal requires `--yes` without a terminal.
 
+## Codex configuration
+
+Portable Codex CLI defaults live in `user/common/.codex/machine.config.toml`.
+
+The managed Shell function runs Codex with `--profile machine`.
+
+Codex loads project configuration before the selected profile and user configuration.
+
+See the official [configuration basics](https://developers.openai.com/codex/config-basic/) and [configuration reference](https://developers.openai.com/codex/config-reference/).
+
+The live `~/.codex/config.toml` can contain generated application state, trusted project paths, runtime hashes, application versions, and cache paths.
+
+The machine bootstrap does not apply or overwrite this live file.
+
+The repository still tracks `.codex/config.toml` for the existing setup.
+
+Review its changes separately from portable dotfiles changes.
+
+Do not include generated state in an ordinary dotfiles commit.
+
 ## Development
 
 ```sh
