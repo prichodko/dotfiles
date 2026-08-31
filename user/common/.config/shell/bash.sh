@@ -1,6 +1,5 @@
 [[ -f "$HOME/.config/shell/common.sh" ]] && source "$HOME/.config/shell/common.sh"
 [[ -f "$HOME/.config/shell/platform.sh" ]] && source "$HOME/.config/shell/platform.sh"
-[[ -f "$HOME/.config/shell/codex.sh" ]] && source "$HOME/.config/shell/codex.sh"
 [[ -f "$HOME/.aliases" ]] && source "$HOME/.aliases"
 
 HISTSIZE=10000

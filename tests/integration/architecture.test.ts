@@ -67,10 +67,27 @@ test("task entrypoints use the shared runtime", async () => {
     "tasks/dotfiles/pull.ts",
     "tasks/dotfiles/sync.ts",
     "tasks/machine/validate.ts",
+    "tasks/machine/apply-codex-config.ts",
     "tasks/machine/exe/create.ts",
     "tasks/machine/exe/apply.ts"
   ]
   for (const task of typeScriptTasks) expect(await Bun.file(`${root}/${task}`).text()).toContain("runProgram")
   expect(await Bun.file(`${root}/tasks/machine/apply`).text()).toContain("bootstrap.sh")
   expect(await Bun.file(`${root}/tasks/bootstrap`).text()).toContain("bun install")
+  expect(await Bun.file(`${root}/tasks/bootstrap`).text()).toContain("apply-codex-config.ts")
+})
+
+test("Codex uses a tracked base and an untracked local configuration", async () => {
+  const project = await Bun.file(`${root}/mise.toml`).text()
+  const bootstrap = await Bun.file(`${root}/tasks/bootstrap`).text()
+  const shellFiles = await Promise.all([
+    Bun.file(`${root}/user/common/.config/shell/bash.sh`).text(),
+    Bun.file(`${root}/user/common/.config/shell/zsh.sh`).text()
+  ])
+
+  expect(await Bun.file(`${root}/user/common/.codex/base.toml`).exists()).toBe(true)
+  expect(await Bun.file(`${root}/user/common/.codex/machine.config.toml`).exists()).toBe(false)
+  expect(project).not.toContain("machine.config.toml")
+  expect(bootstrap).toContain("apply-codex-config.ts")
+  for (const shellFile of shellFiles) expect(shellFile).not.toContain("--profile machine")
 })

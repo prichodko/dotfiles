@@ -82,7 +82,6 @@ exclude = [
 "~/.claude/CLAUDE.md" = { source = "~/.dotfiles/user/common/.agents/AGENTS.md" }
 "~/.claude/settings.json" = { source = "~/.dotfiles/user/common/.claude/settings.json", mode = "copy" }
 "~/.claude/skills" = { source = "~/.dotfiles/.claude/skills", mode = "symlink-each" }
-"~/.codex/machine.config.toml" = { source = "~/.dotfiles/user/common/.codex/machine.config.toml" }
 "~/.config/git/ignore" = { source = "~/.dotfiles/user/common/.config/git/ignore" }
 "~/.config/mise/config.toml" = { source = "~/.dotfiles/user/common/.config/mise/config.toml" }
 "~/.config/mise/config.full.toml" = { source = "~/.dotfiles/mise.full.toml" }
@@ -92,7 +91,6 @@ exclude = [
 "~/.config/mise/miserc.toml" = { source = "~/.dotfiles/user/common/.config/mise/miserc.toml" }
 "~/.config/opencode/opencode.jsonc" = { source = "~/.dotfiles/user/common/.config/opencode/opencode.jsonc" }
 "~/.config/shell/bash.sh" = { source = "~/.dotfiles/user/common/.config/shell/bash.sh" }
-"~/.config/shell/codex.sh" = { source = "~/.dotfiles/user/common/.config/shell/codex.sh" }
 "~/.config/shell/common.sh" = { source = "~/.dotfiles/user/common/.config/shell/common.sh" }
 "~/.config/shell/zsh.sh" = { source = "~/.dotfiles/user/common/.config/shell/zsh.sh" }
 "~/.config/starship.toml" = { source = "~/.dotfiles/user/common/.config/starship.toml" }

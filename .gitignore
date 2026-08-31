@@ -6,6 +6,7 @@
 *.local.lock
 tests/tmp/
 node_modules/
+/.codex/config.toml
 
 # SSH private keys
 .ssh/id_*

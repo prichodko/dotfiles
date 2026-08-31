@@ -1,4 +1,5 @@
 import { Context, Data, Effect, Layer } from "effect"
+import { CodexConfiguration } from "../../codex/config/codex-configuration.ts"
 import { DOTFILES_ROOT } from "../../dotfiles/repository/live-dotfiles-repository.ts"
 import { RepositoryValidation } from "../../dotfiles/validation/validate-repository.ts"
 import { CommandRunner, describeCommandError } from "../../process/command-runner.ts"
@@ -28,6 +29,7 @@ export const allSelectedToolsAreActive = (value: unknown): boolean => {
 export const LiveMachineValidationLayer = Layer.effect(MachineValidation, Effect.gen(function*() {
   const runner = yield* CommandRunner
   const repositoryValidation = yield* RepositoryValidation
+  const codexConfiguration = yield* CodexConfiguration
   const run = (check: string, command: string, args: ReadonlyArray<string>, profile: MachineProfile, allowFailure = false) => runner.run({
     command,
     args,
@@ -63,10 +65,9 @@ export const LiveMachineValidationLayer = Layer.effect(MachineValidation, Effect
     if (!allSelectedToolsAreActive(currentToolsValue)) {
       return yield* new MachineValidationFailure({ check: "active tools", detail: "One or more selected tools are not installed and active." })
     }
-    const profileFile = yield* Effect.promise(() => Bun.file(`${DOTFILES_ROOT}/user/common/.codex/machine.config.toml`).text())
-    if (!profileFile.includes('model = "gpt-5.6-sol"') || !profileFile.includes('model_reasoning_effort = "high"')) {
-      return yield* new MachineValidationFailure({ check: "Codex profile", detail: "The machine Codex profile is invalid." })
-    }
+    yield* codexConfiguration.validateApplied.pipe(
+      Effect.mapError((cause) => new MachineValidationFailure({ check: "Codex configuration", detail: cause.detail, cause }))
+    )
     const authentication = yield* Effect.all([
       run("GitHub authentication", "gh", ["auth", "status"], profile, true),
       run("Entire authentication", "entire", ["auth", "status"], profile, true),

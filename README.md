@@ -228,23 +228,25 @@ Wildcard `*.exe.xyz` hosts use the same Exe user and identity agent.
 
 ## Codex configuration
 
-Portable Codex CLI defaults live in `user/common/.codex/machine.config.toml`.
+Portable Codex defaults live in `user/common/.codex/base.toml`.
 
-The managed Shell function runs Codex with `--profile machine`.
+The final machine bootstrap task merges every base value into `~/.codex/config.toml`.
 
-Codex loads project configuration before the selected profile and user configuration.
+Base values override matching local values.
+
+The merge preserves every local value that the base does not own.
+
+The merge writes the local file atomically only when a managed value changed.
+
+Codex runs without a managed profile wrapper.
 
 See the official [configuration basics](https://developers.openai.com/codex/config-basic/) and [configuration reference](https://developers.openai.com/codex/config-reference/).
 
 The live `~/.codex/config.toml` can contain generated application state, trusted project paths, runtime hashes, application versions, and cache paths.
 
-The machine bootstrap does not apply or overwrite this live file.
+The live file is local state and is not tracked.
 
-The repository still tracks `.codex/config.toml` for the existing setup.
-
-Review its changes separately from portable dotfiles changes.
-
-Do not include generated state in an ordinary dotfiles commit.
+Do not link the live file into the repository.
 
 ## Development
 

@@ -22,4 +22,6 @@ test("the final bootstrap task is explicit", async () => {
   const project = await Bun.file(`${root}/mise.toml`).text()
   expect(project).toContain("[tasks.bootstrap]")
   expect(project).toContain('file = "tasks/bootstrap"')
+  expect(await Bun.file(`${root}/user/common/.codex/base.toml`).exists()).toBe(true)
+  expect(project).not.toContain("machine.config.toml")
 })

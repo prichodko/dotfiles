@@ -2,6 +2,7 @@ import { BunRuntime, BunServices } from "@effect/platform-bun"
 import { Cause, Console, Effect, Layer, Option } from "effect"
 import type * as LayerTypes from "effect/Layer"
 import { CliError } from "effect/unstable/cli"
+import { LiveCodexConfigurationLayer } from "../codex/config/codex-configuration.ts"
 import { LiveDotfilesRepositoryLayer } from "../dotfiles/repository/live-dotfiles-repository.ts"
 import { LiveRepositoryValidationLayer } from "../dotfiles/validation/validate-repository.ts"
 import { ExeMachineProviderLayer } from "../machine/providers/exe/exe-machine-provider.ts"
@@ -12,14 +13,16 @@ import { EffectCommandRunnerLayer } from "../process/effect-command-runner.ts"
 const commandRunnerLayer = EffectCommandRunnerLayer.pipe(Layer.provide(BunServices.layer))
 const platformLayer = Layer.merge(BunServices.layer, commandRunnerLayer)
 const repositoryValidationLayer = LiveRepositoryValidationLayer.pipe(Layer.provide(platformLayer))
+const codexConfigurationLayer = LiveCodexConfigurationLayer.pipe(Layer.provide(BunServices.layer))
 
 export const ApplicationLayer = Layer.mergeAll(
   platformLayer,
+  codexConfigurationLayer,
   LiveNotificationServiceLayer.pipe(Layer.provide(commandRunnerLayer)),
   LiveDotfilesRepositoryLayer.pipe(Layer.provide(platformLayer)),
   repositoryValidationLayer,
   ExeMachineProviderLayer.pipe(Layer.provide(commandRunnerLayer)),
-  LiveMachineValidationLayer.pipe(Layer.provide(Layer.merge(commandRunnerLayer, repositoryValidationLayer)))
+  LiveMachineValidationLayer.pipe(Layer.provide(Layer.mergeAll(commandRunnerLayer, repositoryValidationLayer, codexConfigurationLayer)))
 )
 
 const formatFailure = (error: unknown, cause: Cause.Cause<unknown>): string => {

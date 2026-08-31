@@ -1,4 +1,5 @@
 import { Context, Data, Effect, FileSystem, Layer } from "effect"
+import { parseCodexConfig } from "../../codex/config/codex-config.ts"
 import { CommandRunner, describeCommandError } from "../../process/command-runner.ts"
 import { DOTFILES_ROOT } from "../repository/live-dotfiles-repository.ts"
 
@@ -31,7 +32,14 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
     Effect.mapError((cause) => new RepositoryValidationFailure({ check: "git", detail: String(cause), cause }))
   )
   const validateShell = Effect.gen(function*() {
-    const tracked = (yield* gitOutput(["ls-files", "-co", "--exclude-standard", "lib", "tasks", "tests", "user"])).split("\n").filter(Boolean)
+    const listed = (yield* gitOutput(["ls-files", "-co", "--exclude-standard", "lib", "tasks", "tests", "user"])).split("\n").filter(Boolean)
+    const tracked: Array<string> = []
+    for (const path of listed) {
+      const exists = yield* fileSystem.exists(`${DOTFILES_ROOT}/${path}`).pipe(
+        Effect.mapError((cause) => new RepositoryValidationFailure({ check: "Shell syntax", detail: `The file could not be inspected: ${path}`, cause }))
+      )
+      if (exists) tracked.push(path)
+    }
     const bashFiles = tracked.filter((path) => path.endsWith(".sh") || path === "tasks/bootstrap" || path === "tasks/machine/apply").map((path) => `${DOTFILES_ROOT}/${path}`)
     const zshFiles = tracked.filter((path) => /zsh|\.zshenv|\.zprofile|\.zshrc/.test(path)).map((path) => `${DOTFILES_ROOT}/${path}`)
     yield* Effect.forEach(bashFiles, (path) => run(`bash syntax: ${path}`, "bash", ["-n", path]), { concurrency: "unbounded", discard: true })
@@ -59,8 +67,17 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
     const internalImports = yield* runner.run({ command: "rg", args: ["-n", "effect/(src|internal)", `${DOTFILES_ROOT}/src`, `${DOTFILES_ROOT}/tasks`, `${DOTFILES_ROOT}/bin`], cwd: DOTFILES_ROOT, allowFailure: true })
     if (internalImports.exitCode === 0) return yield* new RepositoryValidationFailure({ check: "architecture", detail: `An Effect internal import remains:\n${internalImports.stdout}` })
   }).pipe(Effect.mapError((cause) => cause instanceof RepositoryValidationFailure ? cause : new RepositoryValidationFailure({ check: "architecture", detail: String(cause), cause })))
+  const validateCodexBase = fileSystem.readFileString(`${DOTFILES_ROOT}/user/common/.codex/base.toml`).pipe(
+    Effect.mapError((cause) => new RepositoryValidationFailure({ check: "Codex base", detail: "The Codex base configuration could not be read.", cause })),
+    Effect.flatMap((source) => Effect.try({
+      try: () => parseCodexConfig(source),
+      catch: (cause) => new RepositoryValidationFailure({ check: "Codex base", detail: "The Codex base configuration is not valid TOML.", cause })
+    })),
+    Effect.asVoid
+  )
   const validate = Effect.gen(function*() {
     yield* run("TypeScript", "bun", ["run", "typecheck"])
+    yield* validateCodexBase
     yield* validateShell
     yield* Effect.all([
       run("mise macOS configuration", "mise", ["-C", DOTFILES_ROOT, "-E", "macos", "config", "ls"], miseEnv("core")),
