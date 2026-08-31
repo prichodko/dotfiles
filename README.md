@@ -1,6 +1,6 @@
-# Machine and dotfiles automation
+# dotfiles
 
-This repository manages portable user files, tools, and local or remote machines.
+Portable configuration, tools, and lifecycle management for local and remote machines.
 
 Mise is the public task runner and bootstrap system.
 
