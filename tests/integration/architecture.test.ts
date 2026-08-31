@@ -74,7 +74,9 @@ test("task entrypoints use the shared runtime", async () => {
     "tasks/machine/exe/apply.ts"
   ]
   for (const task of typeScriptTasks) expect(await Bun.file(`${root}/${task}`).text()).toContain("runProgram")
-  expect(await Bun.file(`${root}/tasks/machine/apply`).text()).toContain("bootstrap.sh")
+  const machineApply = await Bun.file(`${root}/tasks/machine/apply`).text()
+  expect(machineApply).toContain("bootstrap --skip-dirty --yes --locked")
+  expect(machineApply).not.toContain("lib/machine")
   expect(await Bun.file(`${root}/tasks/bootstrap`).text()).toContain("bun install")
   expect(await Bun.file(`${root}/tasks/bootstrap`).text()).toContain("apply-codex-config.ts")
 })

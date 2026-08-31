@@ -3,19 +3,24 @@
 set -euo pipefail
 
 test_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
-source "$test_root/lib/machine/bootstrap.sh"
+test_state="$(mktemp -d)"
+trap 'rm -rf "$test_state"' EXIT
+test_log="$test_state/mise.log"
+test_path="$test_root/tests/fixtures/bin:$PATH"
 
-[[ "$(machine_parse_profile)" == "core" ]]
-[[ "$(machine_parse_profile full)" == "full" ]]
-if machine_parse_profile other >/dev/null 2>&1; then
-  printf 'machine_parse_profile accepted invalid input.\n' >&2
-  exit 1
-fi
-machine_version_at_least 2026.8.16 2026.8.16
-machine_version_at_least 2027.1.0 2026.8.16
-if machine_version_at_least 2026.8.15 2026.8.16; then
-  printf 'machine_version_at_least accepted an old version.\n' >&2
-  exit 1
-fi
+HOME="$test_state" PATH="$test_path" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply"
+HOME="$test_state" PATH="$test_path" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply" full
+for invalid_arguments in "other" "full extra"; do
+  read -r -a arguments <<< "$invalid_arguments"
+  if HOME="$test_state" PATH="$test_path" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply" "${arguments[@]}" >/dev/null 2>&1; then
+    printf 'machine apply accepted invalid arguments: %s\n' "$invalid_arguments" >&2
+    exit 1
+  fi
+done
+
+expected_command="-C $test_root bootstrap --skip-dirty --yes --locked"
+[[ "$(sed -n '1p' "$test_log")" == $'core\t'"$expected_command" ]]
+[[ "$(sed -n '2p' "$test_log")" == $'full\t'"$expected_command" ]]
+[[ "$(wc -l < "$test_log" | tr -d ' ')" == "2" ]]
 
 printf 'machine-apply.test: passed\n'
