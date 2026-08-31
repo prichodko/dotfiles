@@ -1,0 +1,7 @@
+interface:
+  display_name: "trail:findings"
+  short_description: "Read findings from the current Entire trail"
+  default_prompt: "Use $trail-findings to read findings from the current Entire trail."
+
+policy:
+  allow_implicit_invocation: false
