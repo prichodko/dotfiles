@@ -1,5 +1,6 @@
 import { Context, Data, Effect, FileSystem, Layer } from "effect"
 import { parseCodexConfig } from "../../codex/config/codex-config.ts"
+import { HkConfiguration } from "../../hk/configuration/hk-configuration.ts"
 import { CommandRunner, describeCommandError } from "../../process/command-runner.ts"
 import { DOTFILES_ROOT } from "../repository/live-dotfiles-repository.ts"
 
@@ -18,6 +19,7 @@ export const dotfileStatusArguments = ["-C", DOTFILES_ROOT, "bootstrap", "dotfil
 export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, Effect.gen(function*() {
   const runner = yield* CommandRunner
   const fileSystem = yield* FileSystem.FileSystem
+  const hkConfiguration = yield* HkConfiguration
   const miseEnv = (profile: "core" | "full") => ({
     MISE_ENV: profile === "full" ? "full" : "",
     MISE_IGNORED_CONFIG_PATHS: `${process.env.HOME}/.config/mise/config.toml:${DOTFILES_ROOT}/.config/mise/config.toml`
@@ -78,6 +80,9 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
   const validate = Effect.gen(function*() {
     yield* run("TypeScript", "bun", ["run", "typecheck"])
     yield* validateCodexBase
+    yield* hkConfiguration.validateSource.pipe(
+      Effect.mapError((cause) => new RepositoryValidationFailure({ check: "hk configuration", detail: cause.detail, cause }))
+    )
     yield* validateShell
     yield* Effect.all([
       run("mise macOS configuration", "mise", ["-C", DOTFILES_ROOT, "-E", "macos", "config", "ls"], miseEnv("core")),

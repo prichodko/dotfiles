@@ -77,6 +77,8 @@ Effect is a repository dependency.
 
 It is not installed globally.
 
+The bootstrap also installs global hk hooks and applies the portable Codex base configuration.
+
 ## Managed user files
 
 Common user files come from `user/common/`.
@@ -247,6 +249,24 @@ The live `~/.codex/config.toml` can contain generated application state, trusted
 The live file is local state and is not tracked.
 
 Do not link the live file into the repository.
+
+## Git hooks and formatting
+
+Mise installs Homebrew Git on macOS and Linux.
+
+The platform Shell configuration puts the Homebrew prefix before the system path.
+
+Git 2.54 or newer provides config-based global hooks.
+
+The global hk policy lives in `user/common/.config/hk/config.pkl`.
+
+It runs oxfmt on staged supported files when `node_modules/.bin/oxfmt` exists in the repository.
+
+Repositories without local oxfmt do not run the formatter.
+
+The managed `.gitconfig` stores portable config-based hooks for commit messages, pre-commit, pre-push, and commit-message preparation.
+
+Each hook uses `mise x -- hk` so it receives the repository environment without an absolute machine path.
 
 ## Development
 

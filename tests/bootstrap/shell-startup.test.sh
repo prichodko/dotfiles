@@ -12,4 +12,7 @@ while IFS= read -r zsh_file; do
   zsh -n "$zsh_file"
 done < <(find "$test_root/user" -type f \( -name '*zsh*.sh' -o -name '.zshenv' \) | sort -u)
 
+rg -Fq 'eval "$(/opt/homebrew/bin/brew shellenv)"' "$test_root/user/macos/.config/shell/macos.sh"
+rg -Fq 'export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$HOME/.local/bin:$PATH"' "$test_root/user/linux/.config/shell/linux.sh"
+
 printf 'shell-startup.test: passed\n'

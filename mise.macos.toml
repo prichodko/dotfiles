@@ -1,3 +1,6 @@
+[env]
+_.path = ["/opt/homebrew/bin", "/opt/homebrew/sbin"]
+
 [dotfiles]
 "~/.config/ghostty/config" = { source = "~/.dotfiles/user/macos/.config/ghostty/config" }
 "~/.config/git/platform.conf" = { source = "~/.dotfiles/user/macos/.config/git/platform.conf" }

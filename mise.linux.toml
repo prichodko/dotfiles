@@ -1,3 +1,6 @@
+[env]
+_.path = ["/home/linuxbrew/.linuxbrew/bin", "/home/linuxbrew/.linuxbrew/sbin"]
+
 [dotfiles]
 "~/.config/git/platform.conf" = { source = "~/.dotfiles/user/linux/.config/git/platform.conf" }
 "~/.config/shell/platform.sh" = { source = "~/.dotfiles/user/linux/.config/shell/linux.sh" }

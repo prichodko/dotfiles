@@ -12,6 +12,7 @@ package_manager = "npm"
 
 [env]
 HK_PKL_BACKEND = "pklr"
+HK_MISE = "1"
 
 [bootstrap.packages]
 "apt:build-essential" = { os = "linux" }
@@ -26,7 +27,7 @@ HK_PKL_BACKEND = "pklr"
 "apt:xz-utils" = { os = "linux" }
 "apt:zip" = { os = "linux" }
 "apt:zsh" = { os = "linux" }
-"brew:git" = { os = "macos" }
+"brew:git" = { os = ["linux", "macos"] }
 "brew:btop" = { os = "macos" }
 "brew:eza" = { os = "macos" }
 "brew:gnupg" = { os = "macos" }
@@ -83,6 +84,7 @@ exclude = [
 "~/.claude/settings.json" = { source = "~/.dotfiles/user/common/.claude/settings.json", mode = "copy" }
 "~/.claude/skills" = { source = "~/.dotfiles/.claude/skills", mode = "symlink-each" }
 "~/.config/git/ignore" = { source = "~/.dotfiles/user/common/.config/git/ignore" }
+"~/.config/hk/config.pkl" = { source = "~/.dotfiles/user/common/.config/hk/config.pkl" }
 "~/.config/mise/config.toml" = { source = "~/.dotfiles/user/common/.config/mise/config.toml" }
 "~/.config/mise/config.full.toml" = { source = "~/.dotfiles/mise.full.toml" }
 "~/.config/mise/conf.d/core.toml" = { source = "~/.dotfiles/mise/conf.d/core.toml" }

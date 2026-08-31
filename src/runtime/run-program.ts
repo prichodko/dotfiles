@@ -5,6 +5,7 @@ import { CliError } from "effect/unstable/cli"
 import { LiveCodexConfigurationLayer } from "../codex/config/codex-configuration.ts"
 import { LiveDotfilesRepositoryLayer } from "../dotfiles/repository/live-dotfiles-repository.ts"
 import { LiveRepositoryValidationLayer } from "../dotfiles/validation/validate-repository.ts"
+import { LiveHkConfigurationLayer } from "../hk/configuration/hk-configuration.ts"
 import { ExeMachineProviderLayer } from "../machine/providers/exe/exe-machine-provider.ts"
 import { LiveMachineValidationLayer } from "../machine/validation/validate-machine.ts"
 import { LiveNotificationServiceLayer } from "../notification/live-notification-service.ts"
@@ -12,17 +13,19 @@ import { EffectCommandRunnerLayer } from "../process/effect-command-runner.ts"
 
 const commandRunnerLayer = EffectCommandRunnerLayer.pipe(Layer.provide(BunServices.layer))
 const platformLayer = Layer.merge(BunServices.layer, commandRunnerLayer)
-const repositoryValidationLayer = LiveRepositoryValidationLayer.pipe(Layer.provide(platformLayer))
 const codexConfigurationLayer = LiveCodexConfigurationLayer.pipe(Layer.provide(BunServices.layer))
+const hkConfigurationLayer = LiveHkConfigurationLayer.pipe(Layer.provide(platformLayer))
+const repositoryValidationLayer = LiveRepositoryValidationLayer.pipe(Layer.provide(Layer.merge(platformLayer, hkConfigurationLayer)))
 
 export const ApplicationLayer = Layer.mergeAll(
   platformLayer,
   codexConfigurationLayer,
+  hkConfigurationLayer,
   LiveNotificationServiceLayer.pipe(Layer.provide(commandRunnerLayer)),
   LiveDotfilesRepositoryLayer.pipe(Layer.provide(platformLayer)),
   repositoryValidationLayer,
   ExeMachineProviderLayer.pipe(Layer.provide(commandRunnerLayer)),
-  LiveMachineValidationLayer.pipe(Layer.provide(Layer.mergeAll(commandRunnerLayer, repositoryValidationLayer, codexConfigurationLayer)))
+  LiveMachineValidationLayer.pipe(Layer.provide(Layer.mergeAll(commandRunnerLayer, repositoryValidationLayer, codexConfigurationLayer, hkConfigurationLayer)))
 )
 
 const formatFailure = (error: unknown, cause: Cause.Cause<unknown>): string => {

@@ -1,5 +1,7 @@
-if command -v brew >/dev/null 2>&1; then
-  eval "$(brew shellenv)"
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -d /opt/homebrew/bin ]]; then
+  export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 fi
 
 if [[ -n "${ZSH_VERSION:-}" ]]; then

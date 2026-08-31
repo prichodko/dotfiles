@@ -2,6 +2,7 @@ import { Context, Data, Effect, Layer } from "effect"
 import { CodexConfiguration } from "../../codex/config/codex-configuration.ts"
 import { DOTFILES_ROOT } from "../../dotfiles/repository/live-dotfiles-repository.ts"
 import { RepositoryValidation } from "../../dotfiles/validation/validate-repository.ts"
+import { HkConfiguration } from "../../hk/configuration/hk-configuration.ts"
 import { CommandRunner, describeCommandError } from "../../process/command-runner.ts"
 import type { MachineProfile } from "../profile.ts"
 
@@ -30,6 +31,7 @@ export const LiveMachineValidationLayer = Layer.effect(MachineValidation, Effect
   const runner = yield* CommandRunner
   const repositoryValidation = yield* RepositoryValidation
   const codexConfiguration = yield* CodexConfiguration
+  const hkConfiguration = yield* HkConfiguration
   const run = (check: string, command: string, args: ReadonlyArray<string>, profile: MachineProfile, allowFailure = false) => runner.run({
     command,
     args,
@@ -67,6 +69,9 @@ export const LiveMachineValidationLayer = Layer.effect(MachineValidation, Effect
     }
     yield* codexConfiguration.validateApplied.pipe(
       Effect.mapError((cause) => new MachineValidationFailure({ check: "Codex configuration", detail: cause.detail, cause }))
+    )
+    yield* hkConfiguration.validateApplied.pipe(
+      Effect.mapError((cause) => new MachineValidationFailure({ check: "hk configuration", detail: cause.detail, cause }))
     )
     const authentication = yield* Effect.all([
       run("GitHub authentication", "gh", ["auth", "status"], profile, true),
