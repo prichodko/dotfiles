@@ -9,6 +9,8 @@ Create one trail for the current repository. Treat explicit invocation as author
 
 Read [references/entire-trail-cli.md](references/entire-trail-cli.md) before selecting an `entire trail` command or flag. The reference contains the complete API for the captured CLI version. If the installed version differs, run `entire agent-help trail --json` in an Entire-enabled repository and use the live output as authoritative.
 
+Treat version comparison and schema refresh as internal preparation. Do not mention them in progress updates when the refresh succeeds. Report them only when schema retrieval or version incompatibility blocks trail creation.
+
 1. Confirm that `entire` is available and the current directory is in a Git repository.
 2. Detect the current branch with `git symbolic-ref --quiet --short HEAD`. Do this before any `entire trail` command.
 3. Inspect all tracked, untracked, staged, and unstaged changes. Identify only the files and hunks related to the requested trail. Treat all other changes as unrelated.
@@ -27,3 +29,5 @@ Read [references/entire-trail-cli.md](references/entire-trail-cli.md) before sel
 16. Pass type, priority, assignees, branch, base, or other options only when the user supplies them explicitly.
 17. Return only the canonical trail URL from the successful CLI output. Do not open a browser.
 18. If creation fails, report the exact error and stop. Do not repeat the mutation unless the output proves that no trail or branch was created.
+
+After a trail is created or confirmed, validate, commit, and push each later related change. Do not require another `$trail-create` invocation. If the trail is created before the current requested work is complete, ask once before applying this rule to the remaining work. An explicit instruction to keep work uncommitted or not push overrides this rule.
