@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 MACHINE_REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
-MACHINE_MINIMUM_MISE_VERSION="2026.8.14"
+MACHINE_MINIMUM_MISE_VERSION="2026.8.16"
 
 machine_die() {
   printf 'error: %s\n' "$*" >&2

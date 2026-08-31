@@ -1,4 +1,4 @@
-min_version = "2026.8.14"
+min_version = "2026.8.16"
 
 [settings]
 experimental = true
@@ -31,7 +31,6 @@ HK_MISE = "1"
 "brew:btop" = { os = "macos" }
 "brew:eza" = { os = "macos" }
 "brew:gnupg" = { os = "macos" }
-"brew:mise" = { os = "macos" }
 "brew:pinentry-mac" = { os = "macos" }
 "brew:trash" = { os = "macos" }
 "brew:zsh-syntax-highlighting" = { os = "macos" }
@@ -54,7 +53,6 @@ exclude = [
   ".claude/settings.json",
   ".ssh/config",
   ".DS_Store",
-  "node_modules/**",
   "tests/tmp/**",
 ]
 
@@ -63,15 +61,15 @@ exclude = [
 "~/.hushlogin" = { source = "~/.dotfiles/user/common/.hushlogin" }
 "~/.zshenv" = { source = "~/.dotfiles/user/common/.zshenv" }
 "~/.bash_profile/machine" = { block = '''
-[ -f "$HOME/.config/shell/common.sh" ] && source "$HOME/.config/shell/common.sh"
 [ -f "$HOME/.config/shell/platform.sh" ] && source "$HOME/.config/shell/platform.sh"
+[ -f "$HOME/.config/shell/common.sh" ] && source "$HOME/.config/shell/common.sh"
 ''' }
 "~/.bashrc/machine" = { block = '''
 [ -f "$HOME/.config/shell/bash.sh" ] && source "$HOME/.config/shell/bash.sh"
 ''' }
 "~/.zprofile/machine" = { block = '''
-[ -f "$HOME/.config/shell/common.sh" ] && source "$HOME/.config/shell/common.sh"
 [ -f "$HOME/.config/shell/platform.sh" ] && source "$HOME/.config/shell/platform.sh"
+[ -f "$HOME/.config/shell/common.sh" ] && source "$HOME/.config/shell/common.sh"
 ''' }
 "~/.zshrc/machine" = { block = '''
 [ -f "$HOME/.config/shell/zsh.sh" ] && source "$HOME/.config/shell/zsh.sh"
@@ -88,9 +86,7 @@ exclude = [
 "~/.config/mise/config.toml" = { source = "~/.dotfiles/user/common/.config/mise/config.toml" }
 "~/.config/mise/config.full.toml" = { source = "~/.dotfiles/mise.full.toml" }
 "~/.config/mise/conf.d/core.toml" = { source = "~/.dotfiles/mise/conf.d/core.toml" }
-"~/.config/mise/mise.lock" = { source = "~/.dotfiles/mise.lock" }
-"~/.config/mise/mise.full.lock" = { source = "~/.dotfiles/mise.full.lock" }
-"~/.config/mise/miserc.toml" = { source = "~/.dotfiles/user/common/.config/mise/miserc.toml" }
+"~/.config/mise/miserc.toml" = { source = "~/.dotfiles/user/common/.config/mise/miserc.toml", mode = "copy" }
 "~/.config/opencode/opencode.jsonc" = { source = "~/.dotfiles/user/common/.config/opencode/opencode.jsonc" }
 "~/.config/shell/bash.sh" = { source = "~/.dotfiles/user/common/.config/shell/bash.sh" }
 "~/.config/shell/common.sh" = { source = "~/.dotfiles/user/common/.config/shell/common.sh" }

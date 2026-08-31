@@ -20,9 +20,11 @@ test("source files have no default exports or barrel files", () => {
   expect(barrels.stdout.toString().trim()).toBe("")
 })
 
-test("repository dependencies are excluded from remote transfer", async () => {
+test("remote bootstrap excludes private and generated state", async () => {
   const project = await Bun.file(`${root}/mise.toml`).text()
-  expect(project).toContain('"node_modules/**"')
+  expect(project).toContain('".codex/**"')
+  expect(project).toContain('".claude/settings.json"')
+  expect(project).not.toContain('"node_modules/**"')
   const bootstrap = await Bun.file(`${root}/tasks/bootstrap`).text()
   expect(bootstrap).toContain('persistent_root="${HOME}/.dotfiles"')
   expect(bootstrap).toContain("MACHINE_BOOTSTRAP_ALLOW_LOCAL_FALLBACK")

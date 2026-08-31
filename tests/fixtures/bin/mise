@@ -3,7 +3,7 @@ if [[ -n "${MISE_TEST_LOG:-}" ]]; then
   printf '%s\t%s\n' "${MISE_ENV:-core}" "$*" >> "$MISE_TEST_LOG"
 fi
 if [[ "${1:-}" == "--version" ]]; then
-  printf '2026.8.14 test\n'
+  printf '2026.8.16 test\n'
   exit 0
 fi
 if [[ " $* " == *" lock --dry-run --json "* ]]; then

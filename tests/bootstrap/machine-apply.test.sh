@@ -11,9 +11,9 @@ if machine_parse_profile other >/dev/null 2>&1; then
   printf 'machine_parse_profile accepted invalid input.\n' >&2
   exit 1
 fi
-machine_version_at_least 2026.8.14 2026.8.14
-machine_version_at_least 2027.1.0 2026.8.14
-if machine_version_at_least 2026.7.7 2026.8.14; then
+machine_version_at_least 2026.8.16 2026.8.16
+machine_version_at_least 2027.1.0 2026.8.16
+if machine_version_at_least 2026.8.15 2026.8.16; then
   printf 'machine_version_at_least accepted an old version.\n' >&2
   exit 1
 fi

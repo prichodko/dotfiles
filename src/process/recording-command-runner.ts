@@ -11,7 +11,7 @@ export const makeRecordingCommandRunner = (results: ReadonlyArray<CommandResult>
     const commands = yield* Ref.make<ReadonlyArray<CommandInput>>([])
     const queue = [...results]
     const run = (input: CommandInput) => Ref.update(commands, (items) => [...items, input]).pipe(
-      Effect.as(queue.shift() ?? { exitCode: 0, stdout: "", stderr: "" })
+      Effect.andThen(Effect.sync(() => queue.shift() ?? { exitCode: 0, stdout: "", stderr: "" }))
     )
     return {
       layer: Layer.succeed(CommandRunner, CommandRunner.of({ run })),

@@ -19,8 +19,11 @@ export class InvalidMachineName extends Data.TaggedError("InvalidMachineName")<{
 
 export const parseRemoteMachineName = (value: string): string | InvalidMachineName => {
   if (value === "local") return new InvalidMachineName({ value, reason: "The local name is reserved." })
-  if (!/^[a-z][a-z0-9-]{0,62}$/.test(value)) {
-    return new InvalidMachineName({ value, reason: "Use lower-case letters, digits, and hyphens." })
+  if (value.length < 5 || value.length > 52 || !/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/u.test(value)) {
+    return new InvalidMachineName({
+      value,
+      reason: "Use 5 to 52 lower-case letters or digits. Separate groups with single hyphens."
+    })
   }
   return value
 }

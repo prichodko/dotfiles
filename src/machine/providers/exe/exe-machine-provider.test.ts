@@ -14,9 +14,48 @@ test("uses a dynamic ad-hoc bootstrap host", async () => {
   await Effect.runPromise(MachineProvider.use((provider) => provider.bootstrap("work", "full")).pipe(Effect.provide(layer)))
   expect(await Effect.runPromise(recording.commands)).toContainEqual({
     command: "mise",
-    args: ["bootstrap", "remote", "--host", "exedev@work.exe.xyz", "--remote-env", "linux,full", "--yes", "--locked", "--fail-fast"],
+    args: [
+      "bootstrap",
+      "remote",
+      "--host",
+      "exedev@work.exe.xyz",
+      "--remote-env",
+      "linux,full",
+      "--yes",
+      "--update",
+      "--locked",
+      "--fail-fast",
+      "--force-dotfiles"
+    ],
     cwd: expect.any(String)
   })
+})
+
+test("exports the persistent mise path for remote apply", async () => {
+  const recording = await Effect.runPromise(makeRecordingCommandRunner())
+  const layer = ExeMachineProviderLayer.pipe(Layer.provide(recording.layer))
+  await Effect.runPromise(MachineProvider.use((provider) => provider.apply("work", "core")).pipe(Effect.provide(layer)))
+  expect(await Effect.runPromise(recording.commands)).toContainEqual({
+    command: "ssh",
+    args: [
+      "exedev@work.exe.xyz",
+      'export PATH="$HOME/.local/bin:$PATH"; cd "$HOME/.dotfiles" && mise run dotfiles:pull && mise run machine:apply'
+    ],
+    cwd: expect.any(String)
+  })
+})
+
+test("bootstraps an incomplete machine before remote apply", async () => {
+  const recording = await Effect.runPromise(makeRecordingCommandRunner([
+    { exitCode: 1, stdout: "", stderr: "missing" },
+    { exitCode: 0, stdout: "", stderr: "" },
+    { exitCode: 0, stdout: "", stderr: "" },
+    { exitCode: 0, stdout: "", stderr: "" }
+  ]))
+  const layer = ExeMachineProviderLayer.pipe(Layer.provide(recording.layer))
+  await Effect.runPromise(MachineProvider.use((provider) => provider.apply("work", "core")).pipe(Effect.provide(layer)))
+  const commands = await Effect.runPromise(recording.commands)
+  expect(commands.some((command) => command.command === "mise" && command.args?.includes("--force-dotfiles"))).toBe(true)
 })
 
 test("bounds SSH readiness by one total timeout", async () => {

@@ -8,7 +8,7 @@ Bun runs the TypeScript automation.
 
 Effect provides process execution, cleanup, retries, typed failures, and the command-line interface.
 
-The repository requires mise `2026.8.14` or newer.
+The repository requires mise `2026.8.16` or newer.
 
 ## Profiles
 
@@ -51,19 +51,29 @@ Exe is the first provider implementation.
 
 ## Bootstrap
 
+Install the official mise binary:
+
+```sh
+curl https://mise.run | sh
+```
+
+The official binary supports verified cross-platform remote bootstrap.
+
 Clone the repository at `~/.dotfiles`.
 
 Apply the core profile:
 
 ```sh
-mise run machine:apply
+~/.local/bin/mise run machine:apply
 ```
 
 Apply the full profile:
 
 ```sh
-mise run machine:apply full
+~/.local/bin/mise run machine:apply full
 ```
+
+New shells use the managed mise activation and the official binary on `PATH`.
 
 The apply task runs `mise bootstrap --skip-dirty --yes --locked`.
 
@@ -160,13 +170,15 @@ It applies the final repository state and reports preserved untracked files.
 ```sh
 mise run machine:validate
 mise run machine:validate full
-mise run machine:exe:create -- work
-mise run machine:exe:create -- work --profile full
-mise run machine:exe:apply -- work
-mise run machine:exe:apply -- work --profile full
+mise run machine:exe:create -- work-vm
+mise run machine:exe:create -- work-vm --profile full
+mise run machine:exe:apply -- work-vm
+mise run machine:exe:apply -- work-vm --profile full
 ```
 
 Remote machine names are dynamic.
+
+Remote names contain 5 to 52 lower-case letters or digits with optional single hyphen separators.
 
 The `local` name is reserved for the current machine.
 
@@ -194,7 +206,13 @@ Create and remote apply require clean local `main` that matches `origin/main`.
 
 Exe creation defaults to two CPUs, `8GB` of memory, a `25GB` disk, and the core profile.
 
-SSH readiness has a five-minute total timeout.
+SSH readiness has a ten-minute total timeout.
+
+Remote bootstrap installs the verified official Linux binary that matches the local mise version.
+
+New machines refresh package metadata before installation.
+
+Bootstrap replaces only the default Exe files that conflict with tracked managed files.
 
 A failed create or bootstrap keeps the remote machine.
 

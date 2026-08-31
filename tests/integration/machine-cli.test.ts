@@ -21,17 +21,17 @@ describe("machine CLI", () => {
   })
 
   test("non-terminal removal requires yes", () => {
-    const result = Bun.spawnSync(["bun", `${root}/bin/machine.ts`, "remove", "work"], { cwd: root })
+    const result = Bun.spawnSync(["bun", `${root}/bin/machine.ts`, "remove", "work-vm"], { cwd: root })
     expect(result.exitCode).toBe(2)
     expect(result.stderr.toString()).toContain("Use --yes")
   })
 
   test("machine Exe tasks reject malformed arguments before provider access", () => {
     const cases = [
-      ["tasks/machine/exe/create.ts", "work", "--unknown"],
-      ["tasks/machine/exe/create.ts", "work", "--profile"],
-      ["tasks/machine/exe/apply.ts", "work", "extra"],
-      ["tasks/machine/exe/apply.ts", "work", "--profile", "large"]
+      ["tasks/machine/exe/create.ts", "work-vm", "--unknown"],
+      ["tasks/machine/exe/create.ts", "work-vm", "--profile"],
+      ["tasks/machine/exe/apply.ts", "work-vm", "extra"],
+      ["tasks/machine/exe/apply.ts", "work-vm", "--profile", "large"]
     ]
     for (const argumentsList of cases) {
       const result = Bun.spawnSync(["bun", `${root}/${argumentsList[0]}`, ...argumentsList.slice(1)], { cwd: root })

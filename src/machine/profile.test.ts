@@ -11,3 +11,11 @@ test("reserves the local target", () => {
   expect(parseRemoteMachineName("local")).toBeInstanceOf(InvalidMachineName)
   expect(parseRemoteMachineName("work-1")).toBe("work-1")
 })
+
+test("validates provider-compatible remote names", () => {
+  expect(parseRemoteMachineName("test1")).toBe("test1")
+  expect(parseRemoteMachineName("a-vm-name")).toBe("a-vm-name")
+  for (const invalid of ["test", "test-", "test--vm", "1test", "a".repeat(53)]) {
+    expect(parseRemoteMachineName(invalid)).toBeInstanceOf(InvalidMachineName)
+  }
+})
