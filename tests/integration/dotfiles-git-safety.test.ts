@@ -9,15 +9,26 @@ import { makeLiveDotfilesRepositoryLayer } from "../../src/dotfiles/repository/l
 import { synchronizeDotfiles } from "../../src/dotfiles/sync/synchronize-dotfiles.ts"
 import { RepositoryValidation } from "../../src/dotfiles/validation/validate-repository.ts"
 import { NotificationService } from "../../src/notification/notification-service.ts"
+import { CommandRunner } from "../../src/process/command-runner.ts"
 import { EffectCommandRunnerLayer } from "../../src/process/effect-command-runner.ts"
 
 const temporaryRoots: Array<string> = []
+const isolatedGitEnvironment = {
+  GIT_CONFIG_GLOBAL: "/dev/null",
+  HK: "0"
+} as const
+
 afterEach(() => {
   for (const root of temporaryRoots.splice(0)) rmSync(root, { recursive: true, force: true })
 })
 
 const command = (cwd: string, args: ReadonlyArray<string>): string => {
-  const result = Bun.spawnSync([args[0] ?? "", ...args.slice(1)], { cwd, stdout: "pipe", stderr: "pipe" })
+  const result = Bun.spawnSync([args[0] ?? "", ...args.slice(1)], {
+    cwd,
+    env: { ...process.env, ...isolatedGitEnvironment },
+    stdout: "pipe",
+    stderr: "pipe"
+  })
   if (result.exitCode !== 0) throw new Error(result.stderr.toString())
   return result.stdout.toString().trim()
 }
@@ -65,7 +76,16 @@ const makeRepositoryLayer = (
   beforePush?: (attempt: 0 | 1) => Effect.Effect<void>,
   beforeLockPublish?: Effect.Effect<void>
 ) => {
-  const runner = EffectCommandRunnerLayer.pipe(Layer.provide(BunServices.layer))
+  const liveRunner = EffectCommandRunnerLayer.pipe(Layer.provide(BunServices.layer))
+  const runner = Layer.effect(CommandRunner, Effect.gen(function*() {
+    const live = yield* CommandRunner
+    return CommandRunner.of({
+      run: (input) => live.run({
+        ...input,
+        env: { ...input.env, ...isolatedGitEnvironment }
+      })
+    })
+  })).pipe(Layer.provide(liveRunner))
   const platform = Layer.merge(BunServices.layer, runner)
   return makeLiveDotfilesRepositoryLayer({
     repositoryRoot: fixture.local,

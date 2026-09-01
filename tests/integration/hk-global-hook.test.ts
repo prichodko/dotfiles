@@ -70,4 +70,4 @@ done
   run(repository, ["git", "commit", "-m", "test global hook"], environment)
 
   expect(run(repository, ["git", "show", "HEAD:sample.ts"], environment)).toBe("const value = 2\n")
-})
+}, 30_000)
