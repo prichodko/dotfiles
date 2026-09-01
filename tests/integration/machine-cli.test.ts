@@ -9,6 +9,65 @@ describe("machine CLI", () => {
     expect(JSON.parse(result.stdout.toString())).toEqual({ name: "local", status: "present" })
   })
 
+  test("local status has no remote region fields", () => {
+    const result = Bun.spawnSync(["bun", `${root}/bin/machine.ts`, "status"], { cwd: root })
+    expect(result.exitCode).toBe(0)
+    expect(result.stdout.toString().trim()).toBe("Name:   local\nStatus: present")
+  })
+
+  test("remote list and status include region data in text and JSON", () => {
+    const machine = {
+      vm_name: "work-vm",
+      status: "running",
+      region: "fra",
+      region_display: "Frankfurt, Germany"
+    }
+    const env = {
+      ...process.env,
+      PATH: `${root}/tests/fixtures/bin:${process.env.PATH}`,
+      SSH_TEST_LIST_JSON: JSON.stringify({ vms: [machine] })
+    }
+    const list = Bun.spawnSync(["bun", `${root}/bin/machine.ts`, "list"], { cwd: root, env })
+    expect(list.exitCode).toBe(0)
+    expect(list.stdout.toString().trim()).toBe([
+      "NAME     STATUS   REGION",
+      "work-vm  running  Frankfurt, Germany (fra)"
+    ].join("\n"))
+
+    const textStatus = Bun.spawnSync(["bun", `${root}/bin/machine.ts`, "status", "work-vm"], { cwd: root, env })
+    expect(textStatus.exitCode).toBe(0)
+    expect(textStatus.stdout.toString().trim()).toBe([
+      "Name:   work-vm",
+      "Status: running",
+      "Region: Frankfurt, Germany (fra)"
+    ].join("\n"))
+
+    const status = Bun.spawnSync(["bun", `${root}/bin/machine.ts`, "status", "work-vm", "--json"], { cwd: root, env })
+    expect(status.exitCode).toBe(0)
+    expect(JSON.parse(status.stdout.toString())).toEqual({
+      name: "work-vm",
+      status: "running",
+      region: "fra",
+      regionDisplay: "Frankfurt, Germany"
+    })
+  })
+
+  test("remote JSON uses null for missing region data", () => {
+    const env = {
+      ...process.env,
+      PATH: `${root}/tests/fixtures/bin:${process.env.PATH}`,
+      SSH_TEST_LIST_JSON: JSON.stringify({ vms: [{ vm_name: "work-vm", status: "running", region: 42 }] })
+    }
+    const result = Bun.spawnSync(["bun", `${root}/bin/machine.ts`, "list", "--json"], { cwd: root, env })
+    expect(result.exitCode).toBe(0)
+    expect(JSON.parse(result.stdout.toString())).toEqual([{
+      name: "work-vm",
+      status: "running",
+      region: null,
+      regionDisplay: null
+    }])
+  })
+
   test("invalid input exits with code 2", () => {
     const result = Bun.spawnSync(["bun", `${root}/bin/machine.ts`, "create"], { cwd: root })
     expect(result.exitCode).toBe(2)

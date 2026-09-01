@@ -2,7 +2,8 @@ import { Duration, Effect, Layer, Schedule } from "effect"
 import { CommandRunner, describeCommandError } from "../../../process/command-runner.ts"
 import { DOTFILES_ROOT } from "../../../dotfiles/repository/live-dotfiles-repository.ts"
 import { MachineProvider, MachineProviderFailure, type MachineSummary } from "../../lifecycle/machine-provider.ts"
-import type { MachineProfile } from "../../profile.ts"
+import { appendMiseEnvironments, machineProfileEnvironments, type MachineProfile } from "../../profile.ts"
+import { EXE_DIRECT_SSH_ARGUMENTS, EXE_MISE_SSH_OPTION_ARGUMENTS } from "./exe-ssh-policy.ts"
 
 const hostFor = (name: string) => `exedev@${name}.exe.xyz`
 
@@ -11,24 +12,28 @@ export const quotePosixShellArgument = (argument: string): string => `'${argumen
 export const composeRemoteCommand = (argumentsList: ReadonlyArray<string>): string => argumentsList.map(quotePosixShellArgument).join(" ")
 
 export const extractExeMachines = (value: unknown): ReadonlyArray<MachineSummary> => {
-  const found: Array<MachineSummary> = []
-  const visit = (entry: unknown): void => {
-    if (Array.isArray(entry)) {
-      for (const item of entry) visit(item)
-      return
-    }
-    if (entry === null || typeof entry !== "object") return
+  if (value === null || typeof value !== "object") return []
+  const entries = Array.isArray(value) ? value : (value as Record<string, unknown>).vms
+  if (!Array.isArray(entries)) return []
+  const found = entries.flatMap((entry): ReadonlyArray<MachineSummary> => {
+    if (entry === null || typeof entry !== "object") return []
     const record = entry as Record<string, unknown>
-    const name = typeof record.vm_name === "string" ? record.vm_name : typeof record.name === "string" ? record.name : undefined
-    if (name !== undefined) {
-      const status = typeof record.status === "string" ? record.status : typeof record.state === "string" ? record.state : "unknown"
-      found.push({ name, status })
-    }
-    for (const child of Object.values(record)) visit(child)
-  }
-  visit(value)
+    if (typeof record.vm_name !== "string" || record.vm_name === "") return []
+    return [{
+      name: record.vm_name,
+      status: typeof record.status === "string" && record.status !== "" ? record.status : "unknown",
+      region: typeof record.region === "string" && record.region !== "" ? record.region : null,
+      regionDisplay: typeof record.region_display === "string" && record.region_display !== "" ? record.region_display : null
+    }]
+  })
   return found.filter((machine, index) => found.findIndex((candidate) => candidate.name === machine.name) === index)
 }
+
+export const exeRemoteEnvironments = (profile: MachineProfile): ReadonlyArray<string> =>
+  appendMiseEnvironments(undefined, ["linux", "exe", ...machineProfileEnvironments(profile)]).split(",")
+
+const exeMiseEnvironmentArguments = (profile: MachineProfile): ReadonlyArray<string> =>
+  exeRemoteEnvironments(profile).flatMap((environment) => ["-E", environment])
 
 export const waitForSshWithin = <E, R>(
   attempt: Effect.Effect<void, E, R>,
@@ -52,9 +57,11 @@ export const ExeMachineProviderLayer = Layer.effect(MachineProvider, Effect.gen(
     runner.run({ command, args, cwd: DOTFILES_ROOT, ...options }).pipe(
       Effect.mapError((cause) => failure(operation, describeCommandError(cause), cause))
     )
+  const ssh = (operation: string, args: ReadonlyArray<string>, options: { readonly allowFailure?: boolean; readonly interactive?: boolean } = {}) =>
+    run(operation, "ssh", [...EXE_DIRECT_SSH_ARGUMENTS, ...args], options)
   const list = Effect.gen(function*() {
-    yield* run("access", "ssh", ["-o", "BatchMode=yes", "-o", "ConnectTimeout=10", "exe.dev", "whoami"])
-    const result = yield* run("list", "ssh", ["exe.dev", "ls", "--json"])
+    yield* ssh("access", ["-o", "BatchMode=yes", "-o", "ConnectTimeout=10", "exe.dev", "whoami"])
+    const result = yield* ssh("list", ["exe.dev", "ls", "--json"])
     let parsed: unknown
     try { parsed = JSON.parse(result.stdout) } catch (cause) { return yield* failure("list", "Exe returned invalid JSON.", cause) }
     return extractExeMachines(parsed)
@@ -69,7 +76,7 @@ export const ExeMachineProviderLayer = Layer.effect(MachineProvider, Effect.gen(
     const remote = (yield* run("published main", "git", ["-C", DOTFILES_ROOT, "rev-parse", "refs/remotes/origin/main"])).stdout.trim()
     if (local !== remote) return yield* failure("published main", "Local main must match origin/main.")
   })
-  const waitAttempt = (name: string) => run("SSH readiness", "ssh", ["-o", "BatchMode=yes", "-o", "ConnectTimeout=5", hostFor(name), "true"], { allowFailure: true }).pipe(
+  const waitAttempt = (name: string) => ssh("SSH readiness", ["-o", "BatchMode=yes", "-o", "ConnectTimeout=5", hostFor(name), "true"], { allowFailure: true }).pipe(
     Effect.flatMap((result) => result.exitCode === 0 ? Effect.void : Effect.fail(failure("SSH readiness", "SSH is not ready.")))
   )
   const waitForSsh = (name: string) => waitForSshWithin(waitAttempt(name)).pipe(
@@ -78,7 +85,7 @@ export const ExeMachineProviderLayer = Layer.effect(MachineProvider, Effect.gen(
       : failure("SSH readiness", "SSH did not become ready within ten minutes.", cause))
   )
   const bootstrap = (name: string, profile: MachineProfile) => {
-    const remoteEnv = profile === "full" ? "linux,full" : "linux"
+    const remoteEnv = exeRemoteEnvironments(profile).join(",")
     return run("bootstrap", "mise", [
       "bootstrap",
       "remote",
@@ -86,6 +93,7 @@ export const ExeMachineProviderLayer = Layer.effect(MachineProvider, Effect.gen(
       hostFor(name),
       "--remote-env",
       remoteEnv,
+      ...EXE_MISE_SSH_OPTION_ARGUMENTS,
       "--yes",
       "--update",
       "--locked",
@@ -93,35 +101,41 @@ export const ExeMachineProviderLayer = Layer.effect(MachineProvider, Effect.gen(
       "--force-dotfiles"
     ]).pipe(Effect.asVoid)
   }
-  const remoteTask = (operation: string, name: string, command: string) => run(
+  const remoteTask = (operation: string, name: string, command: string) => ssh(
     operation,
-    "ssh",
     [hostFor(name), `export PATH="$HOME/.local/bin:$PATH"; ${command}`]
   ).pipe(Effect.asVoid)
-  const ensureBootstrapped = (name: string, profile: MachineProfile) => Effect.gen(function*() {
-    const inspection = yield* run("bootstrap inspection", "ssh", [
+  const inspectBootstrap = (name: string) => Effect.gen(function*() {
+    const inspection = yield* ssh("bootstrap inspection", [
       "-o",
       "BatchMode=yes",
       "-o",
       "ConnectTimeout=10",
       hostFor(name),
-      "test -x \"$HOME/.local/bin/mise\" && test -d \"$HOME/.dotfiles\""
+      "test -x \"$HOME/.local/bin/mise\" && \"$HOME/.local/bin/mise\" --version >/dev/null 2>&1 && git -C \"$HOME/.dotfiles\" rev-parse --is-inside-work-tree >/dev/null 2>&1 && git -C \"$HOME/.dotfiles\" rev-parse --verify HEAD >/dev/null 2>&1"
     ], { allowFailure: true })
-    if (inspection.exitCode === 0) return
-    yield* waitForSsh(name)
-    yield* bootstrap(name, profile)
+    return inspection.exitCode === 0
+      ? { _tag: "Complete" } as const
+      : { _tag: "Incomplete", reason: "The mise binary or dotfiles Git checkout is incomplete." } as const
   })
+  const remoteMise = (profile: MachineProfile, argumentsList: ReadonlyArray<string>): string =>
+    composeRemoteCommand(["mise", ...exeMiseEnvironmentArguments(profile), ...argumentsList])
+  const applyCommand = (profile: MachineProfile): string => [
+    'cd "$HOME/.dotfiles"',
+    remoteMise(profile, ["run", "dotfiles:pull"]),
+    remoteMise(profile, ["run", "machine:apply", ...(profile === "full" ? ["--", "full"] : [])]),
+    remoteMise(profile, ["bootstrap", "status", "--missing"])
+  ].join(" && ")
   return MachineProvider.of({
     requirePublishedMain,
     list,
-    create: (input) => run("create", "ssh", ["exe.dev", "new", "--json", `--name=${input.name}`, "--cpu", String(input.cpu), "--memory", input.memory, "--disk", input.disk]).pipe(Effect.asVoid),
+    create: (input) => ssh("create", ["exe.dev", "new", "--json", `--name=${input.name}`, "--cpu", String(input.cpu), "--memory", input.memory, "--disk", input.disk]).pipe(Effect.asVoid),
     waitForSsh,
+    inspectBootstrap,
     bootstrap,
-    apply: (name, profile) => ensureBootstrapped(name, profile).pipe(
-      Effect.andThen(remoteTask("apply", name, `cd "$HOME/.dotfiles" && mise run dotfiles:pull && mise run machine:apply${profile === "full" ? " full" : ""}`))
-    ),
-    validate: (name, profile) => remoteTask("validate", name, `cd "$HOME/.dotfiles" && mise run machine:validate${profile === "full" ? " full" : ""}`),
-    shell: (name, command) => run("shell", "ssh", [hostFor(name), ...(command.length === 0 ? [] : [composeRemoteCommand(command)])], { interactive: true }).pipe(Effect.asVoid),
-    remove: (name) => run("remove", "ssh", ["exe.dev", "rm", name], { interactive: true }).pipe(Effect.asVoid)
+    apply: (name, profile) => remoteTask("apply", name, applyCommand(profile)),
+    validate: (name, profile) => remoteTask("validate", name, `cd "$HOME/.dotfiles" && ${remoteMise(profile, ["run", "machine:validate", ...(profile === "full" ? ["--", "full"] : [])])}`),
+    shell: (name, command) => ssh("shell", [hostFor(name), ...(command.length === 0 ? [] : [composeRemoteCommand(command)])], { interactive: true }).pipe(Effect.asVoid),
+    remove: (name) => ssh("remove", ["exe.dev", "rm", name], { interactive: true }).pipe(Effect.asVoid)
   })
 }))

@@ -58,18 +58,26 @@ export const createMachine = (input: CreateMachineInput, profile: MachineProfile
   }))
 }
 
-const providerFailure = (state: MachineLifecycleState, cause: { readonly operation: string; readonly detail: string }) => {
-  const failed = transitionMachineLifecycle(state, { _tag: "Failed", reason: cause.detail })
+const providerFailure = (
+  state: MachineLifecycleState,
+  cause: { readonly operation: string; readonly detail: string },
+  machineKept = false
+) => {
+  const failureEvent = machineKept
+    ? { _tag: "FailedKept", reason: cause.detail } as const
+    : { _tag: "Failed", reason: cause.detail } as const
+  const failed = transitionMachineLifecycle(state, failureEvent)
   return new MachineOperationFailure({
     operation: cause.operation,
-    detail: cause.detail,
-    machineKept: false,
-    state: failed instanceof InvalidMachineLifecycleTransition ? "Failed" : failed._tag as "Failed"
+    detail: machineKept ? `${cause.detail}\nThe machine was kept for inspection.` : cause.detail,
+    machineKept,
+    state: failed instanceof InvalidMachineLifecycleTransition ? "Failed" : failed._tag as "Failed" | "FailedKept"
   })
 }
 
 export const applyRemoteMachine = (name: string, profile: MachineProfile) => Effect.suspend(() => {
   let state: MachineLifecycleState = { _tag: "Inspecting" }
+  let machineFound = false
   return Effect.gen(function*() {
     const provider = yield* MachineProvider
     yield* provider.requirePublishedMain
@@ -79,11 +87,22 @@ export const applyRemoteMachine = (name: string, profile: MachineProfile) => Eff
       return yield* new MachineOperationFailure({ operation: "apply", detail: `The remote machine does not exist: ${name}`, machineKept: false, state: "Failed" })
     }
     state = yield* next(state, { _tag: "Found" })
+    machineFound = true
+    state = yield* next(state, { _tag: "BootstrapInspectionRequested" })
+    const inspection = yield* provider.inspectBootstrap(name)
+    if (inspection._tag === "Incomplete") {
+      state = yield* next(state, { _tag: "BootstrapIncomplete" })
+      yield* provider.waitForSsh(name)
+      yield* provider.bootstrap(name, profile)
+      state = yield* next(state, { _tag: "BootstrapRepaired" })
+    } else {
+      state = yield* next(state, { _tag: "BootstrapComplete" })
+    }
     state = yield* next(state, { _tag: "PullRequested" })
     yield* provider.apply(name, profile)
     state = yield* next(state, { _tag: "PullPassed" })
     state = yield* next(state, { _tag: "ApplyPassed" })
-  }).pipe(Effect.catchTag("MachineProviderFailure", (cause) => Effect.fail(providerFailure(state, cause))))
+  }).pipe(Effect.catchTag("MachineProviderFailure", (cause) => Effect.fail(providerFailure(state, cause, machineFound))))
 })
 
 export const validateRemoteMachine = (name: string, profile: MachineProfile) => Effect.suspend(() => {

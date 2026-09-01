@@ -5,7 +5,7 @@ import { RepositoryValidation } from "../../dotfiles/validation/validate-reposit
 import { HkConfiguration } from "../../hk/configuration/hk-configuration.ts"
 import { homebrewBinDirectories, prependSearchPath, supportsGlobalGitHooks } from "../../hk/configuration/git-version.ts"
 import { CommandRunner, describeCommandError } from "../../process/command-runner.ts"
-import type { MachineProfile } from "../profile.ts"
+import { appendMiseEnvironments, machineProfileEnvironments, type MachineProfile } from "../profile.ts"
 
 export class MachineValidationFailure extends Data.TaggedError("MachineValidationFailure")<{
   readonly check: string
@@ -38,7 +38,7 @@ export const LiveMachineValidationLayer = Layer.effect(MachineValidation, Effect
     allowFailure,
     env: {
       ...commandEnvironment,
-      MISE_ENV: profile === "full" ? "full" : "",
+      MISE_ENV: appendMiseEnvironments(process.env.MISE_ENV, machineProfileEnvironments(profile)),
       MISE_IGNORED_CONFIG_PATHS: `${process.env.HOME}/.config/mise/config.toml:${DOTFILES_ROOT}/.config/mise/config.toml`
     }
   }).pipe(Effect.mapError((cause) => new MachineValidationFailure({ check, detail: describeCommandError(cause), cause })))

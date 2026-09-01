@@ -2,9 +2,10 @@ import { Effect, Layer, Ref } from "effect"
 import { MachineProvider, MachineProviderFailure, type MachineSummary } from "./machine-provider.ts"
 
 export interface RecordingMachineProviderOptions {
+  readonly bootstrapInspection?: "complete" | "incomplete"
   readonly failBootstrap?: boolean
   readonly blockBootstrap?: boolean
-  readonly failOperation?: "apply" | "validate" | "shell" | "remove"
+  readonly failOperation?: "inspectBootstrap" | "apply" | "validate" | "shell" | "remove"
 }
 
 export const makeRecordingMachineProvider = (
@@ -14,7 +15,7 @@ export const makeRecordingMachineProvider = (
   const machines = yield* Ref.make(initialMachines)
   const operations = yield* Ref.make<ReadonlyArray<string>>([])
   const record = (operation: string) => Ref.update(operations, (items) => [...items, operation])
-  const operation = (name: "apply" | "validate" | "shell" | "remove", recorded: string) => record(recorded).pipe(
+  const operation = (name: "inspectBootstrap" | "apply" | "validate" | "shell" | "remove", recorded: string) => record(recorded).pipe(
     Effect.andThen(options.failOperation === name
       ? Effect.fail(new MachineProviderFailure({ operation: name, detail: `${name} failed.` }))
       : Effect.void)
@@ -23,8 +24,18 @@ export const makeRecordingMachineProvider = (
     layer: Layer.succeed(MachineProvider, MachineProvider.of({
       requirePublishedMain: record("requirePublishedMain"),
       list: Ref.get(machines),
-      create: (input) => record(`create:${input.name}`).pipe(Effect.andThen(Ref.update(machines, (items) => [...items, { name: input.name, status: "running" }]))),
+      create: (input) => record(`create:${input.name}`).pipe(Effect.andThen(Ref.update(machines, (items) => [...items, {
+        name: input.name,
+        status: "running",
+        region: null,
+        regionDisplay: null
+      }]))),
       waitForSsh: (name) => record(`waitForSsh:${name}`),
+      inspectBootstrap: (name) => operation("inspectBootstrap", `inspectBootstrap:${name}`).pipe(
+        Effect.as(options.bootstrapInspection === "incomplete"
+          ? { _tag: "Incomplete", reason: "The bootstrap is incomplete." } as const
+          : { _tag: "Complete" } as const)
+      ),
       bootstrap: (name, profile) => record(`bootstrap:${name}:${profile}`).pipe(
         Effect.andThen(options.failBootstrap
           ? Effect.fail(new MachineProviderFailure({ operation: "bootstrap", detail: "Bootstrap failed." }))

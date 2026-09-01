@@ -1,10 +1,23 @@
 import { expect, test } from "bun:test"
-import { InvalidMachineName, InvalidMachineProfile, parseMachineProfile, parseRemoteMachineName } from "./profile.ts"
+import {
+  appendMiseEnvironments,
+  InvalidMachineName,
+  InvalidMachineProfile,
+  machineProfileEnvironments,
+  parseMachineProfile,
+  parseRemoteMachineName
+} from "./profile.ts"
 
 test("parses machine profiles", () => {
   expect(parseMachineProfile(undefined)).toBe("core")
   expect(parseMachineProfile("full")).toBe("full")
   expect(parseMachineProfile("other")).toBeInstanceOf(InvalidMachineProfile)
+})
+
+test("preserves ordered mise environments and appends profile overlays once", () => {
+  expect(appendMiseEnvironments("linux,exe", machineProfileEnvironments("core"))).toBe("linux,exe")
+  expect(appendMiseEnvironments("linux,exe", machineProfileEnvironments("full"))).toBe("linux,exe,full")
+  expect(appendMiseEnvironments("linux,exe,full", machineProfileEnvironments("full"))).toBe("linux,exe,full")
 })
 
 test("reserves the local target", () => {

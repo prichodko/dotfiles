@@ -8,11 +8,41 @@ import { InvalidMachineName, parseRemoteMachineName, type MachineProfile } from 
 import { MachineValidation } from "../validation/validate-machine.ts"
 import { InvalidMachineResources, validateMachineResources } from "../resources.ts"
 
+const formatMachineRegion = (machine: MachineSummary): string => machine.regionDisplay === null
+  ? machine.region ?? "unknown"
+  : machine.region === null ? machine.regionDisplay : `${machine.regionDisplay} (${machine.region})`
+
+const formatColumns = (rows: ReadonlyArray<ReadonlyArray<string>>): string => {
+  const widths = rows[0]!.map((_, columnIndex) => Math.max(...rows.map((row) => row[columnIndex]!.length)))
+  return rows.map((row) => row.map((value, columnIndex) =>
+    columnIndex === row.length - 1 ? value : value.padEnd(widths[columnIndex]!)
+  ).join("  ")).join("\n")
+}
+
+const formatLabeledValues = (values: ReadonlyArray<readonly [string, string]>): string => {
+  const labelWidth = Math.max(...values.map(([label]) => label.length + 1))
+  return values.map(([label, value]) => `${`${label}:`.padEnd(labelWidth)} ${value}`).join("\n")
+}
+
 export const formatMachineList = (machines: ReadonlyArray<MachineSummary>, json: boolean): string => {
   if (json) return JSON.stringify(machines, null, 2)
   if (machines.length === 0) return "No remote machines."
-  return machines.map((machine) => `${machine.name}\t${machine.status}`).join("\n")
+  return formatColumns([
+    ["NAME", "STATUS", "REGION"],
+    ...machines.map((machine) => [machine.name, machine.status, formatMachineRegion(machine)])
+  ])
 }
+
+export const formatMachineStatus = (machine: MachineSummary, json: boolean): string =>
+  json ? JSON.stringify(machine, null, 2) : formatLabeledValues([
+    ["Name", machine.name],
+    ["Status", machine.status],
+    ["Region", formatMachineRegion(machine)]
+  ])
+
+export const formatLocalMachineStatus = (json: boolean): string => json
+  ? JSON.stringify({ name: "local", status: "present" }, null, 2)
+  : formatLabeledValues([["Name", "local"], ["Status", "present"]])
 
 export class InvalidMachineCliInput extends Data.TaggedError("InvalidMachineCliInput")<{
   readonly reason: string
@@ -89,13 +119,13 @@ const statusCommand = Command.make("status", {
 }, Effect.fn(function*({ json, target }) {
   const name = Option.getOrElse(target, () => "local")
   if (name === "local") {
-    yield* Console.log(json ? JSON.stringify({ name: "local", status: "present" }, null, 2) : "local\tpresent")
+    yield* Console.log(formatLocalMachineStatus(json))
     return
   }
   const parsedName = yield* remoteName(name)
   const provider = yield* MachineProvider
-  const found = (yield* provider.list).filter((machine) => machine.name === parsedName)
-  yield* Console.log(formatMachineList(found, json))
+  const found = (yield* provider.list).find((machine) => machine.name === parsedName)
+  yield* Console.log(found === undefined ? "No remote machines." : formatMachineStatus(found, json))
 })).pipe(Command.withDescription("Show machine status"))
 
 const shellCommand = Command.make("shell", {

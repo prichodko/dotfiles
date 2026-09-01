@@ -1,0 +1,34 @@
+[bootstrap.hooks.pre-user]
+run = '''
+set -eu
+
+expected_shell=/usr/bin/zsh
+if [ ! -x "$expected_shell" ]; then
+  printf 'error: The Exe login shell is not available: %s\n' "$expected_shell" >&2
+  exit 1
+fi
+
+user_name="$(id -un)"
+passwd_entry="$(getent passwd "$user_name")"
+current_shell="${passwd_entry##*:}"
+if [ -z "$passwd_entry" ] || [ -z "$current_shell" ]; then
+  printf 'error: Could not read the current login shell for %s.\n' "$user_name" >&2
+  exit 1
+fi
+if [ "$current_shell" = "$expected_shell" ]; then
+  exit 0
+fi
+
+if ! sudo -n true >/dev/null 2>&1; then
+  printf 'error: Password-free sudo is required to set the Exe login shell.\n' >&2
+  exit 1
+fi
+sudo -n chsh -s "$expected_shell" "$user_name"
+
+updated_entry="$(getent passwd "$user_name")"
+updated_shell="${updated_entry##*:}"
+if [ "$updated_shell" != "$expected_shell" ]; then
+  printf 'error: The Exe login shell was not set to %s.\n' "$expected_shell" >&2
+  exit 1
+fi
+'''

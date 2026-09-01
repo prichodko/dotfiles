@@ -1,2 +1,6 @@
 #!/usr/bin/env bash
+
+if [[ " $* " == *" ls --json "* && -n "${SSH_TEST_LIST_JSON:-}" ]]; then
+  printf '%s\n' "$SSH_TEST_LIST_JSON"
+fi
 exit 0

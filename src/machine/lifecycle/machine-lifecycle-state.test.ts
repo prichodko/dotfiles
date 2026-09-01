@@ -9,19 +9,24 @@ test("models create without automatic removal", () => {
 test("implements the complete machine transition table", () => {
   const states: ReadonlyArray<MachineLifecycleState> = [
     { _tag: "Inspecting" }, { _tag: "Absent" }, { _tag: "Present" }, { _tag: "Creating" },
-    { _tag: "WaitingForSsh" }, { _tag: "Bootstrapping" }, { _tag: "Pulling" }, { _tag: "Applying" },
+    { _tag: "WaitingForSsh" }, { _tag: "Bootstrapping" }, { _tag: "CheckingBootstrap" },
+    { _tag: "RepairingBootstrap" }, { _tag: "BootstrapReady" }, { _tag: "Pulling" }, { _tag: "Applying" },
     { _tag: "Validating" }, { _tag: "Ready" }, { _tag: "Removing" }, { _tag: "Removed" },
     { _tag: "FailedKept", reason: "failed" }, { _tag: "Failed", reason: "failed" }
   ]
   const events: ReadonlyArray<MachineLifecycleEvent> = [
     { _tag: "NotFound" }, { _tag: "Found" }, { _tag: "CreateRequested" }, { _tag: "Created" },
-    { _tag: "SshReady" }, { _tag: "BootstrapPassed" }, { _tag: "PullRequested" }, { _tag: "PullPassed" },
+    { _tag: "SshReady" }, { _tag: "BootstrapPassed" }, { _tag: "BootstrapInspectionRequested" },
+    { _tag: "BootstrapComplete" }, { _tag: "BootstrapIncomplete" }, { _tag: "BootstrapRepaired" },
+    { _tag: "PullRequested" }, { _tag: "PullPassed" },
     { _tag: "ApplyPassed" }, { _tag: "ValidationRequested" }, { _tag: "ValidationPassed" },
     { _tag: "RemoveRequested" }, { _tag: "RemovePassed" }, { _tag: "FailedKept", reason: "failed" }, { _tag: "Failed", reason: "failed" }
   ]
   const legal = new Set([
     "Inspecting:NotFound", "Inspecting:Found", "Absent:CreateRequested", "Creating:Created",
-    "WaitingForSsh:SshReady", "Bootstrapping:BootstrapPassed", "Present:PullRequested", "Pulling:PullPassed",
+    "WaitingForSsh:SshReady", "Bootstrapping:BootstrapPassed", "Present:BootstrapInspectionRequested",
+    "CheckingBootstrap:BootstrapComplete", "CheckingBootstrap:BootstrapIncomplete", "RepairingBootstrap:BootstrapRepaired",
+    "BootstrapReady:PullRequested", "Pulling:PullPassed",
     "Applying:ApplyPassed", "Present:ValidationRequested", "Validating:ValidationPassed",
     "Present:RemoveRequested", "Removing:RemovePassed"
   ])

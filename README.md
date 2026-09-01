@@ -30,7 +30,7 @@ Mise lock files pin both profiles.
 | `mise.toml` | Bootstrap packages, managed files, remote settings, and public tasks |
 | `mise/conf.d/core.toml` | Shared core tools |
 | `mise.full.toml` | Full-profile packages and tools |
-| `mise.macos.toml` and `mise.linux.toml` | Platform overlays |
+| `mise.macos.toml`, `mise.linux.toml`, and `mise.exe.toml` | Platform and provider overlays |
 | `bin/machine.ts` | Global provider-neutral `machine` command |
 | `tasks/` | Mise task entrypoints |
 | `src/dotfiles/` | Repository validation, pull, and synchronization |
@@ -204,6 +204,10 @@ The tasks do not copy credentials.
 
 Complete GitHub, Entire, Codex, and Claude authentication manually.
 
+Authentication is not part of bootstrap completeness.
+
+`machine validate` reports missing authentication after the managed environment is complete.
+
 ## Machine command
 
 ```text
@@ -220,13 +224,39 @@ machine remove <name> [--yes]
 
 `create` requires a remote name.
 
+Remote list and status output includes the Exe region code and display name when Exe provides them.
+
 Create and remote apply require clean local `main` that matches `origin/main`.
 
 Exe creation defaults to two CPUs, `8GB` of memory, a `25GB` disk, and the core profile.
 
+Core Exe machines load the ordered mise environments `linux,exe`.
+
+Full Exe machines load the ordered mise environments `linux,exe,full`.
+
+The Exe overlay checks that `/usr/bin/zsh` is available before the mise user step.
+
+It reads the current login shell and makes no change when the shell is already correct.
+
+It uses `sudo -n chsh` only when a change is required.
+
+It fails with a clear message when password-free sudo is unavailable.
+
 SSH readiness has a ten-minute total timeout.
 
 Remote bootstrap installs the verified official Linux binary that matches the local mise version.
+
+Remote apply checks that `~/.local/bin/mise` is executable and can run.
+
+It also checks that `~/.dotfiles` is a valid Git checkout with a current commit.
+
+An incomplete bootstrap waits for SSH and runs the bootstrap again.
+
+A complete bootstrap does not run again.
+
+Remote apply then pulls, applies, and runs `mise bootstrap status --missing` with the same Exe environments.
+
+Missing tools or managed state causes the apply operation to fail.
 
 New machines refresh package metadata before installation.
 
@@ -263,6 +293,32 @@ The macOS SSH configuration uses the 1Password SSH agent for GitHub and Exe host
 The `agent-controller` alias connects to `controller.exe.xyz` as `exedev`.
 
 Wildcard `*.exe.xyz` hosts use the same Exe user and identity agent.
+
+Exe host trust is stored in `user/common/.ssh/exe_known_hosts`.
+
+The managed RSA key applies to `exe.dev` and `*.exe.xyz`.
+
+The official fingerprint is `SHA256:JJOP/lwiBGOMilfONPWZCXUrfK154cnJFXcqlsi6lPo`.
+
+All direct Exe connections and mise remote bootstrap use strict host-key checking.
+
+They use only the managed Exe host-key file.
+
+They do not accept a new or changed key automatically.
+
+For key rotation, first get the replacement key and fingerprint from an official Exe source.
+
+Update `user/common/.ssh/exe_known_hosts` only after the fingerprint is verified.
+
+Check the tracked key before use:
+
+```sh
+ssh-keygen -lf user/common/.ssh/exe_known_hosts
+```
+
+Update `EXE_SSH_HOST_KEY_FINGERPRINT` in `src/machine/providers/exe/exe-ssh-policy.ts` in the same change.
+
+Run the SSH policy and integration tests before publication.
 
 ## Codex configuration
 

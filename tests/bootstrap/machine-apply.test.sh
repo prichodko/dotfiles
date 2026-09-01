@@ -10,6 +10,9 @@ test_path="$test_root/tests/fixtures/bin:$PATH"
 
 HOME="$test_state" PATH="$test_path" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply"
 HOME="$test_state" PATH="$test_path" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply" full
+HOME="$test_state" PATH="$test_path" MISE_ENV="linux,exe" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply"
+HOME="$test_state" PATH="$test_path" MISE_ENV="linux,exe" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply" full
+HOME="$test_state" PATH="$test_path" MISE_ENV="linux,exe,full" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply" full
 for invalid_arguments in "other" "full extra"; do
   read -r -a arguments <<< "$invalid_arguments"
   if HOME="$test_state" PATH="$test_path" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply" "${arguments[@]}" >/dev/null 2>&1; then
@@ -21,6 +24,9 @@ done
 expected_command="-C $test_root bootstrap --skip-dirty --yes --locked"
 [[ "$(sed -n '1p' "$test_log")" == $'core\t'"$expected_command" ]]
 [[ "$(sed -n '2p' "$test_log")" == $'full\t'"$expected_command" ]]
-[[ "$(wc -l < "$test_log" | tr -d ' ')" == "2" ]]
+[[ "$(sed -n '3p' "$test_log")" == $'linux,exe\t'"$expected_command" ]]
+[[ "$(sed -n '4p' "$test_log")" == $'linux,exe,full\t'"$expected_command" ]]
+[[ "$(sed -n '5p' "$test_log")" == $'linux,exe,full\t'"$expected_command" ]]
+[[ "$(wc -l < "$test_log" | tr -d ' ')" == "5" ]]
 
 printf 'machine-apply.test: passed\n'

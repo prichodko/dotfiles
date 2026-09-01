@@ -13,6 +13,10 @@ case "$#:${1:-}" in
 esac
 
 profile="${1:-}"
+mise_environment="${MISE_ENV:-}"
+if [[ "$profile" == "full" && ",${mise_environment}," != *,full,* ]]; then
+  mise_environment="${mise_environment:+${mise_environment},}full"
+fi
 ignored_config_paths="$HOME/.config/mise/config.toml:$task_root/.config/mise/config.toml"
-MISE_IGNORED_CONFIG_PATHS="$ignored_config_paths" MISE_ENV="$profile" \
+MISE_IGNORED_CONFIG_PATHS="$ignored_config_paths" MISE_ENV="$mise_environment" \
   mise -C "$task_root" bootstrap --skip-dirty --yes --locked

@@ -2,6 +2,20 @@ import { Data } from "effect"
 
 export type MachineProfile = "core" | "full"
 
+export const appendMiseEnvironments = (
+  current: string | undefined,
+  additions: ReadonlyArray<string>
+): string => {
+  const environments = (current ?? "").split(",").map((environment) => environment.trim()).filter(Boolean)
+  for (const addition of additions) {
+    if (!environments.includes(addition)) environments.push(addition)
+  }
+  return environments.join(",")
+}
+
+export const machineProfileEnvironments = (profile: MachineProfile): ReadonlyArray<string> =>
+  profile === "full" ? ["full"] : []
+
 export class InvalidMachineProfile extends Data.TaggedError("InvalidMachineProfile")<{
   readonly value: string
 }> {}

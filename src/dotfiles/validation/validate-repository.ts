@@ -1,6 +1,7 @@
 import { Context, Data, Effect, FileSystem, Layer } from "effect"
 import { parseCodexConfig } from "../../codex/config/codex-config.ts"
 import { HkConfiguration } from "../../hk/configuration/hk-configuration.ts"
+import { appendMiseEnvironments, machineProfileEnvironments } from "../../machine/profile.ts"
 import { CommandRunner, describeCommandError } from "../../process/command-runner.ts"
 import { DOTFILES_ROOT } from "../repository/live-dotfiles-repository.ts"
 
@@ -21,7 +22,7 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
   const fileSystem = yield* FileSystem.FileSystem
   const hkConfiguration = yield* HkConfiguration
   const miseEnv = (profile: "core" | "full") => ({
-    MISE_ENV: profile === "full" ? "full" : "",
+    MISE_ENV: appendMiseEnvironments(process.env.MISE_ENV, machineProfileEnvironments(profile)),
     MISE_IGNORED_CONFIG_PATHS: `${process.env.HOME}/.config/mise/config.toml:${DOTFILES_ROOT}/.config/mise/config.toml`
   })
   const run = (check: string, command: string, args: ReadonlyArray<string>, env?: Readonly<Record<string, string | undefined>>) =>
@@ -87,6 +88,7 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
     yield* Effect.all([
       run("mise macOS configuration", "mise", ["-C", DOTFILES_ROOT, "-E", "macos", "config", "ls"], miseEnv("core")),
       run("mise Linux configuration", "mise", ["-C", DOTFILES_ROOT, "-E", "linux", "config", "ls"], miseEnv("core")),
+      run("mise Exe configuration", "mise", ["-C", DOTFILES_ROOT, "-E", "linux", "-E", "exe", "config", "ls"], miseEnv("core")),
       run("mise tasks", "mise", ["-C", DOTFILES_ROOT, "tasks", "validate"], miseEnv("core"))
     ], { concurrency: "unbounded", discard: true })
     yield* validateLocks
