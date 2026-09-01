@@ -20,11 +20,12 @@ test("updates core and full lock files before validation", async () => {
   }).pipe(Effect.provide(layer)))
 
   expect(await Effect.runPromise(repository.operations)).toEqual(["requirePullPreconditions"])
-  expect((await Effect.runPromise(runner.commands)).map((command) => command.args?.slice(-2))).toEqual([
+  expect((await Effect.runPromise(runner.commands)).map((command) => command.args?.slice(2))).toEqual([
     ["lock", "--bump"],
     ["lock", "--bump"],
-    ["--locked", "--dry-run"],
-    ["--locked", "--dry-run"]
+    ["bootstrap", "dotfiles", "apply", "--yes"],
+    ["install", "--locked", "--dry-run"],
+    ["install", "--locked", "--dry-run"]
   ])
   expect(await Effect.runPromise(Ref.get(validationOperations))).toEqual(["validate"])
 })

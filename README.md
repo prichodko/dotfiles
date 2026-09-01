@@ -120,7 +120,11 @@ The global `machine` command is linked as follows:
 ~/.local/bin/machine -> ~/.dotfiles/bin/machine.ts
 ```
 
-The global mise configuration links the shared core fragment and the full overlay directly from this repository.
+The global mise configuration manages copies of the shared core fragment, the full overlay, and their lock files.
+
+The repository `mise.lock` and `mise.full.lock` files remain canonical.
+
+The lock update task refreshes the derived global copies before validation.
 
 The one-time legacy-link conversion is not part of the repository.
 

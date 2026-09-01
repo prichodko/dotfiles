@@ -37,6 +37,7 @@ export const LiveMachineLockUpdateLayer = Layer.effect(MachineLockUpdate, Effect
     )
     yield* run("core lock update", ["lock", "--bump"], "core")
     yield* run("full lock update", ["lock", "--bump"], "full")
+    yield* run("managed mise copies", ["bootstrap", "dotfiles", "apply", "--yes"], "core")
     yield* Effect.all([
       run("core locked install", ["install", "--locked", "--dry-run"], "core"),
       run("full locked install", ["install", "--locked", "--dry-run"], "full")
