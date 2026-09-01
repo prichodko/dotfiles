@@ -1,9 +1,77 @@
 import { expect, test } from "bun:test"
 import { Cause, Effect, Layer, Option } from "effect"
+import { mkdirSync, mkdtempSync, readFileSync, rmSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 import { makeRecordingCommandRunner } from "../../../process/recording-command-runner.ts"
 import { MachineProvider, MachineProviderFailure } from "../../lifecycle/machine-provider.ts"
-import { composeRemoteCommand, ExeMachineProviderLayer, exeRemoteEnvironments, extractExeMachines, waitForSshWithin } from "./exe-machine-provider.ts"
+import {
+  buildExeApplyCommand,
+  composeRemoteCommand,
+  ExeMachineProviderLayer,
+  exeRemoteEnvironments,
+  extractExeMachines,
+  waitForSshWithin
+} from "./exe-machine-provider.ts"
 import { EXE_DIRECT_SSH_ARGUMENTS, EXE_MISE_SSH_OPTION_ARGUMENTS, EXE_SSH_OPTIONS } from "./exe-ssh-policy.ts"
+
+const runExeApplyCommand = (input: {
+  readonly firstPullStatus: number
+  readonly headAfter: string
+  readonly secondPullStatus?: number
+}) => {
+  const temporaryHome = mkdtempSync(join(tmpdir(), "exe-apply-command-"))
+  try {
+    mkdirSync(join(temporaryHome, ".dotfiles"), { recursive: true })
+    const traceFile = join(temporaryHome, "trace")
+    const shell = `
+git() {
+  if [ ! -e "$HEAD_MARKER" ]; then
+    touch "$HEAD_MARKER"
+    printf '%s\\n' "$HEAD_BEFORE"
+  else
+    printf '%s\\n' "$HEAD_AFTER"
+  fi
+}
+mise() {
+  printf '%s\\n' "$*" >> "$TRACE_FILE"
+  case "$*" in
+    *"run dotfiles:pull"*)
+      if [ ! -e "$PULL_MARKER" ]; then
+        touch "$PULL_MARKER"
+        return "$FIRST_PULL_STATUS"
+      fi
+      return "$SECOND_PULL_STATUS"
+      ;;
+  esac
+  return 0
+}
+${buildExeApplyCommand("core")}
+`
+    const result = Bun.spawnSync(["/bin/sh", "-c", shell], {
+      cwd: temporaryHome,
+      env: {
+        ...process.env,
+        FIRST_PULL_STATUS: String(input.firstPullStatus),
+        HEAD_AFTER: input.headAfter,
+        HEAD_BEFORE: "before",
+        HEAD_MARKER: join(temporaryHome, "head-marker"),
+        HOME: temporaryHome,
+        PULL_MARKER: join(temporaryHome, "pull-marker"),
+        SECOND_PULL_STATUS: String(input.secondPullStatus ?? 0),
+        TRACE_FILE: traceFile
+      },
+      stdout: "pipe",
+      stderr: "pipe"
+    })
+    return {
+      exitCode: result.exitCode,
+      trace: readFileSync(traceFile, "utf8").trim().split("\n")
+    }
+  } finally {
+    rmSync(temporaryHome, { recursive: true, force: true })
+  }
+}
 
 test("extracts Exe machines from nested JSON", () => {
   expect(extractExeMachines({ vms: [{
@@ -98,6 +166,55 @@ test("applies and checks bootstrap postconditions with the complete Exe environm
       expect.stringContaining("'mise' '-E' 'linux' '-E' 'exe' 'bootstrap' 'status' '--missing'")
     ],
     cwd: expect.any(String)
+  })
+})
+
+test("re-runs remote pull only when pull changes the checked-out code", () => {
+  const command = buildExeApplyCommand("full")
+  const pull = "'mise' '-E' 'linux' '-E' 'exe' '-E' 'full' 'run' 'dotfiles:pull'"
+  const apply = "'mise' '-E' 'linux' '-E' 'exe' '-E' 'full' 'run' 'machine:apply' '--' 'full'"
+  const status = "'mise' '-E' 'linux' '-E' 'exe' '-E' 'full' 'bootstrap' 'status' '--missing'"
+  const pullOccurrences = command.split(pull).length - 1
+
+  expect(pullOccurrences).toBe(2)
+  expect(command).toContain("dotfiles_head_before=$(git rev-parse HEAD) || exit $?")
+  expect(command).toContain("dotfiles_head_after=$(git rev-parse HEAD) || exit $?")
+  expect(command).toContain('if [ "$dotfiles_head_before" != "$dotfiles_head_after" ]; then')
+  expect(command).toContain(`${pull} || dotfiles_pull_status=$?`)
+  expect(command).toContain(`  ${pull} || exit $?`)
+  expect(command).toContain('elif [ "$dotfiles_pull_status" -ne 0 ]; then\n  exit "$dotfiles_pull_status"')
+  expect(command.indexOf("dotfiles_head_after=")).toBeLessThan(command.indexOf("if ["))
+  expect(command.lastIndexOf(pull)).toBeLessThan(command.indexOf(apply))
+  expect(command.indexOf(apply)).toBeLessThan(command.indexOf(status))
+})
+
+test("retries a failed pull after HEAD changes before apply and status", () => {
+  expect(runExeApplyCommand({ firstPullStatus: 7, headAfter: "after" })).toEqual({
+    exitCode: 0,
+    trace: [
+      "-E linux -E exe run dotfiles:pull",
+      "-E linux -E exe run dotfiles:pull",
+      "-E linux -E exe run machine:apply",
+      "-E linux -E exe bootstrap status --missing"
+    ]
+  })
+})
+
+test("propagates a failed pull without a HEAD change", () => {
+  expect(runExeApplyCommand({ firstPullStatus: 7, headAfter: "before" })).toEqual({
+    exitCode: 7,
+    trace: ["-E linux -E exe run dotfiles:pull"]
+  })
+})
+
+test("does not retry a successful pull without a HEAD change", () => {
+  expect(runExeApplyCommand({ firstPullStatus: 0, headAfter: "before" })).toEqual({
+    exitCode: 0,
+    trace: [
+      "-E linux -E exe run dotfiles:pull",
+      "-E linux -E exe run machine:apply",
+      "-E linux -E exe bootstrap status --missing"
+    ]
   })
 })
 

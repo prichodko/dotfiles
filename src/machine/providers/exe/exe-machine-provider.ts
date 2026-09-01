@@ -35,6 +35,29 @@ export const exeRemoteEnvironments = (profile: MachineProfile): ReadonlyArray<st
 const exeMiseEnvironmentArguments = (profile: MachineProfile): ReadonlyArray<string> =>
   exeRemoteEnvironments(profile).flatMap((environment) => ["-E", environment])
 
+const remoteMise = (profile: MachineProfile, argumentsList: ReadonlyArray<string>): string =>
+  composeRemoteCommand(["mise", ...exeMiseEnvironmentArguments(profile), ...argumentsList])
+
+export const buildExeApplyCommand = (profile: MachineProfile): string => {
+  const pull = remoteMise(profile, ["run", "dotfiles:pull"])
+  const apply = remoteMise(profile, ["run", "machine:apply", ...(profile === "full" ? ["--", "full"] : [])])
+  const status = remoteMise(profile, ["bootstrap", "status", "--missing"])
+  return [
+    'cd "$HOME/.dotfiles" || exit $?',
+    "dotfiles_head_before=$(git rev-parse HEAD) || exit $?",
+    "dotfiles_pull_status=0",
+    `${pull} || dotfiles_pull_status=$?`,
+    "dotfiles_head_after=$(git rev-parse HEAD) || exit $?",
+    'if [ "$dotfiles_head_before" != "$dotfiles_head_after" ]; then',
+    `  ${pull} || exit $?`,
+    'elif [ "$dotfiles_pull_status" -ne 0 ]; then',
+    '  exit "$dotfiles_pull_status"',
+    "fi",
+    `${apply} &&`,
+    status
+  ].join("\n")
+}
+
 export const waitForSshWithin = <E, R>(
   attempt: Effect.Effect<void, E, R>,
   timeout: Duration.Input = "10 minutes",
@@ -127,14 +150,6 @@ export const ExeMachineProviderLayer = Layer.effect(MachineProvider, Effect.gen(
         )))
     )
   }
-  const remoteMise = (profile: MachineProfile, argumentsList: ReadonlyArray<string>): string =>
-    composeRemoteCommand(["mise", ...exeMiseEnvironmentArguments(profile), ...argumentsList])
-  const applyCommand = (profile: MachineProfile): string => [
-    'cd "$HOME/.dotfiles"',
-    remoteMise(profile, ["run", "dotfiles:pull"]),
-    remoteMise(profile, ["run", "machine:apply", ...(profile === "full" ? ["--", "full"] : [])]),
-    remoteMise(profile, ["bootstrap", "status", "--missing"])
-  ].join(" && ")
   return MachineProvider.of({
     requirePublishedMain,
     list,
@@ -142,7 +157,7 @@ export const ExeMachineProviderLayer = Layer.effect(MachineProvider, Effect.gen(
     waitForSsh,
     inspectBootstrap,
     bootstrap,
-    apply: (name, profile) => remoteTask("apply", name, applyCommand(profile)),
+    apply: (name, profile) => remoteTask("apply", name, buildExeApplyCommand(profile)),
     validate: (name, profile) => remoteTask("validate", name, `cd "$HOME/.dotfiles" && ${remoteMise(profile, ["run", "machine:validate", ...(profile === "full" ? ["--", "full"] : [])])}`),
     shell: (name, command) => ssh("shell", [hostFor(name), ...(command.length === 0 ? [] : [composeRemoteCommand(command)])], { interactive: true }).pipe(Effect.asVoid),
     remove: (name) => ssh("remove", ["exe.dev", "rm", name], { interactive: true }).pipe(Effect.asVoid)
