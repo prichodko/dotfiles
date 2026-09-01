@@ -4,6 +4,7 @@ import { MachineProvider, MachineProviderFailure, type MachineSummary } from "./
 export interface RecordingMachineProviderOptions {
   readonly bootstrapInspection?: "complete" | "incomplete"
   readonly failBootstrap?: boolean
+  readonly failBootstrapPostcondition?: boolean
   readonly blockBootstrap?: boolean
   readonly failOperation?: "inspectBootstrap" | "apply" | "validate" | "shell" | "remove"
 }
@@ -39,6 +40,11 @@ export const makeRecordingMachineProvider = (
       bootstrap: (name, profile) => record(`bootstrap:${name}:${profile}`).pipe(
         Effect.andThen(options.failBootstrap
           ? Effect.fail(new MachineProviderFailure({ operation: "bootstrap", detail: "Bootstrap failed." }))
+          : options.failBootstrapPostcondition
+          ? Effect.fail(new MachineProviderFailure({
+            operation: "bootstrap",
+            detail: "Remote bootstrap completed without persistent mise or a valid dotfiles Git checkout."
+          }))
           : options.blockBootstrap ? Effect.never : Effect.void)
       ),
       apply: (name, profile) => operation("apply", `apply:${name}:${profile}`),

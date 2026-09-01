@@ -84,23 +84,6 @@ export const ExeMachineProviderLayer = Layer.effect(MachineProvider, Effect.gen(
       ? cause
       : failure("SSH readiness", "SSH did not become ready within ten minutes.", cause))
   )
-  const bootstrap = (name: string, profile: MachineProfile) => {
-    const remoteEnv = exeRemoteEnvironments(profile).join(",")
-    return run("bootstrap", "mise", [
-      "bootstrap",
-      "remote",
-      "--host",
-      hostFor(name),
-      "--remote-env",
-      remoteEnv,
-      ...EXE_MISE_SSH_OPTION_ARGUMENTS,
-      "--yes",
-      "--update",
-      "--locked",
-      "--fail-fast",
-      "--force-dotfiles"
-    ]).pipe(Effect.asVoid)
-  }
   const remoteTask = (operation: string, name: string, command: string) => ssh(
     operation,
     [hostFor(name), `export PATH="$HOME/.local/bin:$PATH"; ${command}`]
@@ -118,6 +101,32 @@ export const ExeMachineProviderLayer = Layer.effect(MachineProvider, Effect.gen(
       ? { _tag: "Complete" } as const
       : { _tag: "Incomplete", reason: "The mise binary or dotfiles Git checkout is incomplete." } as const
   })
+  const bootstrap = (name: string, profile: MachineProfile) => {
+    const remoteEnv = exeRemoteEnvironments(profile).join(",")
+    return run("bootstrap", "mise", [
+      "bootstrap",
+      "remote",
+      "--host",
+      hostFor(name),
+      "--remote-env",
+      remoteEnv,
+      ...EXE_MISE_SSH_OPTION_ARGUMENTS,
+      "--install-mise",
+      "--yes",
+      "--update",
+      "--locked",
+      "--fail-fast",
+      "--force-dotfiles"
+    ]).pipe(
+      Effect.andThen(inspectBootstrap(name)),
+      Effect.flatMap((inspection) => inspection._tag === "Complete"
+        ? Effect.void
+        : Effect.fail(failure(
+          "bootstrap",
+          "Remote bootstrap completed without persistent mise or a valid dotfiles Git checkout."
+        )))
+    )
+  }
   const remoteMise = (profile: MachineProfile, argumentsList: ReadonlyArray<string>): string =>
     composeRemoteCommand(["mise", ...exeMiseEnvironmentArguments(profile), ...argumentsList])
   const applyCommand = (profile: MachineProfile): string => [

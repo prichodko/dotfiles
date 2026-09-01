@@ -246,6 +246,10 @@ SSH readiness has a ten-minute total timeout.
 
 Remote bootstrap installs the verified official Linux binary that matches the local mise version.
 
+The Exe adapter explicitly requests that mise remains at `~/.local/bin/mise` after remote staging is removed.
+
+It verifies the persistent mise binary and the dotfiles Git checkout before bootstrap can succeed.
+
 Remote apply checks that `~/.local/bin/mise` is executable and can run.
 
 It also checks that `~/.dotfiles` is a valid Git checkout with a current commit.

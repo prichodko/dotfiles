@@ -50,7 +50,7 @@ test("repairs an incomplete bootstrap before apply", async () => {
 test("keeps an existing machine after bootstrap repair failure", async () => {
   const provider = await Effect.runPromise(makeRecordingMachineProvider([workMachine], {
     bootstrapInspection: "incomplete",
-    failBootstrap: true
+    failBootstrapPostcondition: true
   }))
   const exit = await Effect.runPromiseExit(applyRemoteMachine("work", "core").pipe(Effect.provide(provider.layer)))
   expect(exit._tag).toBe("Failure")
@@ -59,6 +59,25 @@ test("keeps an existing machine after bootstrap repair failure", async () => {
     expect(Option.isSome(error) && error.value instanceof MachineOperationFailure && error.value.state === "FailedKept").toBe(true)
   }
   expect(await Effect.runPromise(provider.operations)).not.toContain("remove:work")
+})
+
+test("keeps a fresh machine when bootstrap persistence is incomplete", async () => {
+  const provider = await Effect.runPromise(makeRecordingMachineProvider([], { failBootstrapPostcondition: true }))
+  const exit = await Effect.runPromiseExit(createMachine({
+    name: "kept",
+    cpu: 2,
+    memory: "8GB",
+    disk: "25GB"
+  }, "core").pipe(Effect.provide(provider.layer)))
+  expect(exit._tag).toBe("Failure")
+  if (exit._tag === "Failure") {
+    const error = Cause.findErrorOption(exit.cause)
+    expect(Option.isSome(error) && error.value instanceof MachineOperationFailure && error.value.state === "FailedKept").toBe(true)
+    if (Option.isSome(error) && error.value instanceof MachineOperationFailure) {
+      expect(error.value.detail).toContain("without persistent mise or a valid dotfiles Git checkout")
+    }
+  }
+  expect(await Effect.runPromise(provider.operations)).not.toContain("remove:kept")
 })
 
 test("rejects a missing apply target", async () => {

@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
-import { Effect, Layer } from "effect"
+import { Cause, Effect, Layer, Option } from "effect"
 import { makeRecordingCommandRunner } from "../../../process/recording-command-runner.ts"
-import { MachineProvider } from "../../lifecycle/machine-provider.ts"
+import { MachineProvider, MachineProviderFailure } from "../../lifecycle/machine-provider.ts"
 import { composeRemoteCommand, ExeMachineProviderLayer, exeRemoteEnvironments, extractExeMachines, waitForSshWithin } from "./exe-machine-provider.ts"
 import { EXE_DIRECT_SSH_ARGUMENTS, EXE_MISE_SSH_OPTION_ARGUMENTS, EXE_SSH_OPTIONS } from "./exe-ssh-policy.ts"
 
@@ -43,6 +43,7 @@ test("uses a dynamic ad-hoc bootstrap host", async () => {
       "--remote-env",
       "linux,exe,full",
       ...EXE_MISE_SSH_OPTION_ARGUMENTS,
+      "--install-mise",
       "--yes",
       "--update",
       "--locked",
@@ -51,8 +52,38 @@ test("uses a dynamic ad-hoc bootstrap host", async () => {
     ],
     cwd: expect.any(String)
   })
+  expect((await Effect.runPromise(recording.commands)).at(-1)).toMatchObject({
+    command: "ssh",
+    args: [
+      ...EXE_DIRECT_SSH_ARGUMENTS,
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "ConnectTimeout=10",
+      "exedev@work.exe.xyz",
+      expect.stringContaining('"$HOME/.local/bin/mise" --version')
+    ]
+  })
   expect(exeRemoteEnvironments("core")).toEqual(["linux", "exe"])
   expect(exeRemoteEnvironments("full")).toEqual(["linux", "exe", "full"])
+})
+
+test("fails bootstrap when persistent remote state is incomplete", async () => {
+  const recording = await Effect.runPromise(makeRecordingCommandRunner([
+    { exitCode: 0, stdout: "", stderr: "" },
+    { exitCode: 1, stdout: "", stderr: "missing" }
+  ]))
+  const layer = ExeMachineProviderLayer.pipe(Layer.provide(recording.layer))
+  const exit = await Effect.runPromiseExit(MachineProvider.use((provider) => provider.bootstrap("work", "core")).pipe(Effect.provide(layer)))
+  expect(exit._tag).toBe("Failure")
+  if (exit._tag === "Failure") {
+    const error = Cause.findErrorOption(exit.cause)
+    expect(Option.isSome(error) && error.value instanceof MachineProviderFailure).toBe(true)
+    if (Option.isSome(error) && error.value instanceof MachineProviderFailure) {
+      expect(error.value.operation).toBe("bootstrap")
+      expect(error.value.detail).toBe("Remote bootstrap completed without persistent mise or a valid dotfiles Git checkout.")
+    }
+  }
 })
 
 test("applies and checks bootstrap postconditions with the complete Exe environment", async () => {
