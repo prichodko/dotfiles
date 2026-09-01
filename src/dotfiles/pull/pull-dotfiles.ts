@@ -11,8 +11,9 @@ export const pullDotfiles = Effect.gen(function*() {
   yield* repository.requirePullPreconditions
   const upstreamSha = yield* repository.fetchMain
   yield* repository.fastForwardTo(upstreamSha)
-  yield* validation.validate
+  yield* validation.validateSource
   yield* repository.applyManagedFiles
+  yield* validation.validateApplied
   yield* notifications.notify("success", "Pulled and applied origin/main.")
 }).pipe(
   Effect.onExit((exit) => exit._tag === "Failure"

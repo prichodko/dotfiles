@@ -10,6 +10,8 @@ test("updates core and full lock files before validation", async () => {
   const repository = await Effect.runPromise(makeRecordingDotfilesRepository())
   const validationOperations = await Effect.runPromise(Ref.make<ReadonlyArray<string>>([]))
   const validationLayer = Layer.succeed(RepositoryValidation, RepositoryValidation.of({
+    validateSource: Effect.void,
+    validateApplied: Effect.void,
     validate: Ref.update(validationOperations, (operations) => [...operations, "validate"])
   }))
   const dependencies = Layer.mergeAll(runner.layer, repository.layer, validationLayer)

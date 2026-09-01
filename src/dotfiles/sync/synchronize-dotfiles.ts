@@ -29,7 +29,7 @@ export const synchronizeDotfiles = Effect.suspend(() => {
     state = yield* next(state, { _tag: "ChangesStable" })
     const paths = yield* repository.stageTrackedChanges
     state = yield* next(state, { _tag: "ChangesStaged", affectedPaths: paths })
-    yield* validation.validate
+    yield* validation.validateSource
     state = yield* next(state, { _tag: "RepositoryValidated" })
     const commitSha = yield* repository.commitStagedChanges(paths)
     state = yield* next(state, { _tag: "ChangesCommitted", ...(commitSha === undefined ? {} : { commitSha }) })
@@ -66,10 +66,11 @@ export const synchronizeDotfiles = Effect.suspend(() => {
     }
     state = yield* next(state, { _tag: "PushPassed" })
     yield* repository.verifyPublishedHead
-    yield* validation.validate
+    yield* validation.validateSource
     state = yield* next(state, { _tag: "PublishedHeadVerified" })
     yield* repository.applyManagedFiles
     state = yield* next(state, { _tag: "DotfilesApplied" })
+    yield* validation.validateApplied
     const untrackedFiles = yield* repository.listUntrackedFiles
     if (untrackedFiles.length > 0) yield* Console.log(`Untracked files were not synchronized:\n${untrackedFiles.join("\n")}`)
     yield* notifications.notify("success", "Committed, rebased, pushed, and applied tracked changes.")

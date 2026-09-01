@@ -12,6 +12,8 @@ export class RepositoryValidationFailure extends Data.TaggedError("RepositoryVal
 }> {}
 
 export class RepositoryValidation extends Context.Service<RepositoryValidation, {
+  readonly validateSource: Effect.Effect<void, RepositoryValidationFailure>
+  readonly validateApplied: Effect.Effect<void, RepositoryValidationFailure>
   readonly validate: Effect.Effect<void, RepositoryValidationFailure>
 }>()("dotfiles/validation/RepositoryValidation") {}
 
@@ -78,7 +80,7 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
     })),
     Effect.asVoid
   )
-  const validate = Effect.gen(function*() {
+  const validateSource = Effect.gen(function*() {
     yield* run("TypeScript", "bun", ["run", "typecheck"])
     yield* validateCodexBase
     yield* hkConfiguration.validateSource.pipe(
@@ -93,7 +95,6 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
     ], { concurrency: "unbounded", discard: true })
     yield* validateLocks
     yield* validateLinks
-    yield* run("dotfile status", "mise", dotfileStatusArguments, miseEnv("core"))
     yield* Effect.all([
       run("core locked install", "mise", ["-C", DOTFILES_ROOT, "install", "--locked", "--dry-run"], miseEnv("core")),
       run("full locked install", "mise", ["-C", DOTFILES_ROOT, "install", "--locked", "--dry-run"], miseEnv("full"))
@@ -103,5 +104,10 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
     if (staged.trim() !== "") yield* run("gitleaks staged", "gitleaks", ["git", "--staged", "--no-banner", "--redact", "--config", `${DOTFILES_ROOT}/.gitleaks.toml`, DOTFILES_ROOT])
     yield* validateArchitecture
   })
-  return RepositoryValidation.of({ validate })
+  const validateApplied = run("dotfile status", "mise", dotfileStatusArguments, miseEnv("core"))
+  const validate = Effect.gen(function*() {
+    yield* validateSource
+    yield* validateApplied
+  })
+  return RepositoryValidation.of({ validateSource, validateApplied, validate })
 }))

@@ -33,5 +33,5 @@ export const makeRecordingDotfilesRepository = (options: RecordingDotfilesReposi
       listUntrackedFiles: record("listUntrackedFiles").pipe(Effect.as(options.untrackedFiles ?? [])),
       fastForwardTo: () => record("fastForwardTo")
     }))
-    return { layer, operations: Ref.get(operations) }
+    return { layer, operations: Ref.get(operations), record }
   })

@@ -100,7 +100,11 @@ const makeRepositoryLayer = (
 const runSynchronization = (fixture: RepositoryFixture, beforePush?: (attempt: 0 | 1) => Effect.Effect<void>) => synchronizeDotfiles.pipe(
   Effect.provide(Layer.mergeAll(
     makeRepositoryLayer(fixture, beforePush),
-    Layer.succeed(RepositoryValidation, RepositoryValidation.of({ validate: Effect.void })),
+    Layer.succeed(RepositoryValidation, RepositoryValidation.of({
+      validateSource: Effect.void,
+      validateApplied: Effect.void,
+      validate: Effect.void
+    })),
     Layer.succeed(NotificationService, NotificationService.of({ notify: () => Effect.void }))
   ))
 )
