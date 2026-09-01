@@ -300,6 +300,8 @@ The macOS SSH configuration uses the 1Password SSH agent for GitHub and Exe host
 
 The `agent-controller` alias connects to `controller.exe.xyz` as `exedev`.
 
+The `entire-exe-dev` alias connects to `entire.exe.xyz` as `exedev`.
+
 Wildcard `*.exe.xyz` hosts use the same Exe user and identity agent.
 
 Exe host trust is stored in `user/common/.ssh/exe_known_hosts`.
