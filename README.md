@@ -286,6 +286,10 @@ The managed `.gitconfig` stores portable config-based hooks for commit messages,
 
 Each hook uses `mise x -- hk` so it receives the repository environment without an absolute machine path.
 
+The pre-commit hook always loads the global user policy.
+
+The other hooks use `--from-hook` and remain inactive when a repository does not define them.
+
 ## Development
 
 ```sh

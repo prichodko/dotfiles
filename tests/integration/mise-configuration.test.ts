@@ -56,7 +56,8 @@ test("global hk configuration is managed", async () => {
   for (const event of ["commit-msg", "pre-commit", "pre-push", "prepare-commit-msg"]) {
     expect(git).toContain(`[hook "hk-${event}"]`)
   }
-  expect(git).toContain("mise x -- hk run pre-commit --from-hook --staged")
+  expect(git).toContain('mise x -- hk run pre-commit --staged \\"$@\\"')
+  expect(git).not.toContain("hk run pre-commit --from-hook")
   expect(hk).toContain(`min_hk_version = "${lockedVersion}"`)
   expect(hk).toContain(`/v${lockedVersion}/hk@${lockedVersion}#/Config.pkl`)
   expect(hk).toContain("node_modules/.bin/oxfmt")

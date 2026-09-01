@@ -26,17 +26,21 @@ const makeFixture = (): HkConfigurationPaths => {
   }
 }
 
-const makeCommandLayer = (gitVersion = "git version 2.55.0\n") => Layer.succeed(CommandRunner, CommandRunner.of({
+const makeCommandLayer = (
+  gitVersion = "git version 2.55.0\n",
+  sourcePlanOutput = "Plan: pre-commit\n  oxfmt\n",
+  appliedPlanOutput = sourcePlanOutput
+) => Layer.succeed(CommandRunner, CommandRunner.of({
   run: (input: CommandInput): Effect.Effect<CommandResult> => Effect.sync(() => {
     if (input.command === "git" && input.args?.[0] === "--version") {
       return { exitCode: 0, stdout: gitVersion, stderr: "" }
     }
     if (input.command === "git") {
       const hookCommands: Readonly<Record<string, string>> = {
-        "hook.hk-commit-msg.command": "mise x -- hk run commit-msg --from-hook",
-        "hook.hk-pre-commit.command": "mise x -- hk run pre-commit --from-hook --staged",
-        "hook.hk-pre-push.command": "mise x -- hk run pre-push --from-hook",
-        "hook.hk-prepare-commit-msg.command": "mise x -- hk run prepare-commit-msg --from-hook"
+        "hook.hk-commit-msg.command": "mise x -- hk run commit-msg --from-hook \"$@\"",
+        "hook.hk-pre-commit.command": "mise x -- hk run pre-commit --staged \"$@\"",
+        "hook.hk-pre-push.command": "mise x -- hk run pre-push --from-hook \"$@\"",
+        "hook.hk-prepare-commit-msg.command": "mise x -- hk run prepare-commit-msg --from-hook \"$@\""
       }
       const key = input.args?.at(-1)
       if (key !== undefined && hookCommands[key] !== undefined) {
@@ -45,6 +49,10 @@ const makeCommandLayer = (gitVersion = "git version 2.55.0\n") => Layer.succeed(
     }
     if (input.command === "git" && input.args?.includes("hk.stashUntracked")) {
       return { exitCode: 0, stdout: "false\n", stderr: "" }
+    }
+    if (input.command === "mise" && input.args?.includes("--plan")) {
+      const stdout = input.env?.XDG_CONFIG_HOME === undefined ? appliedPlanOutput : sourcePlanOutput
+      return { exitCode: 0, stdout, stderr: "" }
     }
     return { exitCode: 0, stdout: "", stderr: "" }
   })
@@ -73,5 +81,22 @@ describe("HkConfiguration", () => {
     }), "git version 2.53.9\n")
 
     await expect(promise).rejects.toMatchObject({ _tag: "HkConfigurationFailure", operation: "Git version" })
+  })
+
+  test("rejects an undiscoverable global policy", async () => {
+    const paths = makeFixture()
+    const promise = Effect.runPromise(Effect.gen(function*() {
+      yield* (yield* HkConfiguration).validateApplied
+    }).pipe(
+      Effect.provide(makeHkConfigurationLayer(paths).pipe(
+        Layer.provide(Layer.merge(BunServices.layer, makeCommandLayer(
+          "git version 2.55.0\n",
+          "Plan: pre-commit\n  oxfmt\n",
+          "Plan: pre-commit\n"
+        )))
+      ))
+    ))
+
+    await expect(promise).rejects.toMatchObject({ _tag: "HkConfigurationFailure", operation: "applied hk configuration" })
   })
 })

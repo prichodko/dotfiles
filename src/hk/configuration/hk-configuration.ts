@@ -73,7 +73,7 @@ export const makeHkConfigurationLayer = (paths: HkConfigurationPaths) => Layer.e
   })
   const validateUserConfig = Effect.gen(function*() {
     yield* readRequired(paths.userConfigPath, "The global hk configuration")
-    yield* runHk("hk configuration", [
+    const plan = yield* runHk("hk configuration", [
       "run",
       "pre-commit",
       "--cd",
@@ -83,13 +83,28 @@ export const makeHkConfigurationLayer = (paths: HkConfigurationPaths) => Layer.e
       ...commandEnvironment,
       XDG_CONFIG_HOME: dirname(dirname(paths.userConfigPath))
     })
+    if (!plan.stdout.includes("oxfmt")) {
+      return yield* failure("hk configuration", "The global hk policy does not provide the oxfmt pre-commit step.")
+    }
+  })
+  const validateAppliedUserConfig = Effect.gen(function*() {
+    const plan = yield* runHk("applied hk configuration", [
+      "run",
+      "pre-commit",
+      "--cd",
+      paths.workingDirectory,
+      "--plan"
+    ], commandEnvironment)
+    if (!plan.stdout.includes("oxfmt")) {
+      return yield* failure("applied hk configuration", "hk cannot discover the managed global policy in the normal user environment.")
+    }
   })
   const validateGlobalResolution = Effect.gen(function*() {
     const hooks = [
-      ["commit-msg", "mise x -- hk run commit-msg --from-hook"],
-      ["pre-commit", "mise x -- hk run pre-commit --from-hook --staged"],
-      ["pre-push", "mise x -- hk run pre-push --from-hook"],
-      ["prepare-commit-msg", "mise x -- hk run prepare-commit-msg --from-hook"]
+      ["commit-msg", "mise x -- hk run commit-msg --from-hook \"$@\""],
+      ["pre-commit", "mise x -- hk run pre-commit --staged \"$@\""],
+      ["pre-push", "mise x -- hk run pre-push --from-hook \"$@\""],
+      ["prepare-commit-msg", "mise x -- hk run prepare-commit-msg --from-hook \"$@\""]
     ] as const
     for (const [event, expectedCommand] of hooks) {
       const hook = yield* run("global hk hook", "git", ["config", "--global", "--includes", "--get", `hook.hk-${event}.command`], commandEnvironment)
@@ -105,6 +120,7 @@ export const makeHkConfigurationLayer = (paths: HkConfigurationPaths) => Layer.e
   const validateApplied = Effect.gen(function*() {
     yield* validateGit
     yield* validateUserConfig
+    yield* validateAppliedUserConfig
     yield* validateGlobalResolution
   })
   return HkConfiguration.of({ validateSource: validateUserConfig, validateApplied })
