@@ -1,6 +1,43 @@
 [env]
 _.path = ["/opt/homebrew/bin", "/opt/homebrew/sbin"]
 
+[bootstrap.macos.dock]
+autohide = true
+tilesize = 57
+largesize = 16
+magnification = false
+show_recents = false
+mru_spaces = false
+
+[bootstrap.macos.finder]
+show_all_files = true
+preferred_view_style = "column"
+
+[bootstrap.macos.keyboard]
+initial_key_repeat = 15
+key_repeat = 1
+fn_state = false
+
+[bootstrap.macos.trackpad]
+tap_to_click = true
+three_finger_drag = false
+
+[bootstrap.macos.defaults]
+"com.apple.dock" = { launchanim = false, minimize-to-application = true, wvous-bl-corner = 4, wvous-bl-modifier = 0, wvous-br-corner = 1, wvous-br-modifier = 1048576 }
+"com.apple.finder" = { ShowExternalHardDrivesOnDesktop = true, ShowHardDrivesOnDesktop = false, ShowRemovableMediaOnDesktop = true, ShowSidebar = true }
+"NSGlobalDomain" = { AppleShowScrollBars = "Automatic", NSAutomaticSpellingCorrectionEnabled = true, NSAutomaticCapitalizationEnabled = true, NSAutomaticPeriodSubstitutionEnabled = true, NSAutomaticQuoteSubstitutionEnabled = true, NSAutomaticDashSubstitutionEnabled = true, AppleKeyboardUIMode = 3, "com.apple.mouse.scaling" = 3.0, "com.apple.trackpad.scaling" = 3.0, "com.apple.swipescrolldirection" = true, AppleInterfaceStyleSwitchesAutomatically = true, _HIHideMenuBar = false, "com.apple.sound.beep.volume" = 0.0, "com.apple.springing.enabled" = true, "com.apple.springing.delay" = 0.5 }
+"com.apple.AppleMultitouchTrackpad" = { TrackpadRightClick = true, ActuationStrength = 1, FirstClickThreshold = 1, SecondClickThreshold = 1 }
+"com.apple.menuextra.clock" = { ShowAMPM = true, ShowDate = 0, ShowDayOfWeek = true }
+"com.apple.screencapture" = { location = "~/Downloads" }
+"com.apple.universalaccess" = { closeViewScrollWheelToggle = true }
+"com.apple.WindowManager" = { GloballyEnabled = false, HideDesktop = false }
+"com.apple.loginwindow" = { TALLogoutSavesState = false }
+"com.apple.sharingd" = { DiscoverableMode = "Off" }
+"com.apple.ActivityMonitor" = { ShowCategory = 100 }
+
+[bootstrap.user]
+login_shell = "/bin/zsh"
+
 [dotfiles]
 "~/.config/ghostty/config" = { source = "~/.dotfiles/user/macos/.config/ghostty/config" }
 "~/.config/git/platform.conf" = { source = "~/.dotfiles/user/macos/.config/git/platform.conf" }

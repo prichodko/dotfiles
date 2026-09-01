@@ -51,26 +51,43 @@ Exe is the first provider implementation.
 
 ## Bootstrap
 
+See [the new-machine guide](docs/new-machine.md) for the complete laptop process.
+
+Install Xcode Command Line Tools:
+
+```sh
+xcode-select --install
+```
+
 Install the official mise binary:
 
 ```sh
 curl https://mise.run | sh
 ```
 
-The official binary supports verified cross-platform remote bootstrap.
-
-Clone the repository at `~/.dotfiles`.
-
-Apply the core profile:
+Bootstrap a new core machine directly from GitHub:
 
 ```sh
-~/.local/bin/mise run machine:apply
+~/.local/bin/mise \
+  --locked \
+  bootstrap \
+  --from https://github.com/prichodko/dotfiles.git \
+  --from-dir "$HOME/.dotfiles" \
+  --update \
+  --yes
 ```
 
-Apply the full profile:
+Bootstrap a new full machine directly from GitHub:
 
 ```sh
-~/.local/bin/mise run machine:apply full
+~/.local/bin/mise \
+  -E full \
+  --locked \
+  bootstrap \
+  --from https://github.com/prichodko/dotfiles.git \
+  --from-dir "$HOME/.dotfiles" \
+  --update \
+  --yes
 ```
 
 New shells use the managed mise activation and the official binary on `PATH`.
@@ -170,6 +187,7 @@ It applies the final repository state and reports preserved untracked files.
 ```sh
 mise run machine:validate
 mise run machine:validate full
+mise run machine:update-locks
 mise run machine:exe:create -- work-vm
 mise run machine:exe:create -- work-vm --profile full
 mise run machine:exe:apply -- work-vm

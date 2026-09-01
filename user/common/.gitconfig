@@ -77,6 +77,8 @@
 	enabled = true
 [gpg]
 	format = ssh
+[gpg "ssh"]
+	allowedSignersFile = ~/.dotfiles/user/common/.ssh/allowed_signers
 [hk]
 	stashUntracked = false
 [hook "hk-commit-msg"]
