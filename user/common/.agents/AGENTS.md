@@ -40,6 +40,18 @@ When working on UI:
 - Avoid duplicate copy. Titles and descriptions should communicate different information.
 - Write copy from the user’s perspective: explain the current state and available next action.
 
+## Interactive UI state
+
+Before implementing a stateful interaction:
+
+- Define its valid states, transitions, and invariants.
+- Design the state model so invalid combinations cannot be represented.
+- Place state in the narrowest component that owns the interaction and its effects.
+- Ensure every async result still belongs to the current interaction before applying it.
+- Expose only actions that are valid in the current state.
+- Test transitions, interruption, repeated actions, and out-of-order async completion.
+- Apply relevant framework and composition skills before choosing the component API.
+
 ## Browser control
 
 - When controlling Chrome, enumerate all connected profiles and their tabs before acting. Choose only when the explicit profile name and exact URL or title identify one tab. Never fall back to the default profile when multiple profiles are connected; ask when ambiguous.
