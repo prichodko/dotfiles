@@ -33,8 +33,8 @@ HK_MISE = "1"
 "brew:gnupg" = { os = "macos" }
 "brew:pinentry-mac" = { os = "macos" }
 "brew:trash" = { os = "macos" }
-"brew:zsh-syntax-highlighting" = { os = "macos" }
-"brew:fzf-tab" = { os = "macos" }
+"brew:zsh-syntax-highlighting" = { os = ["linux", "macos"] }
+"brew:fzf-tab" = { os = ["linux", "macos"] }
 
 [bootstrap.repos]
 "~/.dotfiles" = { url = "https://github.com/prichodko/dotfiles.git", ref = "main" }
@@ -61,8 +61,7 @@ exclude = [
 "~/.hushlogin" = { source = "~/.dotfiles/user/common/.hushlogin" }
 "~/.zshenv" = { source = "~/.dotfiles/user/common/.zshenv" }
 "~/.bash_profile/machine" = { block = '''
-[ -f "$HOME/.config/shell/platform.sh" ] && source "$HOME/.config/shell/platform.sh"
-[ -f "$HOME/.config/shell/common.sh" ] && source "$HOME/.config/shell/common.sh"
+[ -f "$HOME/.config/shell/bash.sh" ] && source "$HOME/.config/shell/bash.sh"
 ''' }
 "~/.bashrc/machine" = { block = '''
 [ -f "$HOME/.config/shell/bash.sh" ] && source "$HOME/.config/shell/bash.sh"
