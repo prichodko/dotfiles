@@ -33,6 +33,7 @@ test("portable SSH signing state is managed", async () => {
   expect(project).not.toContain('"~/.ssh/allowed_signers"')
   expect(git).toContain("allowedSignersFile = ~/.dotfiles/user/common/.ssh/allowed_signers")
   expect(allowedSigners).toContain("ssh-ed25519")
+  expect(ssh).toContain("Host agent-controller entire-exe-dev *.exe.xyz\n    ForwardAgent yes")
   expect(ssh).not.toContain(".colima")
   expect(ssh).not.toContain("/Users/pavel")
 })
