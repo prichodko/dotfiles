@@ -33,7 +33,7 @@ test("portable SSH signing state is managed", async () => {
   expect(project).not.toContain('"~/.ssh/allowed_signers"')
   expect(git).toContain("allowedSignersFile = ~/.dotfiles/user/common/.ssh/allowed_signers")
   expect(allowedSigners).toContain("ssh-ed25519")
-  expect(ssh).toContain("Include ~/.colima/ssh_config")
+  expect(ssh).not.toContain(".colima")
   expect(ssh).not.toContain("/Users/pavel")
 })
 
@@ -41,4 +41,18 @@ test("the current Mac can continue to use Homebrew Shell integration", async () 
   const shell = await Bun.file(`${root}/user/macos/.config/shell/macos.sh`).text()
   expect(shell).toContain('eval "$(/opt/homebrew/bin/brew shellenv)"')
   expect(shell).toContain('export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"')
+})
+
+test("the full Mac profile uses the configured container and remote access applications", async () => {
+  const full = await Bun.file(`${root}/mise.full.toml`).text()
+  expect(full).toContain('"brew-cask:orbstack"')
+  expect(full).toContain('"brew-cask:tailscale-app"')
+  expect(full).not.toContain('"brew-cask:docker-desktop"')
+})
+
+test("the full Mac profile excludes pruned application variants", async () => {
+  const full = await Bun.file(`${root}/mise.full.toml`).text()
+  expect(full).not.toContain('"brew-cask:lm-studio"')
+  expect(full).not.toContain('"brew-cask:loom"')
+  expect(full).not.toContain('"brew-cask:visual-studio-code@insiders"')
 })
