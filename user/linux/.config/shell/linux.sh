@@ -3,6 +3,8 @@ if [[ -n "${MACHINE_PLATFORM_SHELL_INITIALIZED:-}" ]]; then
 fi
 MACHINE_PLATFORM_SHELL_INITIALIZED=1
 
+export ENTIRE_TOKEN_STORE=file
+
 if [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
   eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 elif [[ -d /home/linuxbrew/.linuxbrew/bin ]]; then
