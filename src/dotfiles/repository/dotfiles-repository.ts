@@ -14,6 +14,7 @@ export interface RebasePreflightResult {
 export class DotfilesRepository extends Context.Service<DotfilesRepository, {
   readonly requireSyncPreconditions: Effect.Effect<void, DotfilesRepositoryFailure>
   readonly requirePullPreconditions: Effect.Effect<void, DotfilesRepositoryFailure>
+  readonly requireLockUpdatePreconditions: Effect.Effect<void, DotfilesRepositoryFailure>
   readonly acquireLock: Effect.Effect<void, DotfilesRepositoryFailure>
   readonly releaseLock: Effect.Effect<void>
   readonly waitForStableChanges: Effect.Effect<void, DotfilesRepositoryFailure>

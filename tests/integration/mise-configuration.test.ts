@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test"
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, symlinkSync } from "node:fs"
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, symlinkSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { dirname, join } from "node:path"
 
@@ -23,6 +23,25 @@ test("mise owns one core tool fragment, one full overlay, and their canonical lo
   expect(await Bun.file(`${root}/mise.lock`).exists()).toBe(true)
   expect(await Bun.file(`${root}/mise.full.lock`).exists()).toBe(true)
   expect(realpathSync(`${root}/mise/mise.lock`)).toBe(realpathSync(`${root}/mise.lock`))
+})
+
+test("direct TypeScript mise tasks are executable", async () => {
+  const project = await Bun.file(`${root}/mise.toml`).text()
+  const taskPaths = [...project.matchAll(/^run = "(tasks\/.*\.ts)"$/gmu)].map((match) => match[1])
+  expect(taskPaths.length).toBeGreaterThan(0)
+  for (const taskPath of taskPaths) {
+    if (taskPath === undefined) throw new Error("A mise task path is missing.")
+    expect(statSync(`${root}/${taskPath}`).mode & 0o111).not.toBe(0)
+  }
+
+  const execution = Bun.spawnSync(["mise", "run", "machine:update-locks", "--", "unexpected"], {
+    cwd: root,
+    stdout: "pipe",
+    stderr: "pipe"
+  })
+  const output = `${execution.stdout.toString()}${execution.stderr.toString()}`
+  expect(output).toContain("machine:update-locks does not accept arguments")
+  expect(output).not.toContain("Permission denied")
 })
 
 test("global mise uses copied configuration with canonical repository locks", () => {

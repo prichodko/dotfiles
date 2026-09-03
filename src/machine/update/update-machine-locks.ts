@@ -32,7 +32,7 @@ export const LiveMachineLockUpdateLayer = Layer.effect(MachineLockUpdate, Effect
     Effect.asVoid
   )
   const update = Effect.gen(function*() {
-    yield* repository.requirePullPreconditions.pipe(
+    yield* repository.requireLockUpdatePreconditions.pipe(
       Effect.mapError((cause) => new MachineLockUpdateFailure({ operation: "preconditions", detail: cause.detail, cause }))
     )
     yield* run("core lock update", ["lock", "--bump"], "core")

@@ -2,6 +2,7 @@ import { Effect, FileSystem, Layer } from "effect"
 import { CommandRunner, describeCommandError } from "../../process/command-runner.ts"
 import { buildCommitMessage, sortPaths } from "../sync/synchronization-state.ts"
 import { DotfilesRepository, DotfilesRepositoryFailure, type RebasePreflightResult } from "./dotfiles-repository.ts"
+import { findDisallowedLockUpdatePaths } from "./lock-update-paths.ts"
 
 export const DOTFILES_ROOT = new URL("../../../", import.meta.url).pathname.replace(/\/$/, "")
 
@@ -15,6 +16,7 @@ export interface LiveDotfilesRepositoryOptions {
 }
 
 const lines = (output: string): ReadonlyArray<string> => sortPaths(output.split("\n").filter((line) => line.length > 0))
+const nulSeparatedPaths = (output: string): ReadonlyArray<string> => output.split("\0").filter((path) => path.length > 0)
 
 export const makeLiveDotfilesRepositoryLayer = (options: LiveDotfilesRepositoryOptions = {}) => Layer.effect(DotfilesRepository, Effect.gen(function*() {
   const runner = yield* CommandRunner
@@ -53,6 +55,12 @@ export const makeLiveDotfilesRepositoryLayer = (options: LiveDotfilesRepositoryO
   const requireCleanTracked = git(["status", "--porcelain=v1", "--untracked-files=no"]).pipe(Effect.flatMap((result) =>
     result.stdout.trim() === "" ? Effect.void : Effect.fail(fail("preconditions", "Tracked local changes exist. Run dotfiles:sync on a trusted Mac."))
   ))
+  const requireOnlyLockUpdateChanges = Effect.gen(function*() {
+    const changedPaths = nulSeparatedPaths((yield* git(["diff", "--name-only", "-z", "HEAD", "--"])).stdout)
+    const disallowedPaths = findDisallowedLockUpdatePaths(changedPaths)
+    if (disallowedPaths.length === 0) return
+    return yield* fail("preconditions", `Lock updates cannot include unrelated tracked changes: ${disallowedPaths.join(", ")}`)
+  })
   const releaseLock = Effect.gen(function*() {
     if (!ownsLock) return
     yield* fileSystem.remove(lockPath, { recursive: true, force: true }).pipe(Effect.catch(() => Effect.void))
@@ -175,6 +183,12 @@ export const makeLiveDotfilesRepositoryLayer = (options: LiveDotfilesRepositoryO
       yield* requireBranch
     }),
     requirePullPreconditions: Effect.all([requireRepository, requireNoOperation, requireBranch, requireCleanTracked], { discard: true }),
+    requireLockUpdatePreconditions: Effect.all([
+      requireRepository,
+      requireNoOperation,
+      requireBranch,
+      requireOnlyLockUpdateChanges
+    ], { discard: true }),
     acquireLock,
     releaseLock,
     waitForStableChanges,
