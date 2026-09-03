@@ -38,6 +38,7 @@
 "github:can1357/oh-my-pi" = "latest"
 "aqua:ollama/ollama" = "latest"
 "aqua:anomalyco/opencode" = "latest"
+"aqua:oxipng/oxipng" = "latest"
 "npm:@playwright/cli" = "latest"
 "npm:portless" = "latest"
 "npm:sharp-cli" = "latest"

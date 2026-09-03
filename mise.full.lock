@@ -52,6 +52,31 @@ checksum = "sha256:5751e296a2cd545939bdd51b700de0c20d319f0e723c9d7f48bebb5ab0b73
 url = "https://github.com/ollama/ollama/releases/download/v0.33.2/ollama-darwin.tgz"
 url_api = "https://api.github.com/repos/ollama/ollama/releases/assets/534301388"
 
+[[tools."aqua:oxipng/oxipng"]]
+version = "10.2.0"
+backend = "aqua:oxipng/oxipng"
+specifiers = ["latest"]
+
+[tools."aqua:oxipng/oxipng"."platforms.linux-arm64"]
+checksum = "sha256:97d168c6c0d1dbcb36e7438eb489804748a2ba40d94fe21aa7dab7372e9efe9b"
+url = "https://github.com/oxipng/oxipng/releases/download/v10.2.0/oxipng-10.2.0-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/oxipng/oxipng/releases/assets/506928411"
+
+[tools."aqua:oxipng/oxipng"."platforms.linux-x64"]
+checksum = "sha256:b33f84c73d42cb592bea5d84c431030b1e97784817693380dfcec7d9575f871e"
+url = "https://github.com/oxipng/oxipng/releases/download/v10.2.0/oxipng-10.2.0-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/oxipng/oxipng/releases/assets/506927568"
+
+[tools."aqua:oxipng/oxipng"."platforms.macos-arm64"]
+checksum = "sha256:9aad3927d095b6ade2aacb92b89ebaca442483c1f7cde5d7a2486b283c2ed5f9"
+url = "https://github.com/oxipng/oxipng/releases/download/v10.2.0/oxipng-10.2.0-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/oxipng/oxipng/releases/assets/506931441"
+
+[tools."aqua:oxipng/oxipng"."platforms.macos-x64"]
+checksum = "sha256:c45acf40a70cc02539c55555ac240bf5ef24544b7ea9959d22da19f606cec205"
+url = "https://github.com/oxipng/oxipng/releases/download/v10.2.0/oxipng-10.2.0-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/oxipng/oxipng/releases/assets/506930714"
+
 [[tools."github:can1357/oh-my-pi"]]
 version = "17.2.12"
 backend = "github:can1357/oh-my-pi"
