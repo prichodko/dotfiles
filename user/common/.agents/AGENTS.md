@@ -40,6 +40,16 @@ When working on UI:
 - Avoid duplicate copy. Titles and descriptions should communicate different information.
 - Write copy from the user’s perspective: explain the current state and available next action.
 
+## Media tools
+
+When available, use these local media tools:
+
+- Use `svgo` to optimize SVG files.
+- Use `oxipng` for lossless PNG optimization.
+- Use `sharp` to resize, crop, convert, or compress raster images.
+- Use `ffmpeg` to process audio and video.
+- Prefer local and deterministic tools.
+
 ## Interactive UI state
 
 Before implementing a stateful interaction:
