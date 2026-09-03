@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test"
-import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 
@@ -23,12 +23,20 @@ test("source files have no default exports or barrel files", () => {
 test("remote bootstrap excludes private and generated state", async () => {
   const project = await Bun.file(`${root}/mise.toml`).text()
   expect(project).toContain('".codex/**"')
-  expect(project).toContain('".claude/settings.json"')
+  expect(project).not.toContain('".claude/settings.json"')
   expect(project).not.toContain('"node_modules/**"')
   const bootstrap = await Bun.file(`${root}/tasks/bootstrap`).text()
   expect(bootstrap).toContain('persistent_root="${HOME}/.dotfiles"')
   expect(bootstrap).toContain("MACHINE_BOOTSTRAP_ALLOW_LOCAL_FALLBACK")
   expect(bootstrap).toContain("bun install --frozen-lockfile --ignore-scripts")
+})
+
+test("agent configuration has one global source and repository-specific rules", () => {
+  expect(existsSync(`${root}/.agents/AGENTS.md`)).toBe(false)
+  expect(existsSync(`${root}/.claude/settings.json`)).toBe(false)
+  expect(existsSync(`${root}/user/common/.agents/skills`)).toBe(false)
+  expect(existsSync(`${root}/user/common/.claude/CLAUDE.md`)).toBe(false)
+  expect(readlinkSync(`${root}/.claude/CLAUDE.md`)).toBe("../AGENTS.md")
 })
 
 test("bootstrap installs from the persistent checkout", () => {

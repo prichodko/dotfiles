@@ -126,8 +126,6 @@ The repository `mise.lock` and `mise.full.lock` files remain canonical.
 
 The lock update task refreshes the derived global copies before validation.
 
-The one-time legacy-link conversion is not part of the repository.
-
 New machines use mise bootstrap only.
 
 ## Dotfiles tasks
@@ -287,8 +285,6 @@ The command uses exit code `0` for success, `1` for an operational failure, `2` 
 `.agents/skills/` is the canonical skill source.
 
 Claude receives individual links from `.claude/skills/`.
-
-The `grill-me` skill replaces the old `discuss` name.
 
 The `trail-create` skill creates one Entire trail and owns the related commit, push, and trail workflow when explicitly invoked.
 

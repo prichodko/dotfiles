@@ -14,7 +14,7 @@ test("mise owns one core tool fragment, one full overlay, and their canonical lo
   expect(core).toContain("[tools]")
   expect(project).toContain('"~/.config/mise/config.full.toml" = { source = "~/.dotfiles/mise.full.toml", mode = "copy" }')
   expect(project).toContain('"~/.config/mise/conf.d/core.toml" = { source = "~/.dotfiles/mise/conf.d/core.toml", mode = "copy" }')
-  expect(project).toContain('"~/.config/mise/miserc.toml" = { source = "~/.dotfiles/user/common/.config/mise/miserc.toml", mode = "copy" }')
+  expect(project).toContain('"~/.config/mise/miserc.toml" = { source = "~/.dotfiles/.miserc.toml", mode = "copy" }')
   expect(project).toContain('"~/.config/mise/mise.lock" = { source = "~/.dotfiles/mise.lock", mode = "copy" }')
   expect(project).toContain(
     '"~/.config/mise/mise.full.lock" = { source = "~/.dotfiles/mise.full.lock", mode = "copy" }',

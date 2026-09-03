@@ -50,7 +50,6 @@ source = "."
 install_mise = true
 exclude = [
   ".codex/**",
-  ".claude/settings.json",
   ".ssh/config",
   ".DS_Store",
   "tests/tmp/**",
@@ -87,7 +86,7 @@ exclude = [
 "~/.config/mise/conf.d/core.toml" = { source = "~/.dotfiles/mise/conf.d/core.toml", mode = "copy" }
 "~/.config/mise/mise.lock" = { source = "~/.dotfiles/mise.lock", mode = "copy" }
 "~/.config/mise/mise.full.lock" = { source = "~/.dotfiles/mise.full.lock", mode = "copy" }
-"~/.config/mise/miserc.toml" = { source = "~/.dotfiles/user/common/.config/mise/miserc.toml", mode = "copy" }
+"~/.config/mise/miserc.toml" = { source = "~/.dotfiles/.miserc.toml", mode = "copy" }
 "~/.config/opencode/opencode.jsonc" = { source = "~/.dotfiles/user/common/.config/opencode/opencode.jsonc" }
 "~/.config/shell/bash.sh" = { source = "~/.dotfiles/user/common/.config/shell/bash.sh" }
 "~/.config/shell/common.sh" = { source = "~/.dotfiles/user/common/.config/shell/common.sh" }
