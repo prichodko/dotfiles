@@ -294,9 +294,13 @@ The `trail-findings` skill reads every finding for the current branch trail with
 
 The macOS SSH configuration uses the 1Password SSH agent for GitHub and Exe hosts.
 
-The `agent-controller` alias connects to `controller.exe.xyz` as `exedev`.
+The `agent-controller` alias connects to `controller.tail1cfa5f.ts.net` as `exedev` through Tailscale SSH.
 
-The `entire-exe-dev` alias connects to `entire.exe.xyz` as `exedev`.
+The `entire-exe-dev` alias connects to `entire-exe-dev.tail1cfa5f.ts.net` as `exedev` through Tailscale SSH.
+
+The Tailscale SSH aliases do not use the 1Password agent for login.
+
+They forward the 1Password agent for remote Git signing.
 
 Wildcard `*.exe.xyz` hosts use the same Exe user and identity agent.
 

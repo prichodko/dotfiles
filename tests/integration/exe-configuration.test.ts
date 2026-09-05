@@ -13,8 +13,7 @@ test("the managed Exe host key has the official fingerprint", async () => {
 
 test("macOS SSH applies managed strict trust to every Exe host form", async () => {
   const config = await Bun.file(`${root}/user/macos/.ssh/config`).text()
-  expect(config).toContain("Host exe.dev agent-controller entire-exe-dev *.exe.xyz")
-  expect(config).toContain("Host entire-exe-dev\n    HostName entire.exe.xyz\n    User exedev")
+  expect(config).toContain("Host exe.dev *.exe.xyz")
   expect(config).toContain("StrictHostKeyChecking yes")
   expect(config).toContain("UserKnownHostsFile ~/.dotfiles/user/common/.ssh/exe_known_hosts")
   expect(config).toContain("GlobalKnownHostsFile /dev/null")
@@ -22,6 +21,13 @@ test("macOS SSH applies managed strict trust to every Exe host form", async () =
   expect(config).not.toContain("accept-new")
   expect(config).not.toContain("StrictHostKeyChecking no")
   expect(EXE_SSH_OPTIONS).toHaveLength(4)
+})
+
+test("Codex remote aliases use Tailscale SSH", async () => {
+  const config = await Bun.file(`${root}/user/macos/.ssh/config`).text()
+  expect(config).toContain("Host agent-controller\n    HostName controller.tail1cfa5f.ts.net\n    User exedev")
+  expect(config).toContain("Host entire-exe-dev\n    HostName entire-exe-dev.tail1cfa5f.ts.net\n    User exedev")
+  expect(config).toContain("Host agent-controller entire-exe-dev *.exe.xyz\n    ForwardAgent yes")
 })
 
 test("the Exe overlay repairs the login shell before bootstrap user convergence", async () => {
