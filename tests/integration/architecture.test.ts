@@ -33,15 +33,16 @@ test("remote bootstrap excludes private and generated state", async () => {
 
 test("agent configuration separates Codex workflow from shared and repository rules", async () => {
   const project = await Bun.file(`${root}/mise.toml`).text()
-  expect(existsSync(`${root}/.agents/AGENTS.md`)).toBe(false)
+  expect(existsSync(`${root}/.agents/AGENTS.md`)).toBe(true)
+  expect(existsSync(`${root}/user/common/.agents/AGENTS.md`)).toBe(false)
   expect(existsSync(`${root}/.claude/settings.json`)).toBe(false)
   expect(existsSync(`${root}/user/common/.agents/skills`)).toBe(false)
   expect(existsSync(`${root}/user/common/.claude/CLAUDE.md`)).toBe(false)
   expect(readlinkSync(`${root}/.claude/CLAUDE.md`)).toBe("../AGENTS.md")
   expect(existsSync(`${root}/user/common/.codex/AGENTS.md`)).toBe(true)
-  expect(project).toContain('"~/AGENTS.md" = { source = "~/.dotfiles/user/common/.agents/AGENTS.md" }')
+  expect(project).toContain('"~/AGENTS.md" = { source = "~/.dotfiles/.agents/AGENTS.md" }')
   expect(project).toContain('"~/.codex/AGENTS.md" = { source = "~/.dotfiles/user/common/.codex/AGENTS.md" }')
-  expect(project).toContain('"~/.config/opencode/AGENTS.md" = { source = "~/.dotfiles/user/common/.agents/AGENTS.md" }')
+  expect(project).toContain('"~/.config/opencode/AGENTS.md" = { source = "~/.dotfiles/.agents/AGENTS.md" }')
 })
 
 test("bootstrap installs from the persistent checkout", () => {

@@ -37,7 +37,7 @@ Mise lock files pin both profiles.
 | `src/machine/` | Machine lifecycle, validation, CLI, and providers |
 | `user/common/` | Portable user configuration |
 | `user/macos/` and `user/linux/` | Platform-specific user configuration |
-| `.agents/skills/` | Canonical shared agent skills |
+| `.agents/` | Canonical shared agent instructions and skills |
 
 Pure TypeScript owns profiles, validated input, and commit messages.
 
@@ -315,7 +315,9 @@ Removal requires `--yes` without a terminal.
 
 The command uses exit code `0` for success, `1` for an operational failure, `2` for invalid input, and `130` for interruption.
 
-## Agent skills
+## Agent instructions and skills
+
+`.agents/AGENTS.md` contains shared instructions beside the skills.
 
 `.agents/skills/` is the canonical skill source.
 
@@ -398,7 +400,7 @@ Codex workflow instructions live in `user/common/.codex/AGENTS.md` and link to `
 
 They contain the Astra guidance for task completion, skills, communication, delegation, and verification.
 
-Shared instructions remain in `user/common/.agents/AGENTS.md`, linked to `~/AGENTS.md`, Claude, and OpenCode.
+Shared instructions live in `.agents/AGENTS.md`, linked to `~/AGENTS.md`, Claude, and OpenCode.
 
 Portable Codex defaults live in `user/common/.codex/base.toml`.
 
