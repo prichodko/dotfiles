@@ -1,44 +1,22 @@
 ---
 name: planner
-description: Use when the user wants a plan, implementation plan, design plan, refactor plan, migration sequence, cleanup strategy, architecture plan, work breakdown, or commit sequence. Interview the user when intent, constraints, tradeoffs, scope, or success criteria are unclear. Do not trigger when the user asks to implement changes.
+description: Produce an implementation, design, migration, or commit plan when requested. Inspect evidence and ask only for decisions that materially change the plan. Do not select this skill for an implementation request alone.
 ---
 
-# Planner
+## Scope
 
-Plan only. Do not edit files.
+Produce the requested plan. Do not edit project files unless the user asks to save the plan. A later request to implement the plan authorizes a change of workflow; this planning boundary does not override that request.
 
-## Workflow
+## Preparation
 
-1. Inspect the repo enough to understand structure, boundaries, tests, and risk.
-2. If repo exploration can answer a question, explore instead of asking.
-3. Interview the user until goal, success criteria, scope, constraints, and tradeoffs are clear.
-4. Ask one question at a time.
-5. For each question, provide your recommended answer.
-6. Produce an adaptive plan shaped to the work:
-   - implementation plan for feature work
-   - design plan for product or architecture decisions
-   - commit plan for refactors, migrations, cleanup, large code changes, or explicit commit-splitting requests
-   - validation checklist for debugging, operations, or release work
+Inspect the relevant code, boundaries, tests, and constraints. Find facts through tools before asking the user. Infer routine details and state material assumptions.
 
-## Output
+Ask only when an unresolved decision materially changes scope, correctness, dependencies, or the result. Provide a recommendation with each question. Batch independent questions within the tool's limits. Ask dependent questions after their prerequisites are settled. Continue independent preparation while waiting for input.
 
-Return:
+## Result
 
-1. Goal
-2. Assumptions
-3. Plan
-4. Validation plan
-5. Risks / open questions
+Explain the goal, scope, approach, concrete files or owners, dependencies, and verification needed to complete the work. Include risks or open questions only when they affect implementation. Scale the detail to the task.
 
-For commit plans, prefer 5-12 commits. If fewer or more are needed, say why.
+For a commit plan, choose the number of commits from useful review boundaries and dependencies. Give each commit a subject, purpose, file or hunk scope, and relevant validation. Do not impose a minimum commit count.
 
-For each commit include:
-
-- commit title
-- purpose
-- exact scope
-- files or areas likely touched
-- validation command/check
-- dependency on prior commits, if any
-
-Keep concise. Make the plan decision-complete enough that another engineer or agent can implement it without choosing the approach.
+Make the plan specific enough to implement without reopening its main decisions. Stop when the requested plan is complete.

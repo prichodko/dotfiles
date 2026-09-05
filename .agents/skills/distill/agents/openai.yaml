@@ -1,4 +1,0 @@
-interface:
-  display_name: "distill"
-  short_description: "Capture durable session memory"
-  default_prompt: "Use $distill to capture durable memory from this session."

@@ -1,76 +1,28 @@
 ---
 name: improve-codebase-architecture
-description: Find deepening opportunities in a codebase, informed by the domain language in CONTEXT.md and the decisions in docs/adr/. Use when the user wants to improve architecture, find refactoring opportunities, consolidate tightly-coupled modules, or make a codebase more testable and AI-navigable.
+description: Inspect architectural friction and propose refactors that concentrate related behavior behind a useful interface. Use for architecture reviews, refactoring opportunities, and testability analysis. Implement or update project documentation only when requested.
 ---
 
-# Improve Codebase Architecture
+## Scope
 
-Surface architectural friction and propose **deepening opportunities** — refactors that turn shallow modules into deep ones. The aim is testability and AI-navigability.
+Review the requested area and return evidence-based opportunities. A review or design discussion does not authorize code changes or edits to domain documents and architecture decision records. Follow a later request to implement or document a selected decision.
 
-## Glossary
+## Explore
 
-Use these terms exactly in every suggestion. Consistent language is the point — don't drift into "component," "service," "API," or "boundary." Full definitions in [LANGUAGE.md](LANGUAGE.md).
+Read relevant project documentation and existing decisions. Use CONTEXT.md, CONTEXT-MAP.md, and docs/adr/ when they exist. Their absence does not block review. Follow the project's document format if an update is requested; this skill requires no external domain-model package.
 
-- **Module** — anything with an interface and an implementation (function, class, package, slice).
-- **Interface** — everything a caller must know to use the module: types, invariants, error modes, ordering, config. Not just the type signature.
-- **Implementation** — the code inside.
-- **Depth** — leverage at the interface: a lot of behaviour behind a small interface. **Deep** = high leverage. **Shallow** = interface nearly as complex as the implementation.
-- **Seam** — where an interface lives; a place behaviour can be altered without editing in place. (Use this, not "boundary.")
-- **Adapter** — a concrete thing satisfying an interface at a seam.
-- **Leverage** — what callers get from depth.
-- **Locality** — what maintainers get from depth: change, bugs, knowledge concentrated in one place.
+Inspect relevant source and call sites with available search and navigation tools. Use an independent exploration agent only when the environment permits delegation and the work benefits from it. Local exploration is sufficient otherwise.
 
-Key principles (see [LANGUAGE.md](LANGUAGE.md) for the full list):
+Look for related behavior spread across files, interfaces that expose implementation details, repeated coordination, and tests that miss the behavior users depend on. Describe concrete friction before recommending a refactor. A small wrapper or a single implementation is not by itself a defect.
 
-- **Deletion test**: imagine deleting the module. If complexity vanishes, it was a pass-through. If complexity reappears across N callers, it was earning its keep.
-- **The interface is the test surface.**
-- **One adapter = hypothetical seam. Two adapters = real seam.**
+Use project terminology and familiar technical terms. Read [LANGUAGE.md](LANGUAGE.md) when the distinction between interface, implementation, and hidden complexity matters. The glossary explains concepts; it does not restrict the user's vocabulary.
 
-This skill is _informed_ by the project's domain model — `CONTEXT.md` and any `docs/adr/`. The domain language gives names to good seams; ADRs record decisions the skill should not re-litigate. See [CONTEXT-FORMAT.md](../domain-model/CONTEXT-FORMAT.md) and [ADR-FORMAT.md](../domain-model/ADR-FORMAT.md).
+## Recommend
 
-## Process
+For each useful opportunity, identify the files, observed problem, proposed change, and expected effect on maintenance and testing. Include only candidates supported by the code. Do not add refactors to fill a list.
 
-### 1. Explore
+Respect existing architecture decisions. Explain a conflict only when current evidence justifies revisiting it. Recommend a preferred candidate when the evidence supports one. Ask the user to choose only when competing goals materially affect the result.
 
-Read existing documentation first:
+Use [DEEPENING.md](DEEPENING.md) to assess dependency and test boundaries for a selected refactor. Use [INTERFACE-DESIGN.md](INTERFACE-DESIGN.md) when comparing alternative interfaces would resolve a real tradeoff. Do not load every reference for a routine review.
 
-- `CONTEXT.md` (or `CONTEXT-MAP.md` + each `CONTEXT.md` in a multi-context repo)
-- Relevant ADRs in `docs/adr/` (and any context-scoped `docs/adr/` directories)
-
-If any of these files don't exist, proceed silently — don't flag their absence or suggest creating them upfront.
-
-Then use the Agent tool with `subagent_type=Explore` to walk the codebase. Don't follow rigid heuristics — explore organically and note where you experience friction:
-
-- Where does understanding one concept require bouncing between many small modules?
-- Where are modules **shallow** — interface nearly as complex as the implementation?
-- Where have pure functions been extracted just for testability, but the real bugs hide in how they're called (no **locality**)?
-- Where do tightly-coupled modules leak across their seams?
-- Which parts of the codebase are untested, or hard to test through their current interface?
-
-Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want.
-
-### 2. Present candidates
-
-Present a numbered list of deepening opportunities. For each candidate:
-
-- **Files** — which files/modules are involved
-- **Problem** — why the current architecture is causing friction
-- **Solution** — plain English description of what would change
-- **Benefits** — explained in terms of locality and leverage, and also in how tests would improve
-
-**Use CONTEXT.md vocabulary for the domain, and [LANGUAGE.md](LANGUAGE.md) vocabulary for the architecture.** If `CONTEXT.md` defines "Order," talk about "the Order intake module" — not "the FooBarHandler," and not "the Order service."
-
-**ADR conflicts**: if a candidate contradicts an existing ADR, only surface it when the friction is real enough to warrant revisiting the ADR. Mark it clearly (e.g. _"contradicts ADR-0007 — but worth reopening because…"_). Don't list every theoretical refactor an ADR forbids.
-
-Do NOT propose interfaces yet. Ask the user: "Which of these would you like to explore?"
-
-### 3. Grilling loop
-
-Once the user picks a candidate, drop into a grilling conversation. Walk the design tree with them — constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
-
-Side effects happen inline as decisions crystallize:
-
-- **Naming a deepened module after a concept not in `CONTEXT.md`?** Add the term to `CONTEXT.md` — same discipline as `/domain-model` (see [CONTEXT-FORMAT.md](../domain-model/CONTEXT-FORMAT.md)). Create the file lazily if it doesn't exist.
-- **Sharpening a fuzzy term during the conversation?** Update `CONTEXT.md` right there.
-- **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing — skip ephemeral reasons ("not worth it right now") and self-evident ones. See [ADR-FORMAT.md](../domain-model/ADR-FORMAT.md).
-- **Want to explore alternative interfaces for the deepened module?** See [INTERFACE-DESIGN.md](INTERFACE-DESIGN.md).
+For an explicitly requested design interview, ask material decisions in dependency order. For an implementation request, carry the selected change through the relevant checks. Create or update domain documents and decision records only within the authorized scope.

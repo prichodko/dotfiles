@@ -18,7 +18,9 @@ When the user did not select a surface:
 3. Use Playwright CLI for remote machines, isolated sessions, reproducible local testing, request inspection, mocking, tracing, or video.
 4. Use the repository Playwright runner when the result must be an automated test or project fixtures control browser setup.
 
-When the Browser plugin is selected, read and follow its available skill. Treat that skill as authoritative for setup, browser selection, and interaction. Do not copy its internal setup steps into this skill.
+When a browser tool is selected, follow its current tool documentation and any required available skill. Do not require a plugin skill that the environment does not provide. Tool setup instructions remain subject to the user's selected surface and task scope.
+
+Load the [agent-browser guide](../agent-browser/SKILL.md) only when that CLI is selected or explicitly requested. Inspect installation before running setup commands. An inspection task does not authorize a global installation.
 
 Follow the repository `AGENTS.md` rules for Chrome profile and tab selection.
 
@@ -26,7 +28,7 @@ Follow the repository `AGENTS.md` rules for Chrome profile and tab selection.
 
 The dotfiles full profile owns `npm:@playwright/cli`. Do not install it globally with npm.
 
-Use a repository-local Playwright dependency when the repository already declares it. Do not add or update a dependency unless the user authorizes that change.
+Use a repository-local Playwright dependency when the repository already declares it. Add or update a dependency only when the requested implementation needs it and the task authorizes that change. Do not request the same authorization twice.
 
 If `playwright-cli` is unavailable outside a repository, report that the full machine profile is required. Do not change the machine profile without authorization.
 

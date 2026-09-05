@@ -22,7 +22,7 @@ Login flows, session persistence, OAuth, 2FA, and authenticated browsing.
 
 ## Import Auth from Your Browser
 
-The fastest way to authenticate is to reuse cookies from a Chrome session you are already logged into.
+Prefer the verified signed-in session on the browser surface selected for the task. The export and import steps below apply only when that authentication route is explicitly selected. Follow current tool documentation and profile-selection rules before connecting. Auto-discovery does not resolve an ambiguous profile or target.
 
 **Step 1: Start Chrome with remote debugging**
 
@@ -60,7 +60,7 @@ agent-browser state load ./my-auth.json
 agent-browser open https://app.example.com/dashboard
 ```
 
-This works for any site, including those with complex OAuth flows, SSO, or 2FA, as long as Chrome already has valid session cookies.
+Verify access after import. Some authentication systems bind sessions to a browser or device, so copied state may be insufficient.
 
 > **Security note:** State files contain session tokens in plaintext. Add them to `.gitignore`, delete when no longer needed, and set `AGENT_BROWSER_ENCRYPTION_KEY` for encryption at rest. See [Security Best Practices](#security-best-practices).
 
@@ -308,11 +308,11 @@ agent-browser open https://protected.example.com/api
 
 ## Cookie-Based Auth
 
-Manually set authentication cookies:
+When cookie-file import is explicitly selected, import the file without placing secret values in command arguments:
 
 ```bash
-# Set auth cookie
-agent-browser cookies set session_token "abc123xyz"
+# Import the selected local cookie file
+agent-browser cookies set --curl ./cookies.txt
 
 # Navigate to protected page
 agent-browser open https://app.example.com/dashboard
@@ -365,7 +365,7 @@ fi
    agent-browser fill @e2 "$APP_PASSWORD"
    ```
 
-3. **Clean up after automation**
+3. **Clean up task-owned temporary authentication state only.** Do not clear cookies or remove saved state from the user's existing session. These commands apply only to an isolated session and file created for this task:
    ```bash
    agent-browser cookies clear
    rm -f ./auth-state.json

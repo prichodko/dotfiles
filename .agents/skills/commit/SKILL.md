@@ -1,59 +1,24 @@
 ---
 name: commit
-description: "Review git changes, split into logical commit chunks, suggest concise commit messages, and commit. Use when user asks to commit work or structure commits. If grouping is unclear, use askUserTool to confirm grouping before commit."
+description: Inspect Git changes and propose logical commit groups, or create commits when the user requests them. Use for commit planning and committing existing work. A proposal request does not authorize commits.
 ---
 
-# Commit
+## Scope
 
-be terse. sacrifice grammar for speed.
+For a review, message suggestion, or grouping request, return the proposal without changing files, the index, or history. When the user requests commits, use the authorization already given for that scope. Do not add a confirmation step for an obvious grouping. This skill does not authorize pushing.
 
-## 1. review changes
+## Inspect and group
 
-run:
+Inspect the branch, staged diff, unstaged diff, and relevant untracked files. Read existing commit subjects to identify the repository's message style. Group changes by purpose. Preserve unrelated files and hunks, including work already staged by the user.
 
-```bash
-git status --short --branch
-git diff --name-only
-git diff
-```
+Ask only when the relevance of a change or the requested commit scope cannot be determined from available evidence. Use the environment's question tool when available. Respect its question limit. Use a concise text question otherwise.
 
-group by intent, not by folder.
+For a proposal, explain each group, its files or hunks, and its proposed subject. Choose the number of commits from the work and its dependencies.
 
-## 2. propose chunks + msgs
+## Commit
 
-for each chunk, show:
-- files
-- why grouped
-- commit msg
+Create only the requested commits. Stage and commit the relevant files or hunks without including unrelated index entries. Verify the exact content that the commit operation will include. Do not use a whole-index commit when unrelated changes are staged.
 
-msg rules:
-- short
-- imperative
-- use repo style if obvious
-- if no style, use `type(scope): msg` when helpful
+Preserve the user's unrelated index state. If relevant and unrelated hunks cannot be separated safely, report the concrete ambiguity before committing. Do not discard work, disable hooks, or change signing configuration to make a commit succeed.
 
-## 3. if unclear, ask
-
-use askUserTool to choose grouping.
-- 2-3 options
-- recommended first
-- short impact text
-
-if askUserTool unavailable, ask plain text question.
-
-## 4. commit by chunk
-
-for each approved chunk:
-
-```bash
-git add <files>
-git commit -m "<msg>"
-```
-
-never mix unrelated changes in same commit.
-
-## 5. final output
-
-report:
-- commits made (hash + msg)
-- files left uncommitted
+Use a short, imperative subject with correct grammar. Match repository style. After committing, inspect the resulting commit and remaining staged and unstaged changes. Report commit hashes and subjects, plus any remaining work relevant to the request.

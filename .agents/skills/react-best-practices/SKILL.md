@@ -124,6 +124,8 @@ Reference these guidelines when:
 
 ## How to Use
 
+Check the project's React version, compiler, runtime, and existing patterns before applying a rule. Optimize the behavior in the requested scope. Do not introduce unrelated refactors or dependencies solely to satisfy an optional optimization.
+
 Read individual rule files for detailed explanations and code examples:
 
 ```

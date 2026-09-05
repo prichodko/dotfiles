@@ -67,6 +67,8 @@ Reference these guidelines when:
 
 ## How to Use
 
+Check the installed React version before applying version-specific APIs. Keep state in the narrowest useful owner. Use a shared provider only when the interaction needs it. Apply relevant rules to the requested component; do not redesign unrelated components.
+
 Read individual rule files for detailed explanations and code examples:
 
 ```

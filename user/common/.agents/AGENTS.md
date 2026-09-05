@@ -1,6 +1,7 @@
 ## Communication
 
-- Use ASD-STE100 Simplified Technical English in all user-facing output.
+- Use the language requested by the user. Use ASD-STE100 Simplified Technical English for English output.
+- Preserve the wording and language of quoted source text.
 - Use short, direct sentences. Give one instruction per sentence.
 - Use technical terms consistently. Avoid idioms, slang, and ambiguous words.
 - Keep output and commit messages concise. Use correct grammar.
@@ -13,17 +14,19 @@ You are not just writing code. You are shaping the future of this project. The p
 
 Fight entropy. Leave the codebase better than you found it.
 
+Keep cleanup within the requested task. Do not use these principles to expand a focused change into an unrelated refactor.
+
 ## Code
 
-- No barrel files - import directly from source
-- No default exports - named only
+- Prefer direct imports from source over barrel files.
+- Prefer named exports. Preserve required framework entrypoints and established public contracts.
 - Colocate related files in folders (test, styles next to source)
 - Early returns over deep nesting
 - Async/await over .then()
 - Descriptive names over comments
-- Types over runtime checks
+- Use types to prevent invalid internal states. Validate untrusted input at system boundaries.
 - Composition over inheritance
-- Fail fast - throw early on invalid state
+- Fail early on broken programmer invariants. Represent expected user and network failures as explicit states.
 
 ## UI design
 
@@ -59,8 +62,12 @@ Before implementing a stateful interaction:
 - Place state in the narrowest component that owns the interaction and its effects.
 - Ensure every async result still belongs to the current interaction before applying it.
 - Expose only actions that are valid in the current state.
-- Test transitions, interruption, repeated actions, and out-of-order async completion.
+- For changed interactions, test the affected transitions, interruptions, repeated actions, and out-of-order async completion.
 - Apply relevant framework and composition skills before choosing the component API.
+
+## Verification
+
+Test the changed behavior and its relevant failure paths. Complete required repository checks. Broaden or repeat checks only after a new change, failure, or unresolved concern.
 
 ## Browser control
 

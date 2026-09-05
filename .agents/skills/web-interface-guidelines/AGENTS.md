@@ -1,8 +1,8 @@
 # Web Interface Guidelines
 
-Review these files for compliance: $ARGUMENTS
+Apply the relevant rules to the files and scope requested by the user.
 
-Read files, check against rules below. Output concise but comprehensive—sacrifice grammar for brevity. High signal-to-noise.
+Inspect the files and report actionable findings with their locations and effects. Use concise sentences and correct grammar. Do not turn a focused review into an audit of unrelated interfaces.
 
 ## Rules
 
