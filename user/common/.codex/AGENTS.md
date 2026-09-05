@@ -20,8 +20,6 @@
 - Quote the rule that caused the change and explain how it applies. Distinguish an explicit requirement from your interpretation.
 - Resolve routine implementation choices from the available context. Do not treat every skill exception as a requirement for approval.
 
-For Cloudflare, Figma, visualization, and document skills, read [managed-skill-rules.md](managed-skill-rules.md) before following their workflow. These local rules resolve conflicts in managed skill instructions without changing cached packages.
-
 ## Communication
 
 - Lead with the result or main point. Explain the evidence and any limitation that affects its use.

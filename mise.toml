@@ -78,7 +78,6 @@ exclude = [
 "~/.claude/CLAUDE.md" = { source = "~/.dotfiles/user/common/.agents/AGENTS.md" }
 "~/.claude/skills" = { source = "~/.dotfiles/.claude/skills", mode = "symlink-each" }
 "~/.codex/AGENTS.md" = { source = "~/.dotfiles/user/common/.codex/AGENTS.md" }
-"~/.codex/managed-skill-rules.md" = { source = "~/.dotfiles/user/common/.codex/managed-skill-rules.md" }
 "~/.config/git/ignore" = { source = "~/.dotfiles/user/common/.config/git/ignore" }
 "~/.config/hk/config.pkl" = { source = "~/.dotfiles/user/common/.config/hk/config.pkl" }
 "~/.config/mise/config.toml" = { source = "~/.dotfiles/user/common/.config/mise/config.toml" }

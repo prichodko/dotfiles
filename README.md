@@ -398,10 +398,6 @@ Codex workflow instructions live in `user/common/.codex/AGENTS.md` and link to `
 
 They contain the Astra guidance for task completion, skills, communication, delegation, and verification.
 
-Managed skill workflow corrections live in `user/common/.codex/managed-skill-rules.md` and link to `~/.codex/managed-skill-rules.md`.
-
-The Codex instructions load these rules for the affected skill families. Plugin cache files remain package-owned.
-
 Shared instructions remain in `user/common/.agents/AGENTS.md`, linked to `~/AGENTS.md`, Claude, and OpenCode.
 
 Portable Codex defaults live in `user/common/.codex/base.toml`.

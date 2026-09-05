@@ -30,7 +30,6 @@ test("applies managed files in an empty home and preserves local application sta
       expect(readlinkSync(join(home, ".aliases"))).toBe(join(home, ".dotfiles", "user", "common", ".aliases"))
       expect(readlinkSync(join(home, "AGENTS.md"))).toBe(join(home, ".dotfiles", "user", "common", ".agents", "AGENTS.md"))
       expect(readlinkSync(join(home, ".codex", "AGENTS.md"))).toBe(join(home, ".dotfiles", "user", "common", ".codex", "AGENTS.md"))
-      expect(readlinkSync(join(home, ".codex", "managed-skill-rules.md"))).toBe(join(home, ".dotfiles", "user", "common", ".codex", "managed-skill-rules.md"))
       expect(readFileSync(join(home, ".claude", "settings.json"), "utf8")).toBe(localSettings)
       expect(readFileSync(join(home, ".zshrc"), "utf8")).toContain(".config/shell/zsh.sh")
     }
