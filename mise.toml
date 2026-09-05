@@ -79,6 +79,7 @@ exclude = [
 "~/.claude/CLAUDE.md" = { source = "~/.dotfiles/user/common/.agents/AGENTS.md" }
 "~/.claude/settings.json" = { source = "~/.dotfiles/user/common/.claude/settings.json", mode = "copy" }
 "~/.claude/skills" = { source = "~/.dotfiles/.claude/skills", mode = "symlink-each" }
+"~/.codex/AGENTS.md" = { source = "~/.dotfiles/user/common/.codex/AGENTS.md" }
 "~/.config/git/ignore" = { source = "~/.dotfiles/user/common/.config/git/ignore" }
 "~/.config/hk/config.pkl" = { source = "~/.dotfiles/user/common/.config/hk/config.pkl" }
 "~/.config/mise/config.toml" = { source = "~/.dotfiles/user/common/.config/mise/config.toml" }
@@ -87,6 +88,7 @@ exclude = [
 "~/.config/mise/mise.lock" = { source = "~/.dotfiles/mise.lock", mode = "copy" }
 "~/.config/mise/mise.full.lock" = { source = "~/.dotfiles/mise.full.lock", mode = "copy" }
 "~/.config/mise/miserc.toml" = { source = "~/.dotfiles/.miserc.toml", mode = "copy" }
+"~/.config/opencode/AGENTS.md" = { source = "~/.dotfiles/user/common/.agents/AGENTS.md" }
 "~/.config/opencode/opencode.jsonc" = { source = "~/.dotfiles/user/common/.config/opencode/opencode.jsonc" }
 "~/.config/shell/bash.sh" = { source = "~/.dotfiles/user/common/.config/shell/bash.sh" }
 "~/.config/shell/common.sh" = { source = "~/.dotfiles/user/common/.config/shell/common.sh" }

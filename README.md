@@ -332,6 +332,12 @@ Run the SSH policy and integration tests before publication.
 
 ## Codex configuration
 
+Codex workflow instructions live in `user/common/.codex/AGENTS.md` and link to `~/.codex/AGENTS.md`.
+
+They contain the Astra guidance for task completion, skills, communication, delegation, and verification.
+
+Shared instructions remain in `user/common/.agents/AGENTS.md`, linked to `~/AGENTS.md`, Claude, and OpenCode.
+
 Portable Codex defaults live in `user/common/.codex/base.toml`.
 
 The final machine bootstrap task merges every base value into `~/.codex/config.toml`.
