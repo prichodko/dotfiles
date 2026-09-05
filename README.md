@@ -33,17 +33,19 @@ Mise lock files pin both profiles.
 | `mise.macos.toml`, `mise.linux.toml`, and `mise.exe.toml` | Platform and provider overlays |
 | `bin/machine.ts` | Global provider-neutral `machine` command |
 | `tasks/` | Mise task entrypoints |
-| `src/dotfiles/` | Repository validation, pull, and synchronization |
+| `src/dotfiles/` | Repository validation, updates, and optional publication |
 | `src/machine/` | Machine lifecycle, validation, CLI, and providers |
 | `user/common/` | Portable user configuration |
 | `user/macos/` and `user/linux/` | Platform-specific user configuration |
 | `.agents/skills/` | Canonical shared agent skills |
 
-Pure TypeScript owns profiles, validated input, commit messages, and finite-state transitions.
+Pure TypeScript owns profiles, validated input, and commit messages.
 
 Effect owns external processes, locks, interruption, retries, SSH, Git, and notifications.
 
-Synchronization and machine lifecycle use explicit finite-state machines.
+Operation results distinguish publication conflicts and retained machines.
+
+Sequential Effect programs own execution order and cleanup.
 
 The machine lifecycle uses a provider interface.
 
@@ -104,7 +106,9 @@ Effect is a repository dependency.
 
 It is not installed globally.
 
-The bootstrap also installs global hk hooks and applies the portable Codex base configuration.
+The bootstrap applies the global hk configuration and merges the portable Claude and Codex defaults.
+
+After dependency installation, a new Bun process validates the current checkout and managed configuration.
 
 ## Managed user files
 
@@ -136,53 +140,59 @@ mise run dotfiles:pull
 mise run dotfiles:sync
 ```
 
-### `dotfiles:check`
-
-This task validates TypeScript, Shell syntax, startup files, mise configuration, tasks, locks, managed links, managed-file status, and secrets.
+`dotfiles:check` validates TypeScript, Shell syntax, mise configuration, tasks, locks, links, managed configuration, and secrets.
 
 It checks core and full locked installations.
 
 It scans the repository and staged changes with Gitleaks.
 
-### `dotfiles:pull`
+`dotfiles:pull` and `dotfiles:sync` both update without committing or pushing.
 
-This task requires a clean tracked tree.
+They require clean tracked files on `main` and preserve untracked files.
 
-It preserves untracked files.
+They acquire a local process lock, fetch `origin/main`, and permit fast-forward updates only.
 
-It fetches `origin/main` and permits fast-forward updates only.
+The updated checkout runs the same `tasks/machine/apply` entrypoint used for local application.
 
-It validates and applies the final repository state.
+The apply entrypoint prepares the locked Bun dependencies and validates source before native bootstrap changes configuration.
 
-It never commits or pushes.
+Native bootstrap installs platform packages and runs configuration merging with the installed tools.
 
-Use this task on remote machines.
+The apply entrypoint checks aggregate bootstrap status before reporting success.
 
-### `dotfiles:sync`
+An interrupted or failed apply can be repeated.
 
-This task runs only on macOS and only on `main`.
+If application fails after fast-forward, the updated checkout remains available for inspection and repair.
 
-It acquires a local process lock.
+### Optional publication
 
-It waits for tracked changes to become stable.
+Review and commit changes with normal Git commands by default.
 
-It stages modified and deleted tracked files only.
+Automatic publication is an explicit operation:
 
-It validates before and after publication.
+```sh
+mise run dotfiles:publish
+```
 
-It creates commit subjects from sorted affected paths.
+This command runs only on macOS and only on `main`.
 
-It fetches `origin/main` and tests the rebase in an isolated worktree.
+It waits for stable tracked changes, stages modified and deleted tracked files, and creates a local commit.
 
-It preserves the isolated worktree when a conflict occurs.
+New staged files are rejected. Add new files through a reviewed Git commit first.
 
-It keeps the live worktree unchanged after a preflight conflict.
+It tests the rebase in an isolated worktree and preserves that worktree on conflict.
 
-It pushes without force.
+Before each push, it creates a detached checkout of the candidate commit, installs its locked dependencies, and runs its source validation.
 
-It retries once only when another machine updated `origin/main` first.
+It pushes that exact validated commit without force.
 
-It applies the final repository state and reports preserved untracked files.
+If another machine advances `origin/main`, it retries once with a new rebase and validation.
+
+A changed local HEAD cannot cause an unvalidated commit to be pushed.
+
+After publication, it verifies the remote revision and applies the checkout through the shared apply entrypoint.
+
+Failures can leave a local commit or rebased branch for inspection. They never trigger a force push.
 
 ## Machine tasks
 
@@ -260,7 +270,11 @@ An incomplete bootstrap waits for SSH and runs the bootstrap again.
 
 A complete bootstrap does not run again.
 
-Remote apply then pulls, applies, and runs `mise bootstrap status --missing` with the same Exe environments.
+Remote apply delegates to the shared updater with the same Exe environments.
+
+A one-time compatibility path detects machines that still run the old updater. After their checkout advances, it starts the new apply entrypoint.
+
+Current machines invoke the updater once.
 
 Missing tools or managed state causes the apply operation to fail.
 
@@ -330,6 +344,33 @@ Update `EXE_SSH_HOST_KEY_FINGERPRINT` in `src/machine/providers/exe/exe-ssh-poli
 
 Run the SSH policy and integration tests before publication.
 
+## Configuration ownership
+
+| Configuration | Ownership policy |
+|---|---|
+| Shell files, Git configuration, SSH configuration, and editor defaults | Repository-owned files linked by mise |
+| Global mise fragments and locks | Derived copies of the repository-owned files |
+| Claude `settings.json` and Codex `config.toml` | Managed base keys merged into local files |
+| Credentials, Claude hooks, status-line scripts, and generated application state | Local state preserved during application |
+
+Portable configuration must use managed executables or platform-specific settings.
+
+GitHub HTTPS credentials use `mise exec -- gh`.
+
+The `rm` alias is enabled only on macOS when `trash` is available.
+
+Claude defaults live in `user/common/.claude/base.json`.
+
+Bootstrap merges those keys into the local settings file and preserves local hooks, status-line commands, and other unmanaged keys.
+
+Fresh machines do not receive hooks that depend on another machine's scripts.
+
+Claude and Codex use the same atomic merge implementation.
+
+Validation compares managed values, so local formatting and trailing newlines do not cause drift.
+
+Removing a key from a base file relinquishes ownership. It does not delete the local value.
+
 ## Codex configuration
 
 Codex workflow instructions live in `user/common/.codex/AGENTS.md` and link to `~/.codex/AGENTS.md`.
@@ -389,6 +430,6 @@ mise run test
 mise run dotfiles:check
 ```
 
-The test suite includes unit tests, finite-state transition tables, temporary Git repositories, CLI integration tests, bootstrap Shell tests, and architecture checks.
+The test suite covers temporary Git repositories, invalid rebases, push races, locked dependency updates, repeated application, configuration preservation, CLI behavior, bootstrap Shell entrypoints, and architecture checks.
 
 Tests do not create an Exe machine or push to GitHub.

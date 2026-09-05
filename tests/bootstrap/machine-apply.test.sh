@@ -22,11 +22,33 @@ for invalid_arguments in "other" "full extra"; do
 done
 
 expected_command="-C $test_root bootstrap --skip-dirty --yes --locked"
-[[ "$(sed -n '1p' "$test_log")" == $'core\t'"$expected_command" ]]
-[[ "$(sed -n '2p' "$test_log")" == $'full\t'"$expected_command" ]]
-[[ "$(sed -n '3p' "$test_log")" == $'linux,exe\t'"$expected_command" ]]
-[[ "$(sed -n '4p' "$test_log")" == $'linux,exe,full\t'"$expected_command" ]]
-[[ "$(sed -n '5p' "$test_log")" == $'linux,exe,full\t'"$expected_command" ]]
-[[ "$(wc -l < "$test_log" | tr -d ' ')" == "5" ]]
+expected_status="-C $test_root bootstrap status --missing"
+for index in 1 2 3 4 5; do
+  case "$index" in
+    1) environment=core ;;
+    2) environment=full ;;
+    3) environment=linux,exe ;;
+    *) environment=linux,exe,full ;;
+  esac
+  install_line=$((index * 4 - 3))
+  validation_line=$((index * 4 - 2))
+  command_line=$((index * 4 - 1))
+  status_line=$((index * 4))
+  [[ "$(sed -n "${install_line}p" "$test_log")" == "$environment"$'\t'"-C $test_root --locked exec -- bun install --frozen-lockfile --ignore-scripts" ]]
+  [[ "$(sed -n "${validation_line}p" "$test_log")" == "$environment"$'\t'"-C $test_root --locked exec -- bun run tasks/dotfiles/check-source.ts" ]]
+  [[ "$(sed -n "${command_line}p" "$test_log")" == "$environment"$'\t'"$expected_command" ]]
+  [[ "$(sed -n "${status_line}p" "$test_log")" == "$environment"$'\t'"$expected_status" ]]
+done
+[[ "$(wc -l < "$test_log" | tr -d ' ')" == "20" ]]
+
+failure_log="$test_state/failure.log"
+if HOME="$test_state" PATH="$test_path" MISE_TEST_LOG="$failure_log" MISE_TEST_FAIL_MATCH="check-source.ts" "$test_root/tasks/machine/apply"; then
+  printf 'machine apply ignored source validation failure.\n' >&2
+  exit 1
+fi
+if rg -q ' bootstrap ' "$failure_log"; then
+  printf 'machine apply changed configuration after source validation failed.\n' >&2
+  exit 1
+fi
 
 printf 'machine-apply.test: passed\n'

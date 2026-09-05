@@ -21,7 +21,7 @@ test("updates core and full lock files before validation", async () => {
     yield* (yield* MachineLockUpdate).update
   }).pipe(Effect.provide(layer)))
 
-  expect(await Effect.runPromise(repository.operations)).toEqual(["requireLockUpdatePreconditions"])
+  expect(await Effect.runPromise(repository.operations)).toEqual(["acquireLock", "requireLockUpdatePreconditions", "releaseLock"])
   expect((await Effect.runPromise(runner.commands)).map((command) => command.args?.slice(2))).toEqual([
     ["lock", "--bump"],
     ["lock", "--bump"],

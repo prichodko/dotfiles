@@ -1,3 +1,4 @@
+import { buildRemoteUpdateCommand } from "../../../dotfiles/pull/remote-update-command.ts"
 import { Duration, Effect, Layer, Schedule } from "effect"
 import { CommandRunner, describeCommandError } from "../../../process/command-runner.ts"
 import { DOTFILES_ROOT } from "../../../dotfiles/repository/live-dotfiles-repository.ts"
@@ -38,25 +39,11 @@ const exeMiseEnvironmentArguments = (profile: MachineProfile): ReadonlyArray<str
 const remoteMise = (profile: MachineProfile, argumentsList: ReadonlyArray<string>): string =>
   composeRemoteCommand(["mise", ...exeMiseEnvironmentArguments(profile), ...argumentsList])
 
-export const buildExeApplyCommand = (profile: MachineProfile): string => {
-  const pull = remoteMise(profile, ["run", "dotfiles:pull"])
-  const apply = remoteMise(profile, ["run", "machine:apply", ...(profile === "full" ? ["--", "full"] : [])])
-  const status = remoteMise(profile, ["bootstrap", "status", "--missing"])
-  return [
-    'cd "$HOME/.dotfiles" || exit $?',
-    "dotfiles_head_before=$(git rev-parse HEAD) || exit $?",
-    "dotfiles_pull_status=0",
-    `${pull} || dotfiles_pull_status=$?`,
-    "dotfiles_head_after=$(git rev-parse HEAD) || exit $?",
-    'if [ "$dotfiles_head_before" != "$dotfiles_head_after" ]; then',
-    `  ${pull} || exit $?`,
-    'elif [ "$dotfiles_pull_status" -ne 0 ]; then',
-    '  exit "$dotfiles_pull_status"',
-    "fi",
-    `${apply} &&`,
-    status
-  ].join("\n")
-}
+export const buildExeApplyCommand = (profile: MachineProfile): string =>
+  buildRemoteUpdateCommand(
+    remoteMise(profile, ["run", "dotfiles:pull"]),
+    remoteMise(profile, ["run", "machine:apply", ...(profile === "full" ? ["--", "full"] : [])])
+  )
 
 export const waitForSshWithin = <E, R>(
   attempt: Effect.Effect<void, E, R>,

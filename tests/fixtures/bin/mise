@@ -2,6 +2,9 @@
 if [[ -n "${MISE_TEST_LOG:-}" ]]; then
   printf '%s\t%s\n' "${MISE_ENV:-core}" "$*" >> "$MISE_TEST_LOG"
 fi
+if [[ -n "${MISE_TEST_FAIL_MATCH:-}" && "$*" == *"$MISE_TEST_FAIL_MATCH"* ]]; then
+  exit 7
+fi
 if [[ "${1:-}" == "--version" ]]; then
   printf '2026.8.16 test\n'
   exit 0

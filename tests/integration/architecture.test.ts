@@ -79,10 +79,12 @@ test("process environments extend the inherited environment", async () => {
 test("task entrypoints use the shared runtime", async () => {
   const typeScriptTasks = [
     "tasks/dotfiles/check.ts",
-    "tasks/dotfiles/pull.ts",
+    "tasks/dotfiles/update.ts",
     "tasks/dotfiles/sync.ts",
+    "tasks/dotfiles/publish.ts",
+    "tasks/dotfiles/check-source.ts",
     "tasks/machine/validate.ts",
-    "tasks/machine/apply-codex-config.ts",
+    "tasks/machine/finish-bootstrap.ts",
     "tasks/machine/update-locks.ts",
     "tasks/machine/exe/create.ts",
     "tasks/machine/exe/apply.ts"
@@ -92,7 +94,7 @@ test("task entrypoints use the shared runtime", async () => {
   expect(machineApply).toContain("bootstrap --skip-dirty --yes --locked")
   expect(machineApply).not.toContain("lib/machine")
   expect(await Bun.file(`${root}/tasks/bootstrap`).text()).toContain("bun install")
-  expect(await Bun.file(`${root}/tasks/bootstrap`).text()).toContain("apply-codex-config.ts")
+  expect(await Bun.file(`${root}/tasks/bootstrap`).text()).toContain("finish-bootstrap.ts")
 })
 
 test("Codex uses a tracked base and an untracked local configuration", async () => {
@@ -106,6 +108,6 @@ test("Codex uses a tracked base and an untracked local configuration", async () 
   expect(await Bun.file(`${root}/user/common/.codex/base.toml`).exists()).toBe(true)
   expect(await Bun.file(`${root}/user/common/.codex/machine.config.toml`).exists()).toBe(false)
   expect(project).not.toContain("machine.config.toml")
-  expect(bootstrap).toContain("apply-codex-config.ts")
+  expect(bootstrap).toContain("finish-bootstrap.ts")
   for (const shellFile of shellFiles) expect(shellFile).not.toContain("--profile machine")
 })

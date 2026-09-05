@@ -1,0 +1,29 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "defaultMode": "auto"
+  },
+  "skillOverrides": {
+    "trail-create": "user-invocable-only"
+  },
+  "enabledPlugins": {
+    "pr-review-toolkit@claude-plugins-official": true,
+    "figma@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
+  },
+  "effortLevel": "high",
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "skipAutoPermissionPrompt": true
+}

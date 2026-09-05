@@ -66,5 +66,5 @@ test("remote apply preserves provider environments and checks bootstrap status",
   expect(task).toContain('mise_environment="${MISE_ENV:-}"')
   expect(task).toContain('mise_environment="${mise_environment:+${mise_environment},}full"')
   expect(provider).toContain('["linux", "exe", ...machineProfileEnvironments(profile)]')
-  expect(provider).toContain('["bootstrap", "status", "--missing"]')
+  expect(task).toContain('bootstrap status --missing')
 })

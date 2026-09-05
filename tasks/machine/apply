@@ -18,5 +18,9 @@ if [[ "$profile" == "full" && ",${mise_environment}," != *,full,* ]]; then
   mise_environment="${mise_environment:+${mise_environment},}full"
 fi
 ignored_config_paths="$HOME/.config/mise/config.toml:$task_root/.config/mise/config.toml"
-MISE_IGNORED_CONFIG_PATHS="$ignored_config_paths" MISE_ENV="$mise_environment" \
-  mise -C "$task_root" bootstrap --skip-dirty --yes --locked
+export MISE_IGNORED_CONFIG_PATHS="$ignored_config_paths"
+export MISE_ENV="$mise_environment"
+mise -C "$task_root" --locked exec -- bun install --frozen-lockfile --ignore-scripts
+mise -C "$task_root" --locked exec -- bun run tasks/dotfiles/check-source.ts
+mise -C "$task_root" bootstrap --skip-dirty --yes --locked
+mise -C "$task_root" bootstrap status --missing

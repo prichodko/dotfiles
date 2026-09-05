@@ -1,3 +1,4 @@
+import { LiveClaudeConfigurationLayer } from "../claude/config/claude-configuration.ts"
 import { BunRuntime, BunServices } from "@effect/platform-bun"
 import { Cause, Console, Effect, Layer, Option } from "effect"
 import type * as LayerTypes from "effect/Layer"
@@ -14,14 +15,16 @@ import { EffectCommandRunnerLayer } from "../process/effect-command-runner.ts"
 
 const commandRunnerLayer = EffectCommandRunnerLayer.pipe(Layer.provide(BunServices.layer))
 const platformLayer = Layer.merge(BunServices.layer, commandRunnerLayer)
+const claudeConfigurationLayer = LiveClaudeConfigurationLayer.pipe(Layer.provide(BunServices.layer))
 const codexConfigurationLayer = LiveCodexConfigurationLayer.pipe(Layer.provide(BunServices.layer))
 const hkConfigurationLayer = LiveHkConfigurationLayer.pipe(Layer.provide(platformLayer))
-const repositoryValidationLayer = LiveRepositoryValidationLayer.pipe(Layer.provide(Layer.merge(platformLayer, hkConfigurationLayer)))
+const repositoryValidationLayer = LiveRepositoryValidationLayer.pipe(Layer.provide(Layer.mergeAll(platformLayer, hkConfigurationLayer, claudeConfigurationLayer)))
 const dotfilesRepositoryLayer = LiveDotfilesRepositoryLayer.pipe(Layer.provide(platformLayer))
 
 export const ApplicationLayer = Layer.mergeAll(
   platformLayer,
   codexConfigurationLayer,
+  claudeConfigurationLayer,
   hkConfigurationLayer,
   LiveNotificationServiceLayer.pipe(Layer.provide(commandRunnerLayer)),
   dotfilesRepositoryLayer,

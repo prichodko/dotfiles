@@ -77,7 +77,6 @@ exclude = [
 "~/.agents/AGENTS.md" = { source = "~/.dotfiles/user/common/.agents/AGENTS.md" }
 "~/.agents/skills" = { source = "~/.dotfiles/.agents/skills" }
 "~/.claude/CLAUDE.md" = { source = "~/.dotfiles/user/common/.agents/AGENTS.md" }
-"~/.claude/settings.json" = { source = "~/.dotfiles/user/common/.claude/settings.json", mode = "copy" }
 "~/.claude/skills" = { source = "~/.dotfiles/.claude/skills", mode = "symlink-each" }
 "~/.codex/AGENTS.md" = { source = "~/.dotfiles/user/common/.codex/AGENTS.md" }
 "~/.config/git/ignore" = { source = "~/.dotfiles/user/common/.config/git/ignore" }
@@ -102,11 +101,15 @@ run = "tasks/dotfiles/check.ts"
 
 [tasks."dotfiles:pull"]
 description = "Pull and apply dotfiles without publishing local changes"
-run = "tasks/dotfiles/pull.ts"
+run = "tasks/dotfiles/update.ts"
 
 [tasks."dotfiles:sync"]
-description = "Synchronize tracked dotfiles changes between trusted Macs"
+description = "Update dotfiles without committing or publishing local changes"
 run = "tasks/dotfiles/sync.ts"
+
+[tasks."dotfiles:publish"]
+description = "Explicitly commit and publish tracked changes after validation"
+run = "tasks/dotfiles/publish.ts"
 
 [tasks."machine:apply"]
 description = "Apply the native mise machine bootstrap"

@@ -32,6 +32,10 @@ export const LiveMachineLockUpdateLayer = Layer.effect(MachineLockUpdate, Effect
     Effect.asVoid
   )
   const update = Effect.gen(function*() {
+    yield* Effect.acquireRelease(
+      repository.acquireLock.pipe(Effect.mapError((cause) => new MachineLockUpdateFailure({ operation: "lock", detail: cause.detail, cause }))),
+      () => repository.releaseLock
+    )
     yield* repository.requireLockUpdatePreconditions.pipe(
       Effect.mapError((cause) => new MachineLockUpdateFailure({ operation: "preconditions", detail: cause.detail, cause }))
     )
@@ -46,5 +50,5 @@ export const LiveMachineLockUpdateLayer = Layer.effect(MachineLockUpdate, Effect
       Effect.mapError((cause) => new MachineLockUpdateFailure({ operation: "repository validation", detail: cause.detail, cause }))
     )
   })
-  return MachineLockUpdate.of({ update })
+  return MachineLockUpdate.of({ update: update.pipe(Effect.scoped) })
 }))

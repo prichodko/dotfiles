@@ -1,19 +1,15 @@
 import { Effect } from "effect"
 import { NotificationService } from "../../notification/notification-service.ts"
 import { DotfilesRepository } from "../repository/dotfiles-repository.ts"
-import { RepositoryValidation } from "../validation/validate-repository.ts"
 
 export const pullDotfiles = Effect.gen(function*() {
   const repository = yield* DotfilesRepository
-  const validation = yield* RepositoryValidation
   const notifications = yield* NotificationService
   yield* Effect.acquireRelease(repository.acquireLock, () => repository.releaseLock)
   yield* repository.requirePullPreconditions
   const upstreamSha = yield* repository.fetchMain
   yield* repository.fastForwardTo(upstreamSha)
-  yield* validation.validateSource
   yield* repository.applyManagedFiles
-  yield* validation.validateApplied
   yield* notifications.notify("success", "Pulled and applied origin/main.")
 }).pipe(
   Effect.onExit((exit) => exit._tag === "Failure"

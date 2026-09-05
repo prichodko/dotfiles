@@ -1,3 +1,4 @@
+import { ClaudeConfiguration } from "../../claude/config/claude-configuration.ts"
 import { Context, Data, Effect, FileSystem, Layer } from "effect"
 import { parseCodexConfig } from "../../codex/config/codex-config.ts"
 import { HkConfiguration } from "../../hk/configuration/hk-configuration.ts"
@@ -23,6 +24,7 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
   const runner = yield* CommandRunner
   const fileSystem = yield* FileSystem.FileSystem
   const hkConfiguration = yield* HkConfiguration
+  const claudeConfiguration = yield* ClaudeConfiguration
   const miseEnv = (profile: "core" | "full") => ({
     MISE_ENV: appendMiseEnvironments(process.env.MISE_ENV, machineProfileEnvironments(profile)),
     MISE_IGNORED_CONFIG_PATHS: `${process.env.HOME}/.config/mise/config.toml:${DOTFILES_ROOT}/.config/mise/config.toml`
@@ -83,6 +85,7 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
   const validateSource = Effect.gen(function*() {
     yield* run("TypeScript", "bun", ["run", "typecheck"])
     yield* validateCodexBase
+    yield* claudeConfiguration.validateBase.pipe(Effect.mapError((cause) => new RepositoryValidationFailure({ check: "Claude base", detail: cause.detail, cause })))
     yield* hkConfiguration.validateSource.pipe(
       Effect.mapError((cause) => new RepositoryValidationFailure({ check: "hk configuration", detail: cause.detail, cause }))
     )
@@ -104,7 +107,10 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
     if (staged.trim() !== "") yield* run("gitleaks staged", "gitleaks", ["git", "--staged", "--no-banner", "--redact", "--config", `${DOTFILES_ROOT}/.gitleaks.toml`, DOTFILES_ROOT])
     yield* validateArchitecture
   })
-  const validateApplied = run("dotfile status", "mise", dotfileStatusArguments, miseEnv("core"))
+  const validateApplied = Effect.gen(function*() {
+    yield* run("dotfile status", "mise", dotfileStatusArguments, miseEnv("core"))
+    yield* claudeConfiguration.validateApplied.pipe(Effect.mapError((cause) => new RepositoryValidationFailure({ check: "Claude configuration", detail: cause.detail, cause })))
+  })
   const validate = Effect.gen(function*() {
     yield* validateSource
     yield* validateApplied

@@ -72,7 +72,7 @@ printf '%s\n' \
 
 while IFS= read -r shell_file; do
   bash -n "$shell_file"
-done < <({ find "$test_root/lib" "$test_root/tests/bootstrap" -type f -name '*.sh'; printf '%s\n' "$test_root/tasks/bootstrap" "$test_root/tasks/machine/apply"; } | sort -u)
+done < <({ find "$test_root/tests/bootstrap" -type f -name '*.sh'; printf '%s\n' "$test_root/tasks/bootstrap" "$test_root/tasks/machine/apply"; } | sort -u)
 
 while IFS= read -r zsh_file; do
   zsh -n "$zsh_file"

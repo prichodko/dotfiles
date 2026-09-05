@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
-//MISE description="Synchronize tracked dotfiles changes between trusted Macs"
+//MISE description="Update dotfiles without committing or publishing local changes"
 
-import { synchronizeDotfiles } from "../../src/dotfiles/sync/synchronize-dotfiles.ts"
+import { pullDotfiles } from "../../src/dotfiles/pull/pull-dotfiles.ts"
 import { runProgram } from "../../src/runtime/run-program.ts"
 
-runProgram(synchronizeDotfiles)
+runProgram(pullDotfiles)

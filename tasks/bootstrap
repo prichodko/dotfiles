@@ -14,4 +14,4 @@ fi
 
 cd "$persistent_root"
 bun install --frozen-lockfile --ignore-scripts
-bun run tasks/machine/apply-codex-config.ts
+bun run tasks/machine/finish-bootstrap.ts

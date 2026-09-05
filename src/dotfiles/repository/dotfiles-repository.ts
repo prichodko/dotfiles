@@ -6,13 +6,12 @@ export class DotfilesRepositoryFailure extends Data.TaggedError("DotfilesReposit
   readonly cause?: unknown
 }> {}
 
-export interface RebasePreflightResult {
-  readonly _tag: "Passed" | "Conflict"
-  readonly conflictWorktreePath?: string
-}
+export type RebasePreflightResult =
+  | { readonly _tag: "Passed" }
+  | { readonly _tag: "Conflict"; readonly conflictWorktreePath: string }
 
 export class DotfilesRepository extends Context.Service<DotfilesRepository, {
-  readonly requireSyncPreconditions: Effect.Effect<void, DotfilesRepositoryFailure>
+  readonly requirePublishPreconditions: Effect.Effect<void, DotfilesRepositoryFailure>
   readonly requirePullPreconditions: Effect.Effect<void, DotfilesRepositoryFailure>
   readonly requireLockUpdatePreconditions: Effect.Effect<void, DotfilesRepositoryFailure>
   readonly acquireLock: Effect.Effect<void, DotfilesRepositoryFailure>
@@ -23,7 +22,8 @@ export class DotfilesRepository extends Context.Service<DotfilesRepository, {
   readonly fetchMain: Effect.Effect<string, DotfilesRepositoryFailure>
   readonly preflightRebase: (upstreamSha: string) => Effect.Effect<RebasePreflightResult, DotfilesRepositoryFailure>
   readonly rebaseLiveMain: (upstreamSha: string) => Effect.Effect<void, DotfilesRepositoryFailure>
-  readonly pushMain: Effect.Effect<boolean, DotfilesRepositoryFailure>
+  readonly validatePublication: Effect.Effect<string, DotfilesRepositoryFailure>
+  readonly pushMain: (commitSha: string) => Effect.Effect<boolean, DotfilesRepositoryFailure>
   readonly verifyPublishedHead: Effect.Effect<void, DotfilesRepositoryFailure>
   readonly applyManagedFiles: Effect.Effect<void, DotfilesRepositoryFailure>
   readonly listUntrackedFiles: Effect.Effect<ReadonlyArray<string>, DotfilesRepositoryFailure>

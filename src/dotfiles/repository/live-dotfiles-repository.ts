@@ -1,16 +1,18 @@
+import { fileURLToPath } from "node:url"
 import { Effect, FileSystem, Layer } from "effect"
 import { CommandRunner, describeCommandError } from "../../process/command-runner.ts"
-import { buildCommitMessage, sortPaths } from "../sync/synchronization-state.ts"
+import { buildCommitMessage, sortPaths } from "../publish/commit-message.ts"
 import { DotfilesRepository, DotfilesRepositoryFailure, type RebasePreflightResult } from "./dotfiles-repository.ts"
 import { findDisallowedLockUpdatePaths } from "./lock-update-paths.ts"
 
-export const DOTFILES_ROOT = new URL("../../../", import.meta.url).pathname.replace(/\/$/, "")
+export const DOTFILES_ROOT = fileURLToPath(new URL("../../../", import.meta.url)).replace(/\/$/, "")
 
 export interface LiveDotfilesRepositoryOptions {
   readonly repositoryRoot?: string
   readonly stateRoot?: string
   readonly platform?: NodeJS.Platform
   readonly applyManagedFiles?: Effect.Effect<void>
+  readonly validateCheckout?: (checkout: string) => Effect.Effect<void, DotfilesRepositoryFailure>
   readonly beforePush?: (attempt: 0 | 1) => Effect.Effect<void>
   readonly beforeLockPublish?: Effect.Effect<void>
 }
@@ -43,7 +45,7 @@ export const makeLiveDotfilesRepositoryLayer = (options: LiveDotfilesRepositoryO
   })
   const requireNoOperation = Effect.gen(function*() {
     for (const marker of ["rebase-apply", "rebase-merge", "MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD"]) {
-      const path = (yield* git(["rev-parse", "--git-path", marker])).stdout.trim()
+      const path = (yield* git(["rev-parse", "--path-format=absolute", "--git-path", marker])).stdout.trim()
       if (yield* fileSystem.exists(path).pipe(Effect.mapError((cause) => fail("preconditions", "Could not inspect Git operation state.", cause)))) {
         return yield* fail("preconditions", "A Git merge, rebase, cherry-pick, or revert is active.")
       }
@@ -53,7 +55,7 @@ export const makeLiveDotfilesRepositoryLayer = (options: LiveDotfilesRepositoryO
     result.stdout.trim() === repositoryRoot ? Effect.void : Effect.fail(fail("preconditions", "Repository root mismatch."))
   ))
   const requireCleanTracked = git(["status", "--porcelain=v1", "--untracked-files=no"]).pipe(Effect.flatMap((result) =>
-    result.stdout.trim() === "" ? Effect.void : Effect.fail(fail("preconditions", "Tracked local changes exist. Run dotfiles:sync on a trusted Mac."))
+    result.stdout.trim() === "" ? Effect.void : Effect.fail(fail("preconditions", "Tracked local changes exist. Review and commit them before updating."))
   ))
   const requireOnlyLockUpdateChanges = Effect.gen(function*() {
     const changedPaths = nulSeparatedPaths((yield* git(["diff", "--name-only", "-z", "HEAD", "--"])).stdout)
@@ -153,11 +155,30 @@ export const makeLiveDotfilesRepositoryLayer = (options: LiveDotfilesRepositoryO
       Effect.asVoid
     ))
   )
-  const pushMain = Effect.gen(function*() {
+  const validatePublication = Effect.gen(function*() {
+    yield* requireCleanTracked
+    const commitSha = (yield* git(["rev-parse", "HEAD"])).stdout.trim()
+    const checkout = `${stateRoot}/validation/${crypto.randomUUID()}`
+    const validateCheckout = options.validateCheckout ?? ((path: string) => Effect.gen(function*() {
+      const env = { MISE_TRUSTED_CONFIG_PATHS: path, MISE_IGNORED_CONFIG_PATHS: `${process.env.HOME}/.config/mise/config.toml:${path}/.config/mise/config.toml` }
+      yield* command("mise", ["-C", path, "--locked", "exec", "--", "bun", "install", "--frozen-lockfile", "--ignore-scripts"], { env })
+      yield* command("mise", ["-C", path, "--locked", "exec", "--", "bun", "run", "tasks/dotfiles/check-source.ts"], { env })
+    }))
+    yield* fileSystem.makeDirectory(`${stateRoot}/validation`, { recursive: true }).pipe(
+      Effect.mapError((cause) => fail("validation", "Could not create the validation directory.", cause))
+    )
+    yield* Effect.acquireUseRelease(
+      git(["worktree", "add", "--detach", checkout, commitSha]),
+      () => validateCheckout(checkout),
+      () => git(["worktree", "remove", "--force", checkout]).pipe(Effect.catch(() => Effect.void))
+    )
+    return commitSha
+  })
+  const pushMain = (commitSha: string) => Effect.gen(function*() {
     const attempt = pushAttempt
     pushAttempt = 1
     if (options.beforePush !== undefined) yield* options.beforePush(attempt)
-    return (yield* git(["push", "origin", "main:main"], true)).exitCode === 0
+    return (yield* git(["push", "origin", `${commitSha}:refs/heads/main`], true)).exitCode === 0
   })
   const verifyPublishedHead = Effect.gen(function*() {
     yield* git(["fetch", "origin", "main"])
@@ -167,17 +188,17 @@ export const makeLiveDotfilesRepositoryLayer = (options: LiveDotfilesRepositoryO
     ])
     if (local !== remote) return yield* fail("verify", "Local HEAD does not match origin/main.")
   })
-  const applyManagedFiles = options.applyManagedFiles ?? command("mise", ["-C", repositoryRoot, "bootstrap", "--only", "dotfiles,mise-shell-activate", "--yes"]).pipe(Effect.asVoid)
+  const applyManagedFiles = options.applyManagedFiles ?? command("bash", [`${repositoryRoot}/tasks/machine/apply`]).pipe(Effect.asVoid)
   const listUntrackedFiles = git(["ls-files", "--others", "--exclude-standard"]).pipe(Effect.map((result) => lines(result.stdout)))
   const fastForwardTo = (upstreamSha: string) => git(["merge-base", "--is-ancestor", "HEAD", upstreamSha], true).pipe(
     Effect.flatMap((ancestor) => ancestor.exitCode === 0
       ? git(["merge", "--ff-only", upstreamSha]).pipe(Effect.asVoid)
-      : Effect.fail(fail("pull", "Local main cannot fast-forward to origin/main. Run dotfiles:sync on a trusted Mac.")))
+      : Effect.fail(fail("pull", "Local main cannot fast-forward to origin/main. Reconcile it with Git or use dotfiles:publish on a trusted Mac.")))
   )
 
   return DotfilesRepository.of({
-    requireSyncPreconditions: Effect.gen(function*() {
-      if ((options.platform ?? process.platform) !== "darwin") return yield* fail("preconditions", "dotfiles:sync can run only on macOS.")
+    requirePublishPreconditions: Effect.gen(function*() {
+      if ((options.platform ?? process.platform) !== "darwin") return yield* fail("preconditions", "dotfiles:publish can run only on macOS.")
       yield* requireRepository
       yield* requireNoOperation
       yield* requireBranch
@@ -197,6 +218,7 @@ export const makeLiveDotfilesRepositoryLayer = (options: LiveDotfilesRepositoryO
     fetchMain,
     preflightRebase,
     rebaseLiveMain,
+    validatePublication,
     pushMain,
     verifyPublishedHead,
     applyManagedFiles,
