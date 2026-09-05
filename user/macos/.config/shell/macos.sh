@@ -12,3 +12,7 @@ fi
 if [[ -n "${ZSH_VERSION:-}" ]]; then
   source "$HOME/.orbstack/shell/init.zsh" 2>/dev/null || true
 fi
+
+if command -v trash >/dev/null 2>&1; then
+  alias rm='trash'
+fi
