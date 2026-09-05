@@ -1,80 +1,38 @@
 ## Communication
 
-- Use the language requested by the user. Use ASD-STE100 Simplified Technical English for English output.
-- Preserve the wording and language of quoted source text.
-- Use short, direct sentences. Give one instruction per sentence.
-- Use technical terms consistently. Avoid idioms, slang, and ambiguous words.
-- Keep output and commit messages concise. Use correct grammar.
-
-## Philosophy
-
-This codebase will outlive you. Every shortcut becomes someone else's burden. Every hack compounds into technical debt that slows the whole team down.
-
-You are not just writing code. You are shaping the future of this project. The patterns you establish will be copied. The corners you cut will be cut again.
-
-Fight entropy. Leave the codebase better than you found it.
-
-Keep cleanup within the requested task. Do not use these principles to expand a focused change into an unrelated refactor.
+Use the language requested by the user. Write concise, direct sentences with correct grammar and consistent technical terms. Preserve the wording and language of quoted source text.
 
 ## Code
 
-- Prefer direct imports from source over barrel files.
-- Prefer named exports. Preserve required framework entrypoints and established public contracts.
-- Colocate related files in folders (test, styles next to source)
-- Early returns over deep nesting
-- Async/await over .then()
-- Descriptive names over comments
-- Use types to prevent invalid internal states. Validate untrusted input at system boundaries.
-- Composition over inheritance
-- Fail early on broken programmer invariants. Represent expected user and network failures as explicit states.
+Keep changes maintainable and within the requested scope. Treat code-style preferences as defaults, subject to framework requirements and established project conventions.
 
-## UI design
+Prefer direct source imports, named exports, early returns, async/await, and composition. Colocate tests and styles with the relevant code. Use descriptive names and comments that explain non-obvious decisions or constraints.
 
-When working on UI:
+Use types to prevent invalid internal states. Validate untrusted input at system boundaries. Fail early on broken programmer invariants. Represent expected user and network failures as explicit states.
+
+## UI design and state
 
 - Make state transitions feel like the same object changing—not one layout replacing another. Preserve geometry while content, tone, and affordances update in place.
-- Keep surfaces stable across loading, empty, error, blocked, ready, and terminal states.
-- Design every expected state intentionally; unavailable or empty data should not simply disappear.
-- Reuse one structure per component family. State variants should change copy, color, and actions—not layout.
-- Keep actions fixed in position and size while busy or disabled.
-- Make loading feel active without causing layout shifts. Use subtle shimmer or reveal effects to communicate progress.
-- Use color consistently to reinforce status meaning, not as decoration.
-- Prefer compact inline controls near what they affect over dialogs for contextual choices.
-- Avoid duplicate copy. Titles and descriptions should communicate different information.
-- Write copy from the user’s perspective: explain the current state and available next action.
-
-## Media tools
-
-When available, use these local media tools:
-
-- Use `svgo` to optimize SVG files.
-- Use `oxipng` for lossless PNG optimization.
-- Use `sharp` to resize, crop, convert, or compress raster images.
-- Use `ffmpeg` to process audio and video.
-- Prefer local and deterministic tools.
-
-## Interactive UI state
-
-Before implementing a stateful interaction:
-
-- Define its valid states, transitions, and invariants.
-- Design the state model so invalid combinations cannot be represented.
-- Place state in the narrowest component that owns the interaction and its effects.
-- Ensure every async result still belongs to the current interaction before applying it.
-- Expose only actions that are valid in the current state.
-- For changed interactions, test the affected transitions, interruptions, repeated actions, and out-of-order async completion.
+- Design loading, empty, error, blocked, ready, and terminal states explicitly. Reuse the component structure across state variants.
+- Keep actions fixed in position and size while busy or disabled. Show loading progress without layout shifts.
+- Use color consistently for status. Prefer compact inline controls for contextual choices.
+- Write copy from the user's perspective: explain the current state and next action. Give titles and descriptions distinct information.
+- Define valid states, transitions, and invariants before implementation. Represent only valid state combinations and expose only valid actions.
+- Place state in the narrowest component that owns the interaction and its effects. Apply an async result only while it still belongs to the current interaction.
 - Apply relevant framework and composition skills before choosing the component API.
 
 ## Verification
 
-Test the changed behavior and its relevant failure paths. Complete required repository checks. Broaden or repeat checks only after a new change, failure, or unresolved concern.
+Test the changed behavior and relevant failure paths. For interaction changes, cover affected transitions, interruptions, repeated actions, and out-of-order async completion.
+
+Complete required repository checks. Broaden or repeat checks only after a new change, failure, or unresolved concern.
 
 ## Browser control
 
-- When controlling Chrome, enumerate all connected profiles and their tabs before acting. Choose only when the explicit profile name and exact URL or title identify one tab. Never fall back to the default profile when multiple profiles are connected; ask when ambiguous.
+When controlling Chrome, enumerate all connected profiles and their tabs before acting. Choose only when the explicit profile name and exact URL or title identify one tab. Never fall back to the default profile when multiple profiles are connected; ask when ambiguous.
 
-## Code navigation
+## Tools
 
-- Use `rg` first for known strings, symbols, and call sites.
-- Use `ast-grep outline` to orient in unfamiliar files.
-- Use `ast-grep run --pattern` for syntax-aware searches.
+Use `rg` first for known strings, symbols, and call sites. Use `ast-grep outline` when supported to orient in unfamiliar files, and `ast-grep run --pattern` for syntax-aware searches. Use available equivalents when these tools are missing.
+
+For media processing, prefer available local, deterministic tools: `svgo` for SVG optimization, `oxipng` for lossless PNG optimization, `sharp` for raster transformations, and `ffmpeg` for audio and video.
