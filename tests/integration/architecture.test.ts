@@ -85,7 +85,7 @@ test("task entrypoints use the shared runtime", async () => {
     "tasks/dotfiles/check-source.ts",
     "tasks/machine/validate.ts",
     "tasks/machine/finish-bootstrap.ts",
-    "tasks/machine/update-locks.ts",
+    "tasks/machine/upgrade.ts",
     "tasks/machine/exe/create.ts",
     "tasks/machine/exe/apply.ts"
   ]

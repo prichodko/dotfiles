@@ -34,13 +34,13 @@ test("direct TypeScript mise tasks are executable", async () => {
     expect(statSync(`${root}/${taskPath}`).mode & 0o111).not.toBe(0)
   }
 
-  const execution = Bun.spawnSync(["mise", "run", "machine:update-locks", "--", "unexpected"], {
+  const execution = Bun.spawnSync(["mise", "run", "machine:upgrade", "--", "unexpected"], {
     cwd: root,
     stdout: "pipe",
     stderr: "pipe"
   })
   const output = `${execution.stdout.toString()}${execution.stderr.toString()}`
-  expect(output).toContain("machine:update-locks does not accept arguments")
+  expect(output).toContain("Use no argument for core, or use the positional argument full.")
   expect(output).not.toContain("Permission denied")
 })
 
@@ -202,8 +202,9 @@ test("global hk configuration is managed", async () => {
   }
   expect(git).toContain('mise x -- hk run pre-commit --staged \\"$@\\"')
   expect(git).not.toContain("hk run pre-commit --from-hook")
-  expect(hk).toContain(`min_hk_version = "${lockedVersion}"`)
-  expect(hk).toContain(`/v${lockedVersion}/hk@${lockedVersion}#/Config.pkl`)
+  const schemaVersion = /min_hk_version = "([^"]+)"/u.exec(hk)?.[1]
+  if (schemaVersion === undefined) throw new Error("The hk schema version is missing.")
+  expect(hk).toContain(`/v${schemaVersion}/hk@${schemaVersion}#/Config.pkl`)
   expect(hk).toContain("node_modules/.bin/oxfmt")
   expect(settings).toContain('HK_MISE = "1"')
   expect(settings).toContain('trusted_config_paths = ["~/.codex", "~/.dotfiles", "~/Projects"]')

@@ -14,9 +14,9 @@ test("rejects unrelated tracked changes", () => {
   expect(findDisallowedLockUpdatePaths([
     "mise.full.toml",
     "README.md",
-    "src/machine/update/update-machine-locks.ts"
+    "src/machine/upgrade/upgrade-machine.ts"
   ])).toEqual([
     "README.md",
-    "src/machine/update/update-machine-locks.ts"
+    "src/machine/upgrade/upgrade-machine.ts"
   ])
 })

@@ -119,9 +119,9 @@ run = "tasks/machine/apply"
 description = "Validate the complete machine environment"
 run = "tasks/machine/validate.ts"
 
-[tasks."machine:update-locks"]
-description = "Refresh core and full tool lock files"
-run = "tasks/machine/update-locks.ts"
+[tasks."machine:upgrade"]
+description = "Upgrade locked tool versions and apply them locally"
+run = "tasks/machine/upgrade.ts"
 
 [tasks."machine:exe:create"]
 description = "Create and bootstrap an Exe machine"

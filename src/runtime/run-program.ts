@@ -8,7 +8,7 @@ import { LiveDotfilesRepositoryLayer } from "../dotfiles/repository/live-dotfile
 import { LiveRepositoryValidationLayer } from "../dotfiles/validation/validate-repository.ts"
 import { LiveHkConfigurationLayer } from "../hk/configuration/hk-configuration.ts"
 import { ExeMachineProviderLayer } from "../machine/providers/exe/exe-machine-provider.ts"
-import { LiveMachineLockUpdateLayer } from "../machine/update/update-machine-locks.ts"
+import { LiveMachineUpgradeLayer } from "../machine/upgrade/upgrade-machine.ts"
 import { LiveMachineValidationLayer } from "../machine/validation/validate-machine.ts"
 import { LiveNotificationServiceLayer } from "../notification/live-notification-service.ts"
 import { EffectCommandRunnerLayer } from "../process/effect-command-runner.ts"
@@ -30,7 +30,7 @@ export const ApplicationLayer = Layer.mergeAll(
   dotfilesRepositoryLayer,
   repositoryValidationLayer,
   ExeMachineProviderLayer.pipe(Layer.provide(commandRunnerLayer)),
-  LiveMachineLockUpdateLayer.pipe(Layer.provide(Layer.mergeAll(commandRunnerLayer, dotfilesRepositoryLayer, repositoryValidationLayer))),
+  LiveMachineUpgradeLayer.pipe(Layer.provide(Layer.mergeAll(commandRunnerLayer, dotfilesRepositoryLayer, repositoryValidationLayer))),
   LiveMachineValidationLayer.pipe(Layer.provide(Layer.mergeAll(commandRunnerLayer, repositoryValidationLayer, codexConfigurationLayer, hkConfigurationLayer)))
 )
 

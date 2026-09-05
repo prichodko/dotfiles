@@ -128,7 +128,7 @@ The global mise configuration manages copies of the shared core fragment, the fu
 
 The repository `mise.lock` and `mise.full.lock` files remain canonical.
 
-The lock update task refreshes the derived global copies before validation.
+The upgrade task refreshes the derived global copies when it applies the selected profile, after source checks and tests pass.
 
 New machines use mise bootstrap only.
 
@@ -199,12 +199,33 @@ Failures can leave a local commit or rebased branch for inspection. They never t
 ```sh
 mise run machine:validate
 mise run machine:validate full
-mise run machine:update-locks
+mise run machine:upgrade
+mise run machine:upgrade -- full
 mise run machine:exe:create -- work-vm
 mise run machine:exe:create -- work-vm --profile full
 mise run machine:exe:apply -- work-vm
 mise run machine:exe:apply -- work-vm --profile full
 ```
+
+`machine:upgrade` replaces `machine:update-locks`.
+
+Use no argument to apply core, or `full` to apply the full profile.
+
+The command acquires the repository lock and rejects unrelated tracked changes or an active Git operation.
+
+It updates both mise lock files to newer versions allowed by the tool declarations, then displays their diff against HEAD.
+
+It validates source and runs the test suite before applying configuration through `machine:apply`.
+
+Validation can download tools selected by the new locks. Application installs the selected profile, refreshes managed configuration, and checks bootstrap status.
+
+The command does not commit or push. Review the diff and try the upgraded tools in your projects before publishing the changes.
+
+If validation fails, application does not start. If application fails, it can leave partial machine changes. Lock-file changes remain available for inspection in either case.
+
+After correcting a failure, rerun the upgrade to select versions again, or use `machine apply --profile core` (or `full`) to retry application with the existing locks.
+
+Native package and desktop application upgrades remain separate. See [the maintenance guide](docs/new-machine.md#maintenance).
 
 Remote machine names are dynamic.
 
