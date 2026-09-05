@@ -91,7 +91,6 @@ exclude = [
 "~/.config/shell/bash.sh" = { source = "~/.dotfiles/user/common/.config/shell/bash.sh" }
 "~/.config/shell/common.sh" = { source = "~/.dotfiles/user/common/.config/shell/common.sh" }
 "~/.config/shell/zsh.sh" = { source = "~/.dotfiles/user/common/.config/shell/zsh.sh" }
-"~/.config/starship.toml" = { source = "~/.dotfiles/user/common/.config/starship.toml" }
 "~/.local/bin/machine" = { source = "~/.dotfiles/bin/machine.ts" }
 
 [tasks."dotfiles:check"]

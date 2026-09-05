@@ -22,7 +22,24 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt AUTO_CD CORRECT SHARE_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE
 
-command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
+machine_prompt_zsh() {
+  local last_status=$?
+  psvar[1]=$(machine_prompt_branch)
+  psvar[2]=$(machine_prompt_path)
+  PROMPT='%F{8}'
+  if [[ -n "${SSH_CONNECTION:-}${SSH_TTY:-}" ]]; then
+    PROMPT+='%n@%m '
+  fi
+  PROMPT+='%2v%1v%f'
+  if (( last_status != 0 )); then
+    PROMPT+=" [$last_status]"
+  fi
+  PROMPT+=' ❯ '
+  return 0
+}
+precmd_functions=(machine_prompt_zsh ${precmd_functions:#machine_prompt_zsh})
+RPROMPT=''
+machine_prompt_zsh
 command -v fzf >/dev/null 2>&1 && eval "$(fzf --zsh)"
 
 if [[ -n "${HOMEBREW_PREFIX:-}" ]]; then

@@ -16,7 +16,28 @@ if (( BASH_VERSINFO[0] >= 4 )); then
   shopt -s autocd
 fi
 
-command -v starship >/dev/null 2>&1 && eval "$(starship init bash)"
+machine_prompt_bash() {
+  local last_status=$?
+  MACHINE_PROMPT_BRANCH=$(machine_prompt_branch)
+  MACHINE_PROMPT_PATH=$(machine_prompt_path)
+  PS1='\[\e[90m\]'
+  if [[ -n "${SSH_CONNECTION:-}${SSH_TTY:-}" ]]; then
+    PS1+='\u@\h '
+  fi
+  # Expand the path and branch as data, never as shell code embedded in PS1.
+  PS1+='${MACHINE_PROMPT_PATH}${MACHINE_PROMPT_BRANCH}\[\e[0m\]'
+  if (( last_status != 0 )); then
+    PS1+=" [$last_status]"
+  fi
+  PS1+=' ❯ '
+  return "$last_status"
+}
+if [[ "$(declare -p PROMPT_COMMAND 2>/dev/null)" == 'declare -a '* ]]; then
+  PROMPT_COMMAND=(machine_prompt_bash "${PROMPT_COMMAND[@]}")
+else
+  PROMPT_COMMAND="machine_prompt_bash${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+fi
+machine_prompt_bash
 command -v fzf >/dev/null 2>&1 && eval "$(fzf --bash)"
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash --cmd cd)"
 
