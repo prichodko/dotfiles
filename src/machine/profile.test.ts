@@ -5,7 +5,8 @@ import {
   InvalidMachineProfile,
   machineProfileEnvironments,
   parseMachineProfile,
-  parseRemoteMachineName
+  parseRemoteMachineName,
+  resolveMachineProfileEnvironments
 } from "./profile.ts"
 
 test("parses machine profiles", () => {
@@ -18,6 +19,12 @@ test("preserves ordered mise environments and appends profile overlays once", ()
   expect(appendMiseEnvironments("linux,exe", machineProfileEnvironments("core"))).toBe("linux,exe")
   expect(appendMiseEnvironments("linux,exe", machineProfileEnvironments("full"))).toBe("linux,exe,full")
   expect(appendMiseEnvironments("linux,exe,full", machineProfileEnvironments("full"))).toBe("linux,exe,full")
+})
+
+test("explicitly selected profiles replace inherited profile overlays", () => {
+  expect(resolveMachineProfileEnvironments("linux,exe,full,custom", "core")).toBe("linux,exe,custom")
+  expect(resolveMachineProfileEnvironments("linux,exe,custom", "full")).toBe("linux,exe,custom,full")
+  expect(resolveMachineProfileEnvironments("linux,exe,full,custom", "full")).toBe("linux,exe,custom,full")
 })
 
 test("reserves the local target", () => {

@@ -16,6 +16,14 @@ export const appendMiseEnvironments = (
 export const machineProfileEnvironments = (profile: MachineProfile): ReadonlyArray<string> =>
   profile === "full" ? ["full"] : []
 
+export const resolveMachineProfileEnvironments = (
+  current: string | undefined,
+  profile: MachineProfile
+): string => {
+  const withoutProfile = (current ?? "").split(",").filter((environment) => environment.trim() !== "full").join(",")
+  return appendMiseEnvironments(withoutProfile, machineProfileEnvironments(profile))
+}
+
 export class InvalidMachineProfile extends Data.TaggedError("InvalidMachineProfile")<{
   readonly value: string
 }> {}

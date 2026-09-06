@@ -34,7 +34,7 @@ export const makeLiveDotfilesRepositoryLayer = (options: LiveDotfilesRepositoryO
     detail,
     ...(cause === undefined ? {} : { cause })
   })
-  const command = (program: string, args: ReadonlyArray<string>, options: { readonly allowFailure?: boolean; readonly interactive?: boolean; readonly env?: Readonly<Record<string, string | undefined>> } = {}) =>
+  const command = (program: string, args: ReadonlyArray<string>, options: { readonly allowFailure?: boolean; readonly interactive?: boolean; readonly cwd?: string; readonly env?: Readonly<Record<string, string | undefined>> } = {}) =>
     runner.run({ command: program, args, cwd: repositoryRoot, ...options }).pipe(
       Effect.mapError((cause) => fail(program, describeCommandError(cause), cause))
     )
@@ -161,8 +161,9 @@ export const makeLiveDotfilesRepositoryLayer = (options: LiveDotfilesRepositoryO
     const checkout = `${stateRoot}/validation/${crypto.randomUUID()}`
     const validateCheckout = options.validateCheckout ?? ((path: string) => Effect.gen(function*() {
       const env = { MISE_TRUSTED_CONFIG_PATHS: path, MISE_IGNORED_CONFIG_PATHS: `${process.env.HOME}/.config/mise/config.toml:${path}/.config/mise/config.toml` }
-      yield* command("mise", ["-C", path, "--locked", "exec", "--", "bun", "install", "--frozen-lockfile", "--ignore-scripts"], { env })
-      yield* command("mise", ["-C", path, "--locked", "exec", "--", "bun", "run", "tasks/dotfiles/check-source.ts"], { env })
+      yield* command("mise", ["-C", path, "--locked", "exec", "--", "bun", "install", "--frozen-lockfile", "--ignore-scripts"], { cwd: path, env })
+      yield* command("mise", ["-C", path, "--locked", "exec", "--", "bun", "run", "tasks/dotfiles/check-source.ts"], { cwd: path, env })
+      yield* command("mise", ["-C", path, "--locked", "run", "test"], { cwd: path, env })
     }))
     yield* fileSystem.makeDirectory(`${stateRoot}/validation`, { recursive: true }).pipe(
       Effect.mapError((cause) => fail("validation", "Could not create the validation directory.", cause))

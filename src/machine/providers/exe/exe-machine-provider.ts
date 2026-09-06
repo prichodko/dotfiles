@@ -39,6 +39,15 @@ const exeMiseEnvironmentArguments = (profile: MachineProfile): ReadonlyArray<str
 const remoteMise = (profile: MachineProfile, argumentsList: ReadonlyArray<string>): string =>
   composeRemoteCommand(["mise", ...exeMiseEnvironmentArguments(profile), ...argumentsList])
 
+export const buildExeBootstrapInspectionCommand = (): string =>
+  [
+    'if [ ! -x "$HOME/.local/bin/mise" ] || [ ! -e "$HOME/.dotfiles/.git" ]; then exit 42; fi',
+    // Reserve 42 for missing state; execution errors must never request repair.
+    '"$HOME/.local/bin/mise" --version >/dev/null || exit 43',
+    'git -C "$HOME/.dotfiles" rev-parse --is-inside-work-tree >/dev/null || exit 43',
+    'git -C "$HOME/.dotfiles" rev-parse --verify HEAD >/dev/null || exit 43',
+  ].join("\n")
+
 export const buildExeApplyCommand = (profile: MachineProfile): string =>
   buildRemoteUpdateCommand(
     remoteMise(profile, ["run", "dotfiles:pull"]),
@@ -105,11 +114,12 @@ export const ExeMachineProviderLayer = Layer.effect(MachineProvider, Effect.gen(
       "-o",
       "ConnectTimeout=10",
       hostFor(name),
-      "test -x \"$HOME/.local/bin/mise\" && \"$HOME/.local/bin/mise\" --version >/dev/null 2>&1 && git -C \"$HOME/.dotfiles\" rev-parse --is-inside-work-tree >/dev/null 2>&1 && git -C \"$HOME/.dotfiles\" rev-parse --verify HEAD >/dev/null 2>&1"
+      buildExeBootstrapInspectionCommand()
     ], { allowFailure: true })
-    return inspection.exitCode === 0
-      ? { _tag: "Complete" } as const
-      : { _tag: "Incomplete", reason: "The mise binary or dotfiles Git checkout is incomplete." } as const
+    if (inspection.exitCode === 0) return { _tag: "Complete" } as const
+    if (inspection.exitCode === 42) return { _tag: "Incomplete", reason: "The mise binary or dotfiles Git checkout is incomplete." } as const
+    const detail = inspection.stderr.trim()
+    return yield* failure("bootstrap inspection", `SSH bootstrap inspection exited with code ${inspection.exitCode}.${detail === "" ? "" : ` ${detail}`}`)
   })
   const bootstrap = (name: string, profile: MachineProfile) => {
     const remoteEnv = exeRemoteEnvironments(profile).join(",")

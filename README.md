@@ -182,7 +182,7 @@ New staged files are rejected. Add new files through a reviewed Git commit first
 
 It tests the rebase in an isolated worktree and preserves that worktree on conflict.
 
-Before each push, it creates a detached checkout of the candidate commit, installs its locked dependencies, and runs its source validation.
+Before each push, it creates a detached checkout of the candidate commit, installs its locked dependencies, and runs its source validation and test suite.
 
 It pushes that exact validated commit without force.
 
@@ -255,6 +255,8 @@ machine remove <name> [--yes]
 
 `apply`, `validate`, and `status` default to `local`.
 
+An explicit `--profile core` or `--profile full` takes precedence over an inherited `MISE_ENV` profile while preserving provider environments.
+
 `create` requires a remote name.
 
 Remote list and status output includes the Exe region code and display name when Exe provides them.
@@ -288,6 +290,8 @@ Remote apply checks that `~/.local/bin/mise` is executable and can run.
 It also checks that `~/.dotfiles` is a valid Git checkout with a current commit.
 
 An incomplete bootstrap waits for SSH and runs the bootstrap again.
+
+A failed SSH inspection stops application. Only confirmed incomplete configuration triggers bootstrap repair.
 
 A complete bootstrap does not run again.
 

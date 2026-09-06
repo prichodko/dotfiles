@@ -8,7 +8,7 @@ import { DotfilesRepository, DotfilesRepositoryFailure } from "../../src/dotfile
 import { makeLiveDotfilesRepositoryLayer } from "../../src/dotfiles/repository/live-dotfiles-repository.ts"
 import { publishDotfiles } from "../../src/dotfiles/publish/publish-dotfiles.ts"
 import { NotificationService } from "../../src/notification/notification-service.ts"
-import { CommandRunner } from "../../src/process/command-runner.ts"
+import { CommandFailure, CommandRunner, type CommandInput } from "../../src/process/command-runner.ts"
 import { EffectCommandRunnerLayer } from "../../src/process/effect-command-runner.ts"
 
 const temporaryRoots: Array<string> = []
@@ -133,6 +133,32 @@ const runPublication = (fixture: RepositoryFixture, beforePush?: (attempt: 0 | 1
     ),
   )
 
+const makeProductionValidationLayer = (fixture: RepositoryFixture, commands: Array<CommandInput>) => {
+  const liveRunner = EffectCommandRunnerLayer.pipe(Layer.provide(BunServices.layer))
+  const runner = Layer.effect(
+    CommandRunner,
+    Effect.gen(function*() {
+      const live = yield* CommandRunner
+      return CommandRunner.of({
+        run: (input) => {
+          commands.push(input)
+          if (input.command !== "mise") return live.run({ ...input, env: { ...input.env, ...isolatedGitEnvironment } })
+          if (input.args?.join(" ").endsWith(" --locked run test")) {
+            return Effect.fail(new CommandFailure({ input, exitCode: 1, stdout: "", stderr: "behavioral test failed" }))
+          }
+          return Effect.succeed({ exitCode: 0, stdout: "", stderr: "" })
+        }
+      })
+    }),
+  ).pipe(Layer.provide(liveRunner))
+  const platform = Layer.merge(BunServices.layer, runner)
+  return makeLiveDotfilesRepositoryLayer({
+    repositoryRoot: fixture.local,
+    stateRoot: fixture.state,
+    platform: "darwin",
+  }).pipe(Layer.provide(platform))
+}
+
 const pushPeerChange = (fixture: RepositoryFixture, file: string, content: string): void => {
   writeFileSync(join(fixture.peer, file), content)
   command(fixture.peer, ["git", "add", file])
@@ -254,6 +280,38 @@ describe("real Git publication safety", () => {
     expect(command(fixture.state, ["find", ".", "-maxdepth", "1", "-name", "sync.lock.pending-*"])).toBe("")
   })
 })
+
+test("behavioral test failure stops publication before push", async () => {
+  const fixture = makeRepositoryFixture()
+  const originalRemote = command(fixture.root, ["git", "--git-dir", fixture.remote, "rev-parse", "main"])
+  writeFileSync(join(fixture.local, "one.txt"), "candidate\n")
+  const commands: Array<CommandInput> = []
+  const result = await Effect.runPromiseExit(
+    publishDotfiles.pipe(
+      Effect.provide(Layer.mergeAll(
+        makeProductionValidationLayer(fixture, commands),
+        Layer.succeed(NotificationService, NotificationService.of({ notify: () => Effect.void })),
+      )),
+    ),
+  )
+  expect(result._tag).toBe("Failure")
+  const testCommand = commands.find((input) => input.args?.join(" ").endsWith(" --locked run test"))
+  expect(testCommand).toBeDefined()
+  const checkout = testCommand?.args?.[1]
+  expect(checkout).toContain(`${fixture.state}/validation/`)
+  expect(testCommand).toMatchObject({
+    cwd: checkout,
+    args: ["-C", checkout, "--locked", "run", "test"],
+    env: {
+      MISE_TRUSTED_CONFIG_PATHS: checkout,
+      MISE_IGNORED_CONFIG_PATHS: `${process.env.HOME}/.config/mise/config.toml:${checkout}/.config/mise/config.toml`,
+    }
+  })
+  expect(command(fixture.root, ["git", "--git-dir", fixture.remote, "rev-parse", "main"])).toBe(originalRemote)
+  expect(command(fixture.local, ["git", "rev-parse", "HEAD"])).not.toBe(originalRemote)
+  expect(commands.some((input) => input.command === "git" && input.args?.includes("push"))).toBe(false)
+  expect(command(fixture.local, ["git", "worktree", "list", "--porcelain"])).not.toContain("/validation/")
+}, 15_000)
 
 test("rejects an invalid combination after a conflict-free rebase", async () => {
   const fixture = makeRepositoryFixture()

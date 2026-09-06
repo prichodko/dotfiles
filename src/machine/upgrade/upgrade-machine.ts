@@ -3,7 +3,7 @@ import { DotfilesRepository } from "../../dotfiles/repository/dotfiles-repositor
 import { DOTFILES_ROOT } from "../../dotfiles/repository/live-dotfiles-repository.ts"
 import { RepositoryValidation } from "../../dotfiles/validation/validate-repository.ts"
 import { CommandRunner, describeCommandError } from "../../process/command-runner.ts"
-import { appendMiseEnvironments, machineProfileEnvironments, type MachineProfile } from "../profile.ts"
+import { resolveMachineProfileEnvironments, type MachineProfile } from "../profile.ts"
 
 export class MachineUpgradeFailure extends Data.TaggedError("MachineUpgradeFailure")<{
   readonly operation: string
@@ -20,10 +20,7 @@ export const LiveMachineUpgradeLayer = Layer.effect(MachineUpgrade, Effect.gen(f
   const repository = yield* DotfilesRepository
   const validation = yield* RepositoryValidation
   const environment = (profile: MachineProfile) => ({
-    MISE_ENV: appendMiseEnvironments(
-      (process.env.MISE_ENV ?? "").split(",").filter((name) => name.trim() !== "full").join(","),
-      machineProfileEnvironments(profile)
-    ),
+    MISE_ENV: resolveMachineProfileEnvironments(process.env.MISE_ENV, profile),
     MISE_IGNORED_CONFIG_PATHS: `${process.env.HOME}/.config/mise/config.toml:${DOTFILES_ROOT}/.config/mise/config.toml`
   })
   const failure = (operation: string, cause: { readonly detail: string }) =>

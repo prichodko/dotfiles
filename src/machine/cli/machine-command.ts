@@ -4,7 +4,7 @@ import { DOTFILES_ROOT } from "../../dotfiles/repository/live-dotfiles-repositor
 import { CommandRunner } from "../../process/command-runner.ts"
 import { applyRemoteMachine, createMachine, removeRemoteMachine, shellRemoteMachine, validateRemoteMachine } from "../lifecycle/manage-machine.ts"
 import { MachineProvider, type MachineSummary } from "../lifecycle/machine-provider.ts"
-import { InvalidMachineName, parseRemoteMachineName, type MachineProfile } from "../profile.ts"
+import { InvalidMachineName, parseRemoteMachineName, resolveMachineProfileEnvironments, type MachineProfile } from "../profile.ts"
 import { MachineValidation } from "../validation/validate-machine.ts"
 import { InvalidMachineResources, validateMachineResources } from "../resources.ts"
 
@@ -91,7 +91,12 @@ const applyCommand = Command.make("apply", { target: targetArgument, profile: pr
     return
   }
   const runner = yield* CommandRunner
-  yield* runner.run({ command: "mise", args: ["-C", DOTFILES_ROOT, "run", "machine:apply", ...(profile === "full" ? ["--", "full"] : [])], interactive: true })
+  yield* runner.run({
+    command: "mise",
+    args: ["-C", DOTFILES_ROOT, "run", "machine:apply", ...(profile === "full" ? ["--", "full"] : [])],
+    env: { MISE_ENV: resolveMachineProfileEnvironments(process.env.MISE_ENV, profile) },
+    interactive: true
+  })
 })).pipe(Command.withDescription("Apply local or remote machine configuration"))
 
 const validateCommand = Command.make("validate", { target: targetArgument, profile: profileFlag }, Effect.fn(function*({ profile, target }) {

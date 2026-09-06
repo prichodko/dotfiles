@@ -1,12 +1,14 @@
 import { expect, test } from "bun:test"
 import { Cause, Effect, Layer, Option } from "effect"
-import { mkdirSync, mkdtempSync, writeFileSync, rmSync } from "node:fs"
+import { chmodSync, mkdirSync, mkdtempSync, writeFileSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { makeRecordingCommandRunner } from "../../../process/recording-command-runner.ts"
 import { MachineProvider, MachineProviderFailure } from "../../lifecycle/machine-provider.ts"
+import { applyRemoteMachine } from "../../lifecycle/manage-machine.ts"
 import {
   buildExeApplyCommand,
+  buildExeBootstrapInspectionCommand,
   composeRemoteCommand,
   ExeMachineProviderLayer,
   exeRemoteEnvironments,
@@ -95,7 +97,7 @@ test("uses a dynamic ad-hoc bootstrap host", async () => {
 test("fails bootstrap when persistent remote state is incomplete", async () => {
   const recording = await Effect.runPromise(makeRecordingCommandRunner([
     { exitCode: 0, stdout: "", stderr: "" },
-    { exitCode: 1, stdout: "", stderr: "missing" }
+    { exitCode: 42, stdout: "", stderr: "missing" }
   ]))
   const layer = ExeMachineProviderLayer.pipe(Layer.provide(recording.layer))
   const exit = await Effect.runPromiseExit(MachineProvider.use((provider) => provider.bootstrap("work", "core")).pipe(Effect.provide(layer)))
@@ -134,7 +136,7 @@ test("delegates a remote update once with the complete profile", () => {
 
 test("inspects the executable mise binary and the dotfiles Git checkout", async () => {
   const recording = await Effect.runPromise(makeRecordingCommandRunner([
-    { exitCode: 1, stdout: "", stderr: "missing" }
+    { exitCode: 42, stdout: "", stderr: "missing" }
   ]))
   const layer = ExeMachineProviderLayer.pipe(Layer.provide(recording.layer))
   const inspection = await Effect.runPromise(MachineProvider.use((provider) => provider.inspectBootstrap("work")).pipe(Effect.provide(layer)))
@@ -143,6 +145,71 @@ test("inspects the executable mise binary and the dotfiles Git checkout", async 
   expect(commands[0]?.args?.at(-1)).toContain('"$HOME/.local/bin/mise" --version')
   expect(commands[0]?.args?.at(-1)).toContain("rev-parse --is-inside-work-tree")
   expect(commands[0]?.args?.at(-1)).toContain("rev-parse --verify HEAD")
+})
+
+test("uses a reserved remote status only for confirmed incomplete bootstrap state", () => {
+  const temporaryHome = mkdtempSync(join(tmpdir(), "exe-bootstrap-inspection-"))
+  try {
+    const env = { ...process.env, HOME: temporaryHome, GIT_CONFIG_GLOBAL: "/dev/null", HK: "0" }
+    const execute = (home = temporaryHome) => Bun.spawnSync(["/bin/sh", "-c", buildExeBootstrapInspectionCommand()], {
+      env: { ...env, HOME: home }, stdout: "pipe", stderr: "pipe"
+    }).exitCode
+    const git = (args: ReadonlyArray<string>) => {
+      const result = Bun.spawnSync(["git", ...args], { env, stdout: "pipe", stderr: "pipe" })
+      expect(result.exitCode, result.stderr.toString()).toBe(0)
+    }
+    expect(execute()).toBe(42)
+    mkdirSync(join(temporaryHome, ".local", "bin"), { recursive: true })
+    const mise = join(temporaryHome, ".local", "bin", "mise")
+    writeFileSync(mise, "#!/bin/sh\nexit 0\n")
+    chmodSync(mise, 0o755)
+    expect(execute()).toBe(42)
+    const checkout = join(temporaryHome, ".dotfiles")
+    git(["init", checkout])
+    expect(execute()).toBe(43)
+    git(["-C", checkout, "-c", "user.name=Test", "-c", "user.email=test@example.com", "-c", "commit.gpgsign=false", "commit", "--allow-empty", "-m", "fixture"])
+    expect(execute()).toBe(0)
+    writeFileSync(mise, "#!/bin/sh\nexit 42\n")
+    expect(execute()).toBe(43)
+    writeFileSync(mise, "#!/bin/sh\nexit 0\n")
+    const worktreeHome = join(temporaryHome, "worktree-home")
+    mkdirSync(join(worktreeHome, ".local", "bin"), { recursive: true })
+    writeFileSync(join(worktreeHome, ".local", "bin", "mise"), "#!/bin/sh\nexit 0\n", { mode: 0o755 })
+    git(["-C", checkout, "worktree", "add", "--detach", join(worktreeHome, ".dotfiles"), "HEAD"])
+    expect(execute(worktreeHome)).toBe(0)
+  } finally {
+    rmSync(temporaryHome, { recursive: true, force: true })
+  }
+})
+
+test("treats SSH transport failures as inspection errors", async () => {
+  const recording = await Effect.runPromise(makeRecordingCommandRunner([
+    { exitCode: 255, stdout: "", stderr: "Connection refused" }
+  ]))
+  const layer = ExeMachineProviderLayer.pipe(Layer.provide(recording.layer))
+  const exit = await Effect.runPromiseExit(MachineProvider.use((provider) => provider.inspectBootstrap("work")).pipe(Effect.provide(layer)))
+  expect(exit._tag).toBe("Failure")
+  if (exit._tag === "Failure") {
+    const error = Cause.findErrorOption(exit.cause)
+    expect(Option.getOrUndefined(error)).toMatchObject({ operation: "bootstrap inspection", detail: "SSH bootstrap inspection exited with code 255. Connection refused" })
+  }
+})
+
+test("remote apply stops before repair when SSH inspection fails", async () => {
+  const ok = { exitCode: 0, stdout: "", stderr: "" }
+  const recording = await Effect.runPromise(makeRecordingCommandRunner([
+    { ...ok, stdout: "main\n" }, ok, ok,
+    { ...ok, stdout: "same-sha\n" }, { ...ok, stdout: "same-sha\n" },
+    ok, { ...ok, stdout: JSON.stringify({ vms: [{ vm_name: "work-vm" }] }) },
+    { exitCode: 255, stdout: "", stderr: "Connection refused" },
+  ]))
+  const layer = ExeMachineProviderLayer.pipe(Layer.provide(recording.layer))
+  const exit = await Effect.runPromiseExit(applyRemoteMachine("work-vm", "core").pipe(Effect.provide(layer)))
+  expect(exit._tag).toBe("Failure")
+  const commands = await Effect.runPromise(recording.commands)
+  expect(commands).toHaveLength(8)
+  expect(commands.at(-1)?.args?.at(-1)).toBe(buildExeBootstrapInspectionCommand())
+  expect(commands.some((command) => command.args?.includes("--force-dotfiles"))).toBe(false)
 })
 
 test("uses strict managed trust on every direct Exe SSH connection", async () => {

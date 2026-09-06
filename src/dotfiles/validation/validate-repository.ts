@@ -2,7 +2,7 @@ import { ClaudeConfiguration } from "../../claude/config/claude-configuration.ts
 import { Context, Data, Effect, FileSystem, Layer } from "effect"
 import { parseCodexConfig } from "../../codex/config/codex-config.ts"
 import { HkConfiguration } from "../../hk/configuration/hk-configuration.ts"
-import { appendMiseEnvironments, machineProfileEnvironments } from "../../machine/profile.ts"
+import { resolveMachineProfileEnvironments } from "../../machine/profile.ts"
 import { CommandRunner, describeCommandError } from "../../process/command-runner.ts"
 import { DOTFILES_ROOT } from "../repository/live-dotfiles-repository.ts"
 
@@ -26,7 +26,7 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
   const hkConfiguration = yield* HkConfiguration
   const claudeConfiguration = yield* ClaudeConfiguration
   const miseEnv = (profile: "core" | "full") => ({
-    MISE_ENV: appendMiseEnvironments(process.env.MISE_ENV, machineProfileEnvironments(profile)),
+    MISE_ENV: resolveMachineProfileEnvironments(process.env.MISE_ENV, profile),
     MISE_IGNORED_CONFIG_PATHS: `${process.env.HOME}/.config/mise/config.toml:${DOTFILES_ROOT}/.config/mise/config.toml`
   })
   const run = (check: string, command: string, args: ReadonlyArray<string>, env?: Readonly<Record<string, string | undefined>>) =>
