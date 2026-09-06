@@ -187,6 +187,15 @@ test("macOS Git signing uses the managed 1Password signer", async () => {
   expect(platformGit).toContain("/Applications/1Password.app/Contents/MacOS/op-ssh-sign")
 })
 
+test("generic Linux Git configuration does not require an Exe signing key", async () => {
+  const linux = await Bun.file(`${root}/mise.linux.toml`).text()
+  const platformGit = await Bun.file(`${root}/user/linux/.config/git/platform.conf`).text()
+  expect(linux).toContain(
+    '"~/.config/git/platform.conf" = { source = "~/.dotfiles/user/linux/.config/git/platform.conf" }',
+  )
+  expect(platformGit).not.toContain("signingkey")
+})
+
 test("global hk configuration is managed", async () => {
   const project = await Bun.file(`${root}/mise.toml`).text()
   const settings = await Bun.file(`${root}/user/common/.config/mise/config.toml`).text()

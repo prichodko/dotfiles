@@ -23,11 +23,21 @@ test("macOS SSH applies managed strict trust to every Exe host form", async () =
   expect(EXE_SSH_OPTIONS).toHaveLength(4)
 })
 
-test("Codex remote aliases use Tailscale SSH", async () => {
+test("remote aliases use Tailscale SSH without forwarding the personal agent", async () => {
   const config = await Bun.file(`${root}/user/macos/.ssh/config`).text()
   expect(config).toContain("Host agent-controller\n    HostName controller.tail1cfa5f.ts.net\n    User exedev")
   expect(config).toContain("Host entire-exe-dev\n    HostName entire-exe-dev.tail1cfa5f.ts.net\n    User exedev")
-  expect(config).toContain("Host agent-controller entire-exe-dev *.exe.xyz\n    ForwardAgent yes")
+  expect(config).not.toContain("ForwardAgent yes")
+})
+
+test("Exe Git signing uses the unattended machine key", async () => {
+  const config = await Bun.file(`${root}/mise.exe.toml`).text()
+  const git = await Bun.file(`${root}/user/linux/.config/git/exe.conf`).text()
+  expect(config).toContain(
+    '"~/.config/git/platform.conf" = { source = "~/.dotfiles/user/linux/.config/git/exe.conf" }',
+  )
+  expect(git).toContain("path = ~/.dotfiles/user/linux/.config/git/platform.conf")
+  expect(git).toContain("signingkey = ~/.ssh/agent_commit_signing")
 })
 
 test("the Exe overlay repairs the login shell before bootstrap user convergence", async () => {

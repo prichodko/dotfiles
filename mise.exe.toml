@@ -32,3 +32,6 @@ if [ "$updated_shell" != "$expected_shell" ]; then
   exit 1
 fi
 '''
+
+[dotfiles]
+"~/.config/git/platform.conf" = { source = "~/.dotfiles/user/linux/.config/git/exe.conf" }

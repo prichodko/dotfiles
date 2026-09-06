@@ -337,7 +337,7 @@ The `entire-exe-dev` alias connects to `entire-exe-dev.tail1cfa5f.ts.net` as `ex
 
 The Tailscale SSH aliases do not use the 1Password agent for login.
 
-They forward the 1Password agent for remote Git signing.
+Linux remote agents use a dedicated per-machine SSH key for unattended Git signing. The private key stays on the remote machine and is not managed by dotfiles.
 
 Wildcard `*.exe.xyz` hosts use the same Exe user and identity agent.
 
