@@ -21,7 +21,6 @@ export const makeRecordingDotfilesRepository = (options: RecordingDotfilesReposi
     const layer = Layer.succeed(DotfilesRepository, DotfilesRepository.of({
       requirePublishPreconditions: record("requirePublishPreconditions"),
       requirePullPreconditions: record("requirePullPreconditions"),
-      requireLockUpdatePreconditions: record("requireLockUpdatePreconditions"),
       acquireLock: record("acquireLock"),
       releaseLock: record("releaseLock"),
       waitForStableChanges: record("waitForStableChanges"),

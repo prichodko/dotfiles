@@ -130,7 +130,7 @@ The repository `mise.lock` and `mise.full.lock` files remain canonical.
 
 Use `mise upgrade <tool>` to upgrade one tool within its declared version range, install it, and update the canonical lock file. For example, `mise upgrade hk` advances the managed `hk = "2"` request within the 2.x line. The hook resolves hk through mise, so no hook update or machine apply is needed.
 
-The optional `machine:upgrade` task upgrades all managed tools, runs the repository checks, and applies the selected profile.
+Use `mise -C ~ upgrade` to upgrade every core tool. Use `mise -C ~ -E full upgrade` to include the full profile. The linked global configuration updates the canonical repository lock files directly. Review and validate those changes before committing them.
 
 New machines use mise bootstrap only.
 
@@ -201,31 +201,11 @@ Failures can leave a local commit or rebased branch for inspection. They never t
 ```sh
 mise run machine:validate
 mise run machine:validate full
-mise run machine:upgrade
-mise run machine:upgrade -- full
 mise run machine:exe:create -- work-vm
 mise run machine:exe:create -- work-vm --profile full
 mise run machine:exe:apply -- work-vm
 mise run machine:exe:apply -- work-vm --profile full
 ```
-
-`machine:upgrade` replaces `machine:update-locks`.
-
-Use no argument to apply core, or `full` to apply the full profile.
-
-The command acquires the repository lock and rejects unrelated tracked changes or an active Git operation.
-
-It updates both mise lock files to newer versions allowed by the tool declarations, then displays their diff against HEAD.
-
-It validates source and runs the test suite before applying configuration through `machine:apply`.
-
-Validation can download tools selected by the new locks. Application installs the selected profile, refreshes managed configuration, and checks bootstrap status.
-
-The command does not commit or push. Review the diff and try the upgraded tools in your projects before publishing the changes.
-
-If validation fails, application does not start. If application fails, it can leave partial machine changes. Lock-file changes remain available for inspection in either case.
-
-After correcting a failure, rerun the upgrade to select versions again, or use `machine apply --profile core` (or `full`) to retry application with the existing locks.
 
 Native package and desktop application upgrades remain separate. See [the maintenance guide](docs/new-machine.md#maintenance).
 

@@ -33,15 +33,6 @@ test("direct TypeScript mise tasks are executable", async () => {
     if (taskPath === undefined) throw new Error("A mise task path is missing.")
     expect(statSync(`${root}/${taskPath}`).mode & 0o111).not.toBe(0)
   }
-
-  const execution = Bun.spawnSync(["mise", "run", "machine:upgrade", "--", "unexpected"], {
-    cwd: root,
-    stdout: "pipe",
-    stderr: "pipe"
-  })
-  const output = `${execution.stdout.toString()}${execution.stderr.toString()}`
-  expect(output).toContain("Use no argument for core, or use the positional argument full.")
-  expect(output).not.toContain("Permission denied")
 })
 
 test("global mise uses linked configuration with canonical repository locks", () => {

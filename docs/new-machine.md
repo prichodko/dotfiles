@@ -117,19 +117,22 @@ Confirm that the global hk pre-commit hook runs the formatter.
 
 ## Maintenance
 
-Select newer mise tool versions, validate them, and apply the full profile:
+Upgrade one managed tool within its declared version range:
 
 ```sh
-mise run machine:upgrade -- full
+mise upgrade hk
 ```
 
-Omit `-- full` for a core machine. Both profile lock files are updated in either case.
+Upgrade every core tool, or include the full profile:
 
-The command displays the lock-file changes, validates source, runs tests, and applies the selected profile.
+```sh
+mise -C ~ upgrade
+mise -C ~ -E full upgrade
+```
 
-Try the upgraded tools in your projects. Then review, commit, and push the lock-file changes.
+The linked global configuration writes version changes to the canonical repository lock files. Review the diff, run `mise run dotfiles:check`, and try the upgraded tools in your projects before committing and pushing the lock-file changes.
 
-An upgrade failure preserves lock-file changes for inspection. A failure during application can leave partial machine changes.
+For a new machine, bootstrap with the current tested locks first. Upgrade tools only after the initial setup validates successfully.
 
 Preview native package and application upgrades:
 
