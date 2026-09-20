@@ -21,6 +21,7 @@ const makeFixture = (): HkConfigurationPaths => {
   writeFileSync(userConfigPath, "hooks {}\n")
   return {
     userConfigPath,
+    hooksConfigPath: join(root, "user", ".config", "git", "hk.conf"),
     workingDirectory: root,
     commandSearchPath: "/brew/bin:/usr/bin"
   }
@@ -29,18 +30,23 @@ const makeFixture = (): HkConfigurationPaths => {
 const makeCommandLayer = (
   gitVersion = "git version 2.55.0\n",
   sourcePlanOutput = "Plan: pre-commit\n  oxfmt\n",
-  appliedPlanOutput = sourcePlanOutput
+  appliedPlanOutput = sourcePlanOutput,
+  commands?: Array<CommandInput>
 ) => Layer.succeed(CommandRunner, CommandRunner.of({
   run: (input: CommandInput): Effect.Effect<CommandResult> => Effect.sync(() => {
+    commands?.push(input)
     if (input.command === "git" && input.args?.[0] === "--version") {
       return { exitCode: 0, stdout: gitVersion, stderr: "" }
     }
+    if (input.command === "which" && input.args?.[0] === "mise") {
+      return { exitCode: 0, stdout: "/home/test/.local/bin/mise\n", stderr: "" }
+    }
     if (input.command === "git") {
       const hookCommands: Readonly<Record<string, string>> = {
-        "hook.hk-commit-msg.command": "mise x -- hk run commit-msg --from-hook \"$@\"",
-        "hook.hk-pre-commit.command": "mise x -- hk run pre-commit --staged \"$@\"",
-        "hook.hk-pre-push.command": "mise x -- hk run pre-push --from-hook \"$@\"",
-        "hook.hk-prepare-commit-msg.command": "mise x -- hk run prepare-commit-msg --from-hook \"$@\""
+        "hook.hk-commit-msg.command": "test \"${HK:-1}\" = \"0\" || /home/test/.local/bin/mise x hk -- hk run commit-msg --from-hook",
+        "hook.hk-pre-commit.command": "test \"${HK:-1}\" = \"0\" || /home/test/.local/bin/mise x hk -- hk run pre-commit --staged",
+        "hook.hk-pre-push.command": "test \"${HK:-1}\" = \"0\" || /home/test/.local/bin/mise x hk -- hk run pre-push --from-hook",
+        "hook.hk-prepare-commit-msg.command": "test \"${HK:-1}\" = \"0\" || /home/test/.local/bin/mise x hk -- hk run prepare-commit-msg --from-hook"
       }
       const key = input.args?.at(-1)
       if (key !== undefined && hookCommands[key] !== undefined) {
@@ -67,6 +73,33 @@ const runWithConfiguration = <A>(
 ))
 
 describe("HkConfiguration", () => {
+  test("installs machine-local global hooks through mise", async () => {
+    const paths = makeFixture()
+    const commands: Array<CommandInput> = []
+    await Effect.runPromise(HkConfiguration.use((configuration) => configuration.applyGlobalHooks).pipe(
+      Effect.provide(makeHkConfigurationLayer(paths).pipe(
+        Layer.provide(Layer.merge(BunServices.layer, makeCommandLayer(undefined, undefined, undefined, commands)))
+      ))
+    ))
+
+    expect(commands).toContainEqual(expect.objectContaining({
+      command: "mise",
+      args: ["--locked", "-C", paths.workingDirectory, "exec", "--", "hk", "install", "--global", "--mise"],
+      env: expect.objectContaining({ GIT_CONFIG_GLOBAL: paths.hooksConfigPath })
+    }))
+    expect(commands).toContainEqual(expect.objectContaining({
+      command: "git",
+      args: [
+        "config",
+        "--file",
+        paths.hooksConfigPath,
+        "--replace-all",
+        "hook.hk-pre-commit.command",
+        'test "${HK:-1}" = "0" || /home/test/.local/bin/mise x hk -- hk run pre-commit --staged'
+      ]
+    }))
+  })
+
   test("validates the managed global hooks", async () => {
     const paths = makeFixture()
     await runWithConfiguration(paths, Effect.gen(function*() {

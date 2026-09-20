@@ -11,6 +11,7 @@ import {
 
 export interface HkConfigurationPaths {
   readonly userConfigPath: string
+  readonly hooksConfigPath: string
   readonly workingDirectory: string
   readonly commandSearchPath: string
 }
@@ -22,6 +23,7 @@ export class HkConfigurationFailure extends Data.TaggedError("HkConfigurationFai
 }> {}
 
 export class HkConfiguration extends Context.Service<HkConfiguration, {
+  readonly applyGlobalHooks: Effect.Effect<void, HkConfigurationFailure>
   readonly validateSource: Effect.Effect<void, HkConfigurationFailure>
   readonly validateApplied: Effect.Effect<void, HkConfigurationFailure>
 }>()("hk/configuration/HkConfiguration") {}
@@ -35,6 +37,7 @@ export const defaultHkConfigurationPaths = (): HkConfigurationPaths => {
   const home = requiredHome()
   return {
     userConfigPath: `${DOTFILES_ROOT}/user/common/.config/hk/config.pkl`,
+    hooksConfigPath: `${home}/.config/git/hk.conf`,
     workingDirectory: DOTFILES_ROOT,
     commandSearchPath: prependSearchPath(homebrewBinDirectories(process.platform), process.env.PATH)
   }
@@ -99,16 +102,36 @@ export const makeHkConfigurationLayer = (paths: HkConfigurationPaths) => Layer.e
       return yield* failure("applied hk configuration", "hk cannot discover the managed global policy in the normal user environment.")
     }
   })
+  const applyGlobalHooks = Effect.gen(function*() {
+    yield* fileSystem.makeDirectory(dirname(paths.hooksConfigPath), { recursive: true }).pipe(
+      Effect.mapError((cause) => failure("global hk hooks", `Could not create the hook configuration directory: ${dirname(paths.hooksConfigPath)}`, cause))
+    )
+    yield* runHk("global hk hooks", ["install", "--global", "--mise"], {
+      ...commandEnvironment,
+      GIT_CONFIG_GLOBAL: paths.hooksConfigPath
+    })
+    const miseExecutable = (yield* run("mise executable", "which", ["mise"], commandEnvironment)).stdout.trim()
+    if (miseExecutable === "") return yield* failure("mise executable", "mise is not available on PATH.")
+    yield* run("global hk pre-commit hook", "git", [
+      "config",
+      "--file",
+      paths.hooksConfigPath,
+      "--replace-all",
+      "hook.hk-pre-commit.command",
+      `test "\${HK:-1}" = "0" || ${miseExecutable} x hk -- hk run pre-commit --staged`
+    ], commandEnvironment)
+  })
   const validateGlobalResolution = Effect.gen(function*() {
     const hooks = [
-      ["commit-msg", "mise x -- hk run commit-msg --from-hook \"$@\""],
-      ["pre-commit", "mise x -- hk run pre-commit --staged \"$@\""],
-      ["pre-push", "mise x -- hk run pre-push --from-hook \"$@\""],
-      ["prepare-commit-msg", "mise x -- hk run prepare-commit-msg --from-hook \"$@\""]
+      ["commit-msg", "x hk -- hk run commit-msg --from-hook"],
+      ["pre-commit", "x hk -- hk run pre-commit --staged"],
+      ["pre-push", "x hk -- hk run pre-push --from-hook"],
+      ["prepare-commit-msg", "x hk -- hk run prepare-commit-msg --from-hook"]
     ] as const
-    for (const [event, expectedCommand] of hooks) {
+    for (const [event, expectedSuffix] of hooks) {
       const hook = yield* run("global hk hook", "git", ["config", "--global", "--includes", "--get", `hook.hk-${event}.command`], commandEnvironment)
-      if (!hook.stdout.includes(expectedCommand)) {
+      const command = hook.stdout.trim()
+      if (!command.startsWith('test "${HK:-1}" = "0" || ') || !command.endsWith(expectedSuffix)) {
         return yield* failure("global hk hook", `The managed global Git configuration does not include the hk ${event} hook.`)
       }
     }
@@ -123,7 +146,7 @@ export const makeHkConfigurationLayer = (paths: HkConfigurationPaths) => Layer.e
     yield* validateAppliedUserConfig
     yield* validateGlobalResolution
   })
-  return HkConfiguration.of({ validateSource: validateUserConfig, validateApplied })
+  return HkConfiguration.of({ applyGlobalHooks, validateSource: validateUserConfig, validateApplied })
 }))
 
 export const LiveHkConfigurationLayer = makeHkConfigurationLayer(defaultHkConfigurationPaths())

@@ -17,4 +17,4 @@
 
 - Run focused tests for each changed module.
 - Run `mise run dotfiles:check` before publishing dotfiles changes.
-- Use `mise run machine:upgrade` (or `mise run machine:upgrade -- full`) to update managed mise lock files, validate them, and apply the selected local profile.
+- Use `mise upgrade <tool>` for a single managed tool within its declared version range. Use `mise run machine:upgrade` (or `mise run machine:upgrade -- full`) for a coordinated all-tools upgrade with validation and local profile application.

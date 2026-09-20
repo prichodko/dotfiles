@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test"
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, symlinkSync } from "node:fs"
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, symlinkSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { dirname, join } from "node:path"
 
@@ -12,12 +12,12 @@ test("mise owns one core tool fragment, one full overlay, and their canonical lo
   expect(project).not.toContain("\n[tools]\n")
   expect(settings).not.toContain("\n[tools]\n")
   expect(core).toContain("[tools]")
-  expect(project).toContain('"~/.config/mise/config.full.toml" = { source = "~/.dotfiles/mise.full.toml", mode = "copy" }')
-  expect(project).toContain('"~/.config/mise/conf.d/core.toml" = { source = "~/.dotfiles/mise/conf.d/core.toml", mode = "copy" }')
+  expect(project).toContain('"~/.config/mise/config.full.toml" = { source = "~/.dotfiles/mise.full.toml" }')
+  expect(project).toContain('"~/.config/mise/conf.d/core.toml" = { source = "~/.dotfiles/mise/conf.d/core.toml" }')
   expect(project).toContain('"~/.config/mise/miserc.toml" = { source = "~/.dotfiles/.miserc.toml", mode = "copy" }')
-  expect(project).toContain('"~/.config/mise/mise.lock" = { source = "~/.dotfiles/mise.lock", mode = "copy" }')
+  expect(project).toContain('"~/.config/mise/mise.lock" = { source = "~/.dotfiles/mise.lock" }')
   expect(project).toContain(
-    '"~/.config/mise/mise.full.lock" = { source = "~/.dotfiles/mise.full.lock", mode = "copy" }',
+    '"~/.config/mise/mise.full.lock" = { source = "~/.dotfiles/mise.full.lock" }',
   )
   expect(await Bun.file(`${root}/mise/mise.lock`).exists()).toBe(true)
   expect(await Bun.file(`${root}/mise.lock`).exists()).toBe(true)
@@ -44,7 +44,7 @@ test("direct TypeScript mise tasks are executable", async () => {
   expect(output).not.toContain("Permission denied")
 })
 
-test("global mise uses copied configuration with canonical repository locks", () => {
+test("global mise uses linked configuration with canonical repository locks", () => {
   const temporaryHome = mkdtempSync(join(tmpdir(), "mise-global-locks-"))
   try {
     const canonicalCoreLock = readFileSync(`${root}/mise.lock`, "utf8")
@@ -54,12 +54,12 @@ test("global mise uses copied configuration with canonical repository locks", ()
     const configDirectory = join(temporaryHome, ".config", "mise")
     mkdirSync(join(configDirectory, "conf.d"), { recursive: true })
     symlinkSync(`${root}/user/common/.config/mise/config.toml`, join(configDirectory, "config.toml"))
-    copyFileSync(`${root}/mise.full.toml`, join(configDirectory, "config.full.toml"))
-    copyFileSync(`${root}/mise/conf.d/core.toml`, join(configDirectory, "conf.d", "core.toml"))
-    copyFileSync(`${root}/mise.lock`, join(configDirectory, "mise.lock"))
-    copyFileSync(`${root}/mise.full.lock`, join(configDirectory, "mise.full.lock"))
-    expect(realpathSync(join(configDirectory, "mise.lock"))).not.toBe(realpathSync(`${root}/mise.lock`))
-    expect(realpathSync(join(configDirectory, "mise.full.lock"))).not.toBe(realpathSync(`${root}/mise.full.lock`))
+    symlinkSync(`${root}/mise.full.toml`, join(configDirectory, "config.full.toml"))
+    symlinkSync(`${root}/mise/conf.d/core.toml`, join(configDirectory, "conf.d", "core.toml"))
+    symlinkSync(`${root}/mise.lock`, join(configDirectory, "mise.lock"))
+    symlinkSync(`${root}/mise.full.lock`, join(configDirectory, "mise.full.lock"))
+    expect(realpathSync(join(configDirectory, "mise.lock"))).toBe(realpathSync(`${root}/mise.lock`))
+    expect(realpathSync(join(configDirectory, "mise.full.lock"))).toBe(realpathSync(`${root}/mise.full.lock`))
     expect(readFileSync(join(configDirectory, "mise.lock"), "utf8")).toBe(canonicalCoreLock)
     expect(readFileSync(join(configDirectory, "mise.full.lock"), "utf8")).toBe(canonicalFullLock)
     const { MISE_IGNORED_CONFIG_PATHS: _ignored, ...inheritedEnvironment } = process.env
@@ -101,6 +101,15 @@ test("global mise uses copied configuration with canonical repository locks", ()
       expect(resolvedEntireTools[0]?.version).toBe(lockedEntireVersion)
       expect(resolvedEntireTools[0]?.requested_version).toBe(`v${lockedEntireVersion}`)
     }
+    const hkUpgrade = Bun.spawnSync(["mise", "upgrade", "hk", "--dry-run"], {
+      cwd: temporaryHome,
+      env: isolatedEnvironment,
+      stdout: "pipe",
+      stderr: "pipe"
+    })
+    if (hkUpgrade.exitCode !== 0) throw new Error(hkUpgrade.stderr.toString())
+    expect(hkUpgrade.exitCode).toBe(0)
+    expect(readFileSync(join(configDirectory, "mise.lock"), "utf8")).toBe(canonicalCoreLock)
     for (const profile of ["core", "full"] as const) {
       const lockArguments = [
         "mise",
@@ -198,21 +207,21 @@ test("generic Linux Git configuration does not require an Exe signing key", asyn
 
 test("global hk configuration is managed", async () => {
   const project = await Bun.file(`${root}/mise.toml`).text()
+  const coreTools = await Bun.file(`${root}/mise/conf.d/core.toml`).text()
   const settings = await Bun.file(`${root}/user/common/.config/mise/config.toml`).text()
   const git = await Bun.file(`${root}/user/common/.gitconfig`).text()
   const hk = await Bun.file(`${root}/user/common/.config/hk/config.pkl`).text()
   const lock = await Bun.file(`${root}/mise.lock`).text()
-  const lockedVersion = /\[\[tools\."aqua:jdx\/hk"\]\]\nversion = "([^"]+)"/u.exec(lock)?.[1]
+  const lockedVersion = /\[\[tools\.hk\]\]\nversion = "([^"]+)"/u.exec(lock)?.[1]
   if (lockedVersion === undefined) throw new Error("The hk lock version is missing.")
-  expect(project).toContain('"~/.config/hk/config.pkl" = { source = "~/.dotfiles/user/common/.config/hk/config.pkl" }')
-  expect(git).toContain("stashUntracked = false")
-  for (const event of ["commit-msg", "pre-commit", "pre-push", "prepare-commit-msg"]) {
-    expect(git).toContain(`[hook "hk-${event}"]`)
-  }
-  expect(git).toContain('mise x -- hk run pre-commit --staged \\"$@\\"')
-  expect(git).not.toContain("hk run pre-commit --from-hook")
   const schemaVersion = /min_hk_version = "([^"]+)"/u.exec(hk)?.[1]
   if (schemaVersion === undefined) throw new Error("The hk schema version is missing.")
+  expect(project).toContain('"~/.config/hk/config.pkl" = { source = "~/.dotfiles/user/common/.config/hk/config.pkl" }')
+  expect(git).toContain("stashUntracked = false")
+  expect(git).toContain("path = ~/.config/git/hk.conf")
+  expect(git).not.toContain('[hook "hk-')
+  expect(coreTools).toContain(`hk = "${Number.parseInt(schemaVersion, 10)}"`)
+  expect(Number.parseInt(lockedVersion, 10)).toBe(Number.parseInt(schemaVersion, 10))
   expect(hk).toContain(`/v${schemaVersion}/hk@${schemaVersion}#/Config.pkl`)
   expect(hk).toContain("node_modules/.bin/oxfmt")
   expect(settings).toContain('HK_MISE = "1"')

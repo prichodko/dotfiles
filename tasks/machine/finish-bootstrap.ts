@@ -4,6 +4,7 @@ import { Console, Effect } from "effect"
 import { ClaudeConfiguration } from "../../src/claude/config/claude-configuration.ts"
 import { CodexConfiguration } from "../../src/codex/config/codex-configuration.ts"
 import { RepositoryValidation } from "../../src/dotfiles/validation/validate-repository.ts"
+import { HkConfiguration } from "../../src/hk/configuration/hk-configuration.ts"
 import { runProgram } from "../../src/runtime/run-program.ts"
 
 runProgram(
@@ -12,8 +13,10 @@ runProgram(
     yield* validation.validateSource
     const claude = yield* ClaudeConfiguration
     const codex = yield* CodexConfiguration
+    const hk = yield* HkConfiguration
     yield* Console.log(`Claude configuration: ${yield* claude.applyBase}.`)
     yield* Console.log(`Codex configuration: ${yield* codex.applyBase}.`)
+    yield* hk.applyGlobalHooks
     yield* codex.validateApplied
     yield* validation.validateApplied
   }),

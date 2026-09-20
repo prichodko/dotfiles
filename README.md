@@ -124,11 +124,13 @@ The global `machine` command is linked as follows:
 ~/.local/bin/machine -> ~/.dotfiles/bin/machine.ts
 ```
 
-The global mise configuration manages copies of the shared core fragment, the full overlay, and their lock files.
+The global mise configuration links the shared core fragment, the full overlay, and their lock files to this repository.
 
 The repository `mise.lock` and `mise.full.lock` files remain canonical.
 
-The upgrade task refreshes the derived global copies when it applies the selected profile, after source checks and tests pass.
+Use `mise upgrade <tool>` to upgrade one tool within its declared version range, install it, and update the canonical lock file. For example, `mise upgrade hk` advances the managed `hk = "2"` request within the 2.x line. The hook resolves hk through mise, so no hook update or machine apply is needed.
+
+The optional `machine:upgrade` task upgrades all managed tools, runs the repository checks, and applies the selected profile.
 
 New machines use mise bootstrap only.
 
@@ -440,9 +442,9 @@ It runs oxfmt on staged supported files when `node_modules/.bin/oxfmt` exists in
 
 Repositories without local oxfmt do not run the formatter.
 
-The managed `.gitconfig` stores portable config-based hooks for commit messages, pre-commit, pre-push, and commit-message preparation.
+The managed `.gitconfig` includes machine-local config-based hooks for commit messages, pre-commit, pre-push, and commit-message preparation.
 
-Each hook uses `mise x -- hk` so it receives the repository environment without an absolute machine path.
+Bootstrap runs `hk install --global --mise` against `~/.config/git/hk.conf`, then keeps the global formatter-only pre-commit policy active even in repositories without `hk.pkl`. The launcher records that machine's mise path and resolves the globally managed hk 2.x tool, so 2.x upgrades do not require editing the hook configuration.
 
 The pre-commit hook always loads the global user policy.
 
