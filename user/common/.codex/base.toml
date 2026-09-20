@@ -4,3 +4,56 @@ approvals_reviewer = "user"
 plan_mode_reasoning_effort = "xhigh"
 personality = "pragmatic"
 sandbox_mode = "workspace-write"
+
+# Keep user-level plugin choices portable. Marketplace caches and service
+# authentication remain machine-local and are recreated by Codex.
+[plugins."google-calendar@openai-curated"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = false
+
+[plugins."figma@openai-curated"]
+enabled = true
+
+[plugins."cloudflare@openai-curated"]
+enabled = true
+
+[plugins."sites@openai-bundled"]
+enabled = false
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."openai-templates@openai-curated"]
+enabled = false
+
+[plugins."chrome@openai-bundled"]
+enabled = true
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."computer-use@openai-bundled"]
+enabled = true
+
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
+[plugins."unified-computer-use@openai-bundled"]
+enabled = true
+
+[plugins."slack@openai-curated"]
+enabled = true
+
+[plugins."gmail@openai-curated"]
+enabled = true
+
+[plugins."posthog@openai-curated"]
+enabled = true
+
+[plugins."github@openai-curated"]
+enabled = true

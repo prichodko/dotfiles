@@ -106,7 +106,7 @@ Effect is a repository dependency.
 
 It is not installed globally.
 
-The bootstrap applies the global hk configuration and merges the portable Claude and Codex defaults.
+The bootstrap applies the global hk configuration and merges the portable Claude and Codex defaults. Codex plugin enablement is tracked in `user/common/.codex/base.toml`; generated marketplace paths, plugin caches, and service authentication remain machine-local.
 
 After dependency installation, a new Bun process validates the current checkout and managed configuration.
 
