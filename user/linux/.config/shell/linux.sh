@@ -5,8 +5,5 @@ MACHINE_PLATFORM_SHELL_INITIALIZED=1
 
 export ENTIRE_TOKEN_STORE=file
 
-if [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
-  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-elif [[ -d /home/linuxbrew/.linuxbrew/bin ]]; then
-  export PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
-fi
+MACHINE_PACKAGE_PREFIX=/home/linuxbrew/.linuxbrew
+export PATH="$MACHINE_PACKAGE_PREFIX/bin:$MACHINE_PACKAGE_PREFIX/sbin:$PATH"

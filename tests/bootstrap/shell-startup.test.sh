@@ -23,7 +23,7 @@ ln -s "$test_root/user/common/.config/shell/bash.sh" "$test_home/.config/shell/b
 printf '%s\n' \
   'if [[ -n "${MACHINE_PLATFORM_SHELL_INITIALIZED:-}" ]]; then return 0; fi' \
   'MACHINE_PLATFORM_SHELL_INITIALIZED=1' \
-  "export HOMEBREW_PREFIX='$test_homebrew'" \
+  "MACHINE_PACKAGE_PREFIX='$test_homebrew'" \
   "export PATH=\"$test_bin:\$PATH:$test_bin\"" \
   > "$test_home/.config/shell/platform.sh"
 
@@ -78,8 +78,13 @@ while IFS= read -r zsh_file; do
   zsh -n "$zsh_file"
 done < <(find "$test_root/user" -type f \( -name '*zsh*.sh' -o -name '.zshenv' \) | sort -u)
 
-rg -Fq 'eval "$(/opt/homebrew/bin/brew shellenv)"' "$test_root/user/macos/.config/shell/macos.sh"
-rg -Fq 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"' "$test_root/user/linux/.config/shell/linux.sh"
+rg -Fq 'MACHINE_PACKAGE_PREFIX=/opt/homebrew' "$test_root/user/macos/.config/shell/macos.sh"
+rg -Fq 'export PATH="$MACHINE_PACKAGE_PREFIX/bin:$MACHINE_PACKAGE_PREFIX/sbin:$PATH"' "$test_root/user/macos/.config/shell/macos.sh"
+rg -Fq 'MACHINE_PACKAGE_PREFIX=/home/linuxbrew/.linuxbrew' "$test_root/user/linux/.config/shell/linux.sh"
+if rg -Fq 'brew shellenv' "$test_root/user/macos/.config/shell/macos.sh" "$test_root/user/linux/.config/shell/linux.sh"; then
+  printf 'shell-startup.test: platform shell still invokes brew shellenv\n' >&2
+  exit 1
+fi
 rg -Fq 'export ENTIRE_TOKEN_STORE=file' "$test_root/user/linux/.config/shell/linux.sh"
 rg -Fq '"brew:zsh-syntax-highlighting" = { os = ["linux", "macos"] }' "$test_root/mise.toml"
 rg -Fq '"brew:fzf-tab" = { os = ["linux", "macos"] }' "$test_root/mise.toml"

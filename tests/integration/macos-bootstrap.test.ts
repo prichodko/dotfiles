@@ -38,10 +38,11 @@ test("portable SSH signing state is managed", async () => {
   expect(ssh).not.toContain("/Users/pavel")
 })
 
-test("the current Mac can continue to use Homebrew Shell integration", async () => {
+test("the current Mac exposes the mise package prefix without invoking Homebrew", async () => {
   const shell = await Bun.file(`${root}/user/macos/.config/shell/macos.sh`).text()
-  expect(shell).toContain('eval "$(/opt/homebrew/bin/brew shellenv)"')
-  expect(shell).toContain('export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"')
+  expect(shell).toContain("MACHINE_PACKAGE_PREFIX=/opt/homebrew")
+  expect(shell).toContain('export PATH="$MACHINE_PACKAGE_PREFIX/bin:$MACHINE_PACKAGE_PREFIX/sbin:$PATH"')
+  expect(shell).not.toContain("brew shellenv")
 })
 
 test("the full Mac profile uses the configured container and remote access applications", async () => {
