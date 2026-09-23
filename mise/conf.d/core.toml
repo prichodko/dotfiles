@@ -7,7 +7,7 @@ bun = "latest"
 "aqua:openai/codex" = "latest"
 "aqua:eza-community/eza" = { version = "v0.23.5", os = ["linux"] }
 "aqua:sharkdp/fd" = "latest"
-"github:entireio/cli" = { version = "v0.10.4-nightly.202608290622.a918e75fb", filter_bins = ["entire", "git-remote-entire"] }
+"github:entireio/cli" = { version = "latest", prerelease = true, filter_bins = ["entire", "git-remote-entire"] }
 "aqua:junegunn/fzf" = "latest"
 "aqua:cli/cli" = "latest"
 "aqua:git-lfs/git-lfs" = "latest"

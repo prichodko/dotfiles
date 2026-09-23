@@ -103,54 +103,54 @@ url = "https://github.com/ajeetdsouza/zoxide/releases/download/v0.10.0/zoxide-0.
 url_api = "https://api.github.com/repos/ajeetdsouza/zoxide/releases/assets/466316167"
 
 [[tools."aqua:anthropics/claude-code"]]
-version = "2.1.263"
+version = "2.1.280"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
 [tools."aqua:anthropics/claude-code"."platforms.linux-arm64"]
-checksum = "sha256:cba2e616346c4f45f7fe468297bcc186d84ee6c292b2b1814b9be190b1da49be"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.263/claude-linux-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/546595138"
+checksum = "sha256:e6cdd9f07fba8d181b7d6d0dedd9406f1be6ba4f5302a56a61ab4ebb43c5a569"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.280/claude-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/581709747"
 
 [tools."aqua:anthropics/claude-code"."platforms.linux-arm64-musl"]
-checksum = "sha256:7d49674fd10bbf7d0e5989bd300aaa8dce4c2ecfec66d2c19a82fe4ec84bfeb8"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.263/claude-linux-arm64-musl.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/546595140"
+checksum = "sha256:3a5ebe41b78d94ea2bfafee539dde4c9a53afc9658abbc72d918c45477524b28"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.280/claude-linux-arm64-musl.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/581709746"
 
 [tools."aqua:anthropics/claude-code"."platforms.linux-x64"]
-checksum = "sha256:7f1444a22ba7c0949b728a19511ed8e47d218ab23b32dbb0a557fe9798ad7ce6"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.263/claude-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/546595199"
+checksum = "sha256:4239c476881f46f5bd2cccee97c10b1c8073f4ab4ae40e3c829493210e757764"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.280/claude-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/581709942"
 
 [tools."aqua:anthropics/claude-code"."platforms.linux-x64-baseline"]
-checksum = "sha256:7f1444a22ba7c0949b728a19511ed8e47d218ab23b32dbb0a557fe9798ad7ce6"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.263/claude-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/546595199"
+checksum = "sha256:4239c476881f46f5bd2cccee97c10b1c8073f4ab4ae40e3c829493210e757764"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.280/claude-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/581709942"
 
 [tools."aqua:anthropics/claude-code"."platforms.linux-x64-musl"]
-checksum = "sha256:9a96f0e03cea5ebbb3af9b70cde7dc145ed33c7912735cbeee1f923f55de0585"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.263/claude-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/546595141"
+checksum = "sha256:35e3435305e5608abac726ca2ced1f1a651980dff43099606628c10a44d05101"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.280/claude-linux-x64-musl.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/581709745"
 
 [tools."aqua:anthropics/claude-code"."platforms.linux-x64-musl-baseline"]
-checksum = "sha256:9a96f0e03cea5ebbb3af9b70cde7dc145ed33c7912735cbeee1f923f55de0585"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.263/claude-linux-x64-musl.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/546595141"
+checksum = "sha256:35e3435305e5608abac726ca2ced1f1a651980dff43099606628c10a44d05101"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.280/claude-linux-x64-musl.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/581709745"
 
 [tools."aqua:anthropics/claude-code"."platforms.macos-arm64"]
-checksum = "sha256:c41b084242538dc94adb60b9cc74dab7571e1eb1d51ac7fb6c60fa9f16531765"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.263/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/546595143"
+checksum = "sha256:872a1fa1f770165202bfa0e1771a8b02ce0a13b5f6de4f4489ec4ff268946b56"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.280/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/581709751"
 
 [tools."aqua:anthropics/claude-code"."platforms.macos-x64"]
-checksum = "sha256:459314a8bd2116f69cbd78caaa7c2d03f966a3aeaa7ffb6327f1f5f9e7d3b83a"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.263/claude-darwin-x64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/546595142"
+checksum = "sha256:96c54208699e555f67da028f12d7ab594b6bbb844b5d65b47640c086c65ad959"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.280/claude-darwin-x64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/581709749"
 
 [tools."aqua:anthropics/claude-code"."platforms.macos-x64-baseline"]
-checksum = "sha256:459314a8bd2116f69cbd78caaa7c2d03f966a3aeaa7ffb6327f1f5f9e7d3b83a"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.263/claude-darwin-x64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/546595142"
+checksum = "sha256:96c54208699e555f67da028f12d7ab594b6bbb844b5d65b47640c086c65ad959"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.280/claude-darwin-x64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/581709749"
 
 [[tools."aqua:ast-grep/ast-grep"]]
 version = "0.45.2"
@@ -533,54 +533,54 @@ url = "https://github.com/junegunn/fzf/releases/download/v0.74.3/fzf-0.74.3-darw
 url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/517537094"
 
 [[tools."aqua:openai/codex"]]
-version = "0.153.2"
+version = "0.156.1"
 backend = "aqua:openai/codex"
 specifiers = ["latest"]
 
 [tools."aqua:openai/codex"."platforms.linux-arm64"]
-checksum = "sha256:a3bfaf4b62fcb17e0a0338dfe0502413ddce0ab1b39028679390539c45d2c6e3"
-url = "https://github.com/openai/codex/releases/download/rust-v0.153.2/codex-package-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/543502961"
+checksum = "sha256:fdd47ed6aade0360796fd3f6f95a45096f327c15e19e8c7339f9dc5633041786"
+url = "https://github.com/openai/codex/releases/download/rust-v0.156.1/codex-package-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/582791754"
 
 [tools."aqua:openai/codex"."platforms.linux-arm64-musl"]
-checksum = "sha256:a3bfaf4b62fcb17e0a0338dfe0502413ddce0ab1b39028679390539c45d2c6e3"
-url = "https://github.com/openai/codex/releases/download/rust-v0.153.2/codex-package-aarch64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/543502961"
+checksum = "sha256:fdd47ed6aade0360796fd3f6f95a45096f327c15e19e8c7339f9dc5633041786"
+url = "https://github.com/openai/codex/releases/download/rust-v0.156.1/codex-package-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/582791754"
 
 [tools."aqua:openai/codex"."platforms.linux-x64"]
-checksum = "sha256:e10fa0cee78e9f0bd395880f03fd4fd227d903ca7af649bbc08d1649101e9225"
-url = "https://github.com/openai/codex/releases/download/rust-v0.153.2/codex-package-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/543502893"
+checksum = "sha256:8b711520beddf385467b8da4d2c93736637c6ba1e46811cf0d8606b7c490b6f6"
+url = "https://github.com/openai/codex/releases/download/rust-v0.156.1/codex-package-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/582785983"
 
 [tools."aqua:openai/codex"."platforms.linux-x64-baseline"]
-checksum = "sha256:e10fa0cee78e9f0bd395880f03fd4fd227d903ca7af649bbc08d1649101e9225"
-url = "https://github.com/openai/codex/releases/download/rust-v0.153.2/codex-package-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/543502893"
+checksum = "sha256:8b711520beddf385467b8da4d2c93736637c6ba1e46811cf0d8606b7c490b6f6"
+url = "https://github.com/openai/codex/releases/download/rust-v0.156.1/codex-package-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/582785983"
 
 [tools."aqua:openai/codex"."platforms.linux-x64-musl"]
-checksum = "sha256:e10fa0cee78e9f0bd395880f03fd4fd227d903ca7af649bbc08d1649101e9225"
-url = "https://github.com/openai/codex/releases/download/rust-v0.153.2/codex-package-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/543502893"
+checksum = "sha256:8b711520beddf385467b8da4d2c93736637c6ba1e46811cf0d8606b7c490b6f6"
+url = "https://github.com/openai/codex/releases/download/rust-v0.156.1/codex-package-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/582785983"
 
 [tools."aqua:openai/codex"."platforms.linux-x64-musl-baseline"]
-checksum = "sha256:e10fa0cee78e9f0bd395880f03fd4fd227d903ca7af649bbc08d1649101e9225"
-url = "https://github.com/openai/codex/releases/download/rust-v0.153.2/codex-package-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/543502893"
+checksum = "sha256:8b711520beddf385467b8da4d2c93736637c6ba1e46811cf0d8606b7c490b6f6"
+url = "https://github.com/openai/codex/releases/download/rust-v0.156.1/codex-package-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/582785983"
 
 [tools."aqua:openai/codex"."platforms.macos-arm64"]
-checksum = "sha256:287e2dd0a9bbfb58581b0a9150399458b4f094ea42caf02860f1e8cb5a202a0b"
-url = "https://github.com/openai/codex/releases/download/rust-v0.153.2/codex-package-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/543503001"
+checksum = "sha256:fea42f9625091f011e38f059da974d52e57ba31831648bb1c7f0b1a385fde547"
+url = "https://github.com/openai/codex/releases/download/rust-v0.156.1/codex-package-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/582795411"
 
 [tools."aqua:openai/codex"."platforms.macos-x64"]
-checksum = "sha256:6e3876e7f4edff2e3dee545e1d3b2334866791a8dfce7e25789bf6799355a4ea"
-url = "https://github.com/openai/codex/releases/download/rust-v0.153.2/codex-package-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/543502938"
+checksum = "sha256:618dbcd55419fa041871f777a14b107ceb3fe2d339ef81e21e6ab5374420dc71"
+url = "https://github.com/openai/codex/releases/download/rust-v0.156.1/codex-package-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/582789045"
 
 [tools."aqua:openai/codex"."platforms.macos-x64-baseline"]
-checksum = "sha256:6e3876e7f4edff2e3dee545e1d3b2334866791a8dfce7e25789bf6799355a4ea"
-url = "https://github.com/openai/codex/releases/download/rust-v0.153.2/codex-package-x86_64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/543502938"
+checksum = "sha256:618dbcd55419fa041871f777a14b107ceb3fe2d339ef81e21e6ab5374420dc71"
+url = "https://github.com/openai/codex/releases/download/rust-v0.156.1/codex-package-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/582789045"
 
 [[tools."aqua:pnpm/pnpm"]]
 version = "11.24.0"
@@ -908,54 +908,54 @@ checksum = "sha256:da9b9f1b4ba766c6f299711f38dfaa98623e1ed9c40896aa53db803c52ec1
 url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-darwin-x64-baseline.zip"
 
 [[tools."github:entireio/cli"]]
-version = "0.10.4-nightly.202608290622.a918e75fb"
+version = "0.11.3-nightly.202609230619.4e2e839c2"
 backend = "github:entireio/cli"
-specifiers = ["v0.10.4-nightly.202608290622.a918e75fb"]
+specifiers = ["latest"]
 
 [tools."github:entireio/cli"."platforms.linux-arm64"]
-checksum = "sha256:7e13236453d0bcb28fafba4022d2a428a5e7aaacdf23dca7be0302d7b1a2e5d8"
-url = "https://github.com/entireio/cli/releases/download/v0.10.4-nightly.202608290622.a918e75fb/entire_linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/534857900"
+checksum = "sha256:8fe8b3cd859d42ac8fbb775e7285737c3c334551fef2ff3b17f10844b452792f"
+url = "https://github.com/entireio/cli/releases/download/v0.11.3-nightly.202609230619.4e2e839c2/entire_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/583140304"
 
 [tools."github:entireio/cli"."platforms.linux-arm64-musl"]
-checksum = "sha256:7e13236453d0bcb28fafba4022d2a428a5e7aaacdf23dca7be0302d7b1a2e5d8"
-url = "https://github.com/entireio/cli/releases/download/v0.10.4-nightly.202608290622.a918e75fb/entire_linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/534857900"
+checksum = "sha256:8fe8b3cd859d42ac8fbb775e7285737c3c334551fef2ff3b17f10844b452792f"
+url = "https://github.com/entireio/cli/releases/download/v0.11.3-nightly.202609230619.4e2e839c2/entire_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/583140304"
 
 [tools."github:entireio/cli"."platforms.linux-x64"]
-checksum = "sha256:de8ba1a1fa24ce6a3bff40b3e01e45ffbdb6dcfbe14b7e40107e6e0ba18623c0"
-url = "https://github.com/entireio/cli/releases/download/v0.10.4-nightly.202608290622.a918e75fb/entire_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/534857899"
+checksum = "sha256:a87be3989e2ab36e95566737511dc2db05a31d18a59648a7d15a49d335b603ba"
+url = "https://github.com/entireio/cli/releases/download/v0.11.3-nightly.202609230619.4e2e839c2/entire_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/583140358"
 
 [tools."github:entireio/cli"."platforms.linux-x64-baseline"]
-checksum = "sha256:de8ba1a1fa24ce6a3bff40b3e01e45ffbdb6dcfbe14b7e40107e6e0ba18623c0"
-url = "https://github.com/entireio/cli/releases/download/v0.10.4-nightly.202608290622.a918e75fb/entire_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/534857899"
+checksum = "sha256:a87be3989e2ab36e95566737511dc2db05a31d18a59648a7d15a49d335b603ba"
+url = "https://github.com/entireio/cli/releases/download/v0.11.3-nightly.202609230619.4e2e839c2/entire_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/583140358"
 
 [tools."github:entireio/cli"."platforms.linux-x64-musl"]
-checksum = "sha256:de8ba1a1fa24ce6a3bff40b3e01e45ffbdb6dcfbe14b7e40107e6e0ba18623c0"
-url = "https://github.com/entireio/cli/releases/download/v0.10.4-nightly.202608290622.a918e75fb/entire_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/534857899"
+checksum = "sha256:a87be3989e2ab36e95566737511dc2db05a31d18a59648a7d15a49d335b603ba"
+url = "https://github.com/entireio/cli/releases/download/v0.11.3-nightly.202609230619.4e2e839c2/entire_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/583140358"
 
 [tools."github:entireio/cli"."platforms.linux-x64-musl-baseline"]
-checksum = "sha256:de8ba1a1fa24ce6a3bff40b3e01e45ffbdb6dcfbe14b7e40107e6e0ba18623c0"
-url = "https://github.com/entireio/cli/releases/download/v0.10.4-nightly.202608290622.a918e75fb/entire_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/534857899"
+checksum = "sha256:a87be3989e2ab36e95566737511dc2db05a31d18a59648a7d15a49d335b603ba"
+url = "https://github.com/entireio/cli/releases/download/v0.11.3-nightly.202609230619.4e2e839c2/entire_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/583140358"
 
 [tools."github:entireio/cli"."platforms.macos-arm64"]
-checksum = "sha256:0e1971848ecdcdb40ed99827271291121d6917635bcad6b27bfe0c8a308473bb"
-url = "https://github.com/entireio/cli/releases/download/v0.10.4-nightly.202608290622.a918e75fb/entire_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/534857897"
+checksum = "sha256:9963e1c58f8c03382fafd957be01cfc4d00c19d5f40157604486ecbb0fdf7ae1"
+url = "https://github.com/entireio/cli/releases/download/v0.11.3-nightly.202609230619.4e2e839c2/entire_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/583140301"
 
 [tools."github:entireio/cli"."platforms.macos-x64"]
-checksum = "sha256:070d2e83829b2a5776692d57b62fdf542cd399ada6189429b894b528367d8489"
-url = "https://github.com/entireio/cli/releases/download/v0.10.4-nightly.202608290622.a918e75fb/entire_darwin_amd64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/534857898"
+checksum = "sha256:1c645f8782563c850660e1b1b7fee2fdfdd6c0995495ebb92e0422786fa5d560"
+url = "https://github.com/entireio/cli/releases/download/v0.11.3-nightly.202609230619.4e2e839c2/entire_darwin_amd64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/583140306"
 
 [tools."github:entireio/cli"."platforms.macos-x64-baseline"]
-checksum = "sha256:070d2e83829b2a5776692d57b62fdf542cd399ada6189429b894b528367d8489"
-url = "https://github.com/entireio/cli/releases/download/v0.10.4-nightly.202608290622.a918e75fb/entire_darwin_amd64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/534857898"
+checksum = "sha256:1c645f8782563c850660e1b1b7fee2fdfdd6c0995495ebb92e0422786fa5d560"
+url = "https://github.com/entireio/cli/releases/download/v0.11.3-nightly.202609230619.4e2e839c2/entire_darwin_amd64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/583140306"
 
 [[tools.go]]
 version = "1.26.6"

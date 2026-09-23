@@ -90,7 +90,7 @@ test("global mise uses linked configuration with canonical repository locks", ()
       const resolvedEntireTools = entireTools.filter((tool) => tool.source !== undefined)
       expect(resolvedEntireTools).toHaveLength(1)
       expect(resolvedEntireTools[0]?.version).toBe(lockedEntireVersion)
-      expect(resolvedEntireTools[0]?.requested_version).toBe(`v${lockedEntireVersion}`)
+      expect(resolvedEntireTools[0]?.requested_version).toBe("latest")
     }
     const hkUpgrade = Bun.spawnSync(["mise", "upgrade", "hk", "--dry-run"], {
       cwd: temporaryHome,
