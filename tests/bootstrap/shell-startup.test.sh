@@ -19,6 +19,33 @@ mkdir -p \
 ln -s "$test_root/user/common/.config/shell/common.sh" "$test_home/.config/shell/common.sh"
 ln -s "$test_root/user/common/.config/shell/zsh.sh" "$test_home/.config/shell/zsh.sh"
 ln -s "$test_root/user/common/.config/shell/bash.sh" "$test_home/.config/shell/bash.sh"
+ln -s "$test_root/user/common/.zshenv" "$test_home/.zshenv"
+
+# Noninteractive shells must resolve managed tools without interactive activation.
+for shim_root in "$test_home/.local/share/mise" "$test_home/xdg/mise" "$test_home/custom-mise"; do
+  mkdir -p "$shim_root/shims"
+  printf '#!/bin/sh\nprintf "managed-tool\\n"\n' > "$shim_root/shims/machine-test-tool"
+  chmod +x "$shim_root/shims/machine-test-tool"
+done
+for data_mode in default xdg override; do
+  env -i HOME="$test_home" PATH=/usr/bin:/bin TEST_DATA_MODE="$data_mode" zsh -d -c '
+    case "$TEST_DATA_MODE" in
+      default) expected="$HOME/.local/share/mise/shims" ;;
+      xdg) export XDG_DATA_HOME="$HOME/xdg"; expected="$XDG_DATA_HOME/mise/shims" ;;
+      override) export XDG_DATA_HOME="$HOME/xdg" MISE_DATA_DIR="$HOME/custom-mise"; expected="$MISE_DATA_DIR/shims" ;;
+    esac
+    source "$HOME/.zshenv"
+    source "$HOME/.zshenv"
+    [[ "$path[1]" == "$expected" ]] || exit 60
+    [[ "$(command -v machine-test-tool)" == "$expected/machine-test-tool" ]] || exit 61
+    [[ "$(machine-test-tool)" == managed-tool ]] || exit 62
+    typeset -A seen
+    for entry in $path; do
+      (( seen[$entry]++ ))
+      (( seen[$entry] == 1 )) || exit 63
+    done
+  '
+done
 
 printf '%s\n' \
   'if [[ -n "${MACHINE_PLATFORM_SHELL_INITIALIZED:-}" ]]; then return 0; fi' \
