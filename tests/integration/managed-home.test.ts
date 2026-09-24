@@ -34,6 +34,14 @@ test("applies managed files in an empty home and preserves local application sta
       expect(readlinkSync(join(home, ".codex", "AGENTS.md"))).toBe(join(home, ".dotfiles", "user", "common", ".codex", "AGENTS.md"))
       expect(readFileSync(join(home, ".claude", "settings.json"), "utf8")).toBe(localSettings)
       expect(readFileSync(join(home, ".zshrc"), "utf8")).toContain(".config/shell/zsh.sh")
+      if (attempt === 0) {
+        const trust = Bun.spawnSync(["mise", "trust", join(home, ".config", "mise", "config.toml")], {
+          env,
+          stdout: "pipe",
+          stderr: "pipe",
+        })
+        if (trust.exitCode !== 0) throw new Error(trust.stderr.toString() + trust.stdout.toString())
+      }
     }
   } finally {
     rmSync(home, { recursive: true, force: true })

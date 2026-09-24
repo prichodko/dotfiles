@@ -3,6 +3,7 @@
 set -euo pipefail
 
 test_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+test_git_bin="$(dirname "$(command -v git)")"
 test_state="$(mktemp -d)"
 trap 'rm -rf "$test_state"' EXIT
 test_home="$test_state/home"
@@ -227,7 +228,7 @@ env -i \
   SHELL=/bin/zsh \
   LC_ALL=C.UTF-8 \
   TERM=xterm-256color \
-  PATH=/usr/bin:/bin:/usr/sbin:/sbin \
+  PATH="$test_git_bin:/usr/bin:/bin:/usr/sbin:/sbin" \
   zsh -dfi -c '
     source "$HOME/.config/shell/zsh.sh"
     source "$HOME/.config/shell/zsh.sh"
@@ -263,7 +264,7 @@ env -i \
   SHELL=/bin/bash \
   LC_ALL=C.UTF-8 \
   TERM=xterm-256color \
-  PATH=/usr/bin:/bin:/usr/bin:/usr/sbin:/sbin \
+  PATH="$test_git_bin:/usr/bin:/bin:/usr/bin:/usr/sbin:/sbin" \
   bash --noprofile --norc -i -c '
     PROMPT_COMMAND="MACHINE_TEST_EXISTING_HOOK=1"
     source "$HOME/.config/shell/bash.sh"
