@@ -24,6 +24,31 @@ Load the [agent-browser guide](../agent-browser/SKILL.md) only when that CLI is 
 
 Follow the repository `AGENTS.md` rules for Chrome profile and tab selection.
 
+## Bind the browser provider
+
+When using a browser plugin, select a working provider before claiming or creating a tab:
+
+1. List browser providers directly. Avoid broad aggregate-state calls during discovery because one stale provider can make the whole inventory time out.
+2. Match an explicit browser or tab mention by browser family, extension instance, profile, tab ID, title, and URL as the current tool documentation requires.
+3. If multiple providers match the requested browser family, do not select the first entry by position. Prefer the explicitly mentioned extension instance or profile. Otherwise probe candidates individually with a bounded tab-list request and use a provider only after it successfully returns its tabs. Provider presence alone does not prove a working connection.
+4. If multiple healthy profiles remain ambiguous, ask which profile to use rather than inspecting an unintended signed-in session.
+5. Name the browser session when the selected browser API supports it, then claim the exact user tab from a fresh open-tab listing. Record whether the tab was claimed, created, or only observed.
+
+Reuse the selected browser binding while it remains healthy. If a tab becomes stale after navigation, reload, a new user turn, or a tool reset, reacquire the tab and fresh page state from that provider; do not silently switch browser families or profiles.
+
+## Recover a browser connection
+
+After a timeout, reset, unknown-tab error, or unavailable-browser error, reacquire the provider, tab, page state, and locators before retrying. After two identical failures, stop repeating the same call and change the recovery hypothesis.
+
+For an extension-backed Chrome-family browser:
+
+1. Reset only the browser-control session when the tool supports it; do not close the user's browser or tabs.
+2. If the provider still fails, use native app control only to confirm that the intended browser/profile is open and that the ChatGPT extension side panel loads.
+3. Rediscover providers and probe matching instances individually. Ignore stale duplicate instances once a profile-specific provider responds.
+4. Use native app control as connection recovery, not as a silent substitute for extension-based page testing.
+
+If the extension still does not connect, ask the user to confirm the intended profile and the browser's status in Settings > Computer Use. The user-facing recovery order is: reopen the extension side panel, confirm the browser shows Manage, restart the browser, start a fresh task, restart the desktop app, and only then reinstall the extension.
+
 ## Playwright ownership
 
 The dotfiles full profile owns `npm:@playwright/cli`. Do not install it globally with npm.
@@ -52,6 +77,8 @@ Capture current page state before using an element reference. Refresh page state
 Use role, label, or test ID locators before fragile CSS selectors when stable references are unavailable.
 
 When application behavior is incorrect, inspect console errors and failed requests before changing code.
+
+After each consequential interaction, verify the expected visible result and URL from fresh browser state. For asynchronous workflows, observe the relevant intermediate and terminal states without reloading unless reload behavior is part of the test. Do not report a successful browser test from source inspection, HTTP reachability, or unit tests alone.
 
 For UI changes, verify the applicable loading, empty, error, blocked, ready, and completed states. Verify relevant desktop and mobile sizes. Capture screenshots when geometry or appearance is part of the result.
 
