@@ -3,6 +3,7 @@ min_version = "2026.8.16"
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
 trusted_config_paths = ["~/.codex", "~/.dotfiles", "~/Projects"]
+minimum_release_age_excludes = ["aqua:anthropics/claude-code", "aqua:openai/codex", "github:entireio/cli"]
 
 [settings.npm]
 package_manager = "npm"
