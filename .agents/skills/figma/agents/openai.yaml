@@ -1,0 +1,6 @@
+interface:
+  display_name: "Figma"
+  short_description: "Explicit router for installed Figma workflows"
+  default_prompt: "Use $figma to complete this task with the installed Figma plugin."
+policy:
+  allow_implicit_invocation: false

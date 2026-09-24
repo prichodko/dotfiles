@@ -1,0 +1,6 @@
+interface:
+  display_name: "Cloudflare"
+  short_description: "Explicit router for Cloudflare workflows"
+  default_prompt: "Use $cloudflare to complete this task with the installed Cloudflare plugin."
+policy:
+  allow_implicit_invocation: false
