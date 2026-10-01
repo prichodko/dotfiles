@@ -16,7 +16,7 @@ go = "latest"
 hk = "2"
 "aqua:jqlang/jq" = "latest"
 node = "latest"
-"npm:@mariozechner/pi-coding-agent" = "latest"
+"npm:@earendil-works/pi-coding-agent" = { version = "latest", npm_args = "--ignore-scripts" }
 "aqua:pnpm/pnpm" = "latest"
 "aqua:BurntSushi/ripgrep" = "latest"
 rust = "1"
