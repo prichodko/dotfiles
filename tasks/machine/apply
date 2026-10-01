@@ -24,3 +24,4 @@ mise -C "$task_root" --locked exec -- bun install --frozen-lockfile --ignore-scr
 mise -C "$task_root" --locked exec -- bun run tasks/dotfiles/check-source.ts
 mise -C "$task_root" bootstrap --skip-dirty --yes --locked
 mise -C "$task_root" bootstrap status --missing
+mise -C "$task_root" --locked exec -- bun run tasks/machine/refresh-codex.ts

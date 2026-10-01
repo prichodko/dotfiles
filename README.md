@@ -164,6 +164,13 @@ Native bootstrap installs platform packages and runs configuration merging with 
 
 The apply entrypoint checks aggregate bootstrap status before reporting success.
 
+After successful bootstrap, it compares the running Codex app-server with the mise-selected CLI.
+Stopped and already-current servers are left alone. Stale managed daemons are updated from the selected CLI package;
+the Linux desktop launcher is refreshed by stopping only the verified control-socket owner and waiting for desktop reconnection.
+This can interrupt an active Codex turn. It does not restart the VM or install a second supervisor.
+If the desktop does not reconnect within 30 seconds, apply reports failure; reconnect the VM and repeat it.
+The same check is available separately as `mise run machine:refresh-codex`.
+
 An interrupted or failed apply can be repeated.
 
 If application fails after fast-forward, the updated checkout remains available for inspection and repair.

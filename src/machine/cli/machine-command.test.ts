@@ -78,13 +78,13 @@ test("explicit local profiles override an inherited full environment", () => {
       expect(result.exitCode, result.stderr.toString()).toBe(0)
     }
     const commands = readFileSync(log, "utf8").trim().split("\n")
-    expect(commands).toHaveLength(10)
+    expect(commands).toHaveLength(12)
     expect(commands.filter((line) => line.includes(" bootstrap --skip-dirty"))).toEqual([
       `linux,exe\t-C ${repositoryRoot} bootstrap --skip-dirty --yes --locked`,
       `linux,exe,full\t-C ${repositoryRoot} bootstrap --skip-dirty --yes --locked`,
     ])
-    expect(commands.slice(0, 5).every((line) => line.startsWith("linux,exe\t"))).toBe(true)
-    expect(commands.slice(5).every((line) => line.startsWith("linux,exe,full\t"))).toBe(true)
+    expect(commands.slice(0, 6).every((line) => line.startsWith("linux,exe\t"))).toBe(true)
+    expect(commands.slice(6).every((line) => line.startsWith("linux,exe,full\t"))).toBe(true)
   } finally {
     rmSync(state, { recursive: true, force: true })
   }

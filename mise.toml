@@ -117,6 +117,9 @@ run = "tasks/machine/apply"
 description = "Validate the complete machine environment"
 run = "tasks/machine/validate.ts"
 
+[tasks."machine:refresh-codex"]
+run = "tasks/machine/refresh-codex.ts"
+
 [tasks."machine:exe:create"]
 description = "Create and bootstrap an Exe machine"
 run = "tasks/machine/exe/create.ts"
