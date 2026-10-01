@@ -126,6 +126,8 @@ The global `machine` command is linked as follows:
 
 The global mise configuration links the shared core fragment, the full overlay, and their lock files to this repository.
 
+The core profile also manages Rust through mise.
+
 The repository `mise.lock` and `mise.full.lock` files remain canonical.
 
 Use `mise upgrade <tool>` to upgrade one tool within its declared version range, install it, and update the canonical lock file. For example, `mise upgrade hk` advances the managed `hk = "2"` request within the 2.x line. The hook resolves hk through mise, so no hook update or machine apply is needed.

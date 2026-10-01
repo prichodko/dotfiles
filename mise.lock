@@ -1105,3 +1105,8 @@ url = "https://nodejs.org/dist/v26.10.0/node-v26.10.0-darwin-x64.tar.gz"
 version = "0.73.1"
 backend = "npm:@mariozechner/pi-coding-agent"
 specifiers = ["latest"]
+
+[[tools.rust]]
+version = "1.98.1"
+backend = "core:rust"
+specifiers = ["1"]

@@ -20,6 +20,8 @@ xcode-select --install
 
 Wait for the installation to finish.
 
+Rust is installed and selected by mise with the core profile.
+
 Install the official mise binary:
 
 ```sh
@@ -97,6 +99,14 @@ Validate the complete machine:
 ```sh
 cd "$HOME/.dotfiles"
 mise run machine:validate full
+```
+
+Verify the managed Rust compiler and macOS SDK:
+
+```sh
+mise exec -- rustc --version
+mise exec -- cargo --version
+mise exec -- xcrun --show-sdk-version
 ```
 
 Verify Git and GitHub SSH:

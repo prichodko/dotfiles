@@ -11,3 +11,5 @@ package_manager = "npm"
 [env]
 HK_PKL_BACKEND = "pklr"
 HK_MISE = "1"
+MISE_CARGO_HOME = "{{env.HOME}}/.local/share/mise/cargo"
+MISE_RUSTUP_HOME = "{{env.HOME}}/.local/share/mise/rustup"

@@ -38,7 +38,6 @@ machine_prepend_path() {
   esac
 }
 
-machine_prepend_path "$HOME/.cargo/bin"
 machine_prepend_path "$HOME/.local/bin"
 unset -f machine_prepend_path
 

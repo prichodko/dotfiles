@@ -42,6 +42,8 @@ test("global mise uses linked configuration with canonical repository locks", ()
     const canonicalFullLock = readFileSync(`${root}/mise.full.lock`, "utf8")
     const lockedEntireVersion = /\[\[tools\."github:entireio\/cli"\]\]\nversion = "([^"]+)"/u.exec(canonicalCoreLock)?.[1]
     if (lockedEntireVersion === undefined) throw new Error("The canonical Entire lock version is missing.")
+    const lockedRustVersion = /\[\[tools\.rust\]\]\nversion = "([^"]+)"/u.exec(canonicalCoreLock)?.[1]
+    if (lockedRustVersion === undefined) throw new Error("The canonical Rust lock version is missing.")
     const configDirectory = join(temporaryHome, ".config", "mise")
     mkdirSync(join(configDirectory, "conf.d"), { recursive: true })
     symlinkSync(`${root}/user/common/.config/mise/config.toml`, join(configDirectory, "config.toml"))
@@ -91,7 +93,33 @@ test("global mise uses linked configuration with canonical repository locks", ()
       expect(resolvedEntireTools).toHaveLength(1)
       expect(resolvedEntireTools[0]?.version).toBe(lockedEntireVersion)
       expect(resolvedEntireTools[0]?.requested_version).toBe("latest")
+      const rustList = Bun.spawnSync(["mise", "ls", "rust", "--json"], {
+        cwd,
+        env: isolatedEnvironment,
+        stdout: "pipe",
+        stderr: "pipe"
+      })
+      if (rustList.exitCode !== 0) throw new Error(rustList.stderr.toString())
+      const rustTools = JSON.parse(rustList.stdout.toString()) as Array<{
+        requested_version?: string
+        source?: unknown
+        version: string
+      }>
+      const resolvedRustTools = rustTools.filter((tool) => tool.source !== undefined)
+      expect(resolvedRustTools).toHaveLength(1)
+      expect(resolvedRustTools[0]?.version).toBe(lockedRustVersion)
+      expect(resolvedRustTools[0]?.requested_version).toBe("1")
     }
+    const rustEnvironment = Bun.spawnSync(["mise", "env", "--json"], {
+      cwd: temporaryHome,
+      env: isolatedEnvironment,
+      stdout: "pipe",
+      stderr: "pipe"
+    })
+    if (rustEnvironment.exitCode !== 0) throw new Error(rustEnvironment.stderr.toString())
+    const environment = JSON.parse(rustEnvironment.stdout.toString()) as Record<string, string>
+    expect(environment.MISE_CARGO_HOME).toBe(join(temporaryHome, ".local", "share", "mise", "cargo"))
+    expect(environment.MISE_RUSTUP_HOME).toBe(join(temporaryHome, ".local", "share", "mise", "rustup"))
     const hkUpgrade = Bun.spawnSync(["mise", "upgrade", "hk", "--dry-run"], {
       cwd: temporaryHome,
       env: isolatedEnvironment,

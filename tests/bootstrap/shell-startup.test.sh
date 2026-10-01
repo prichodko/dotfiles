@@ -40,6 +40,7 @@ for data_mode in default xdg override; do
     [[ "$path[1]" == "$expected" ]] || exit 60
     [[ "$(command -v machine-test-tool)" == "$expected/machine-test-tool" ]] || exit 61
     [[ "$(machine-test-tool)" == managed-tool ]] || exit 62
+    [[ ":$PATH:" != *":$HOME/.cargo/bin:"* ]] || exit 64
     typeset -A seen
     for entry in $path; do
       (( seen[$entry]++ ))
