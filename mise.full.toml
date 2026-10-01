@@ -13,6 +13,7 @@
 "brew-cask:google-chrome@canary" = { os = "macos", adopt = true }
 "brew-cask:httpie-desktop" = { os = "macos", adopt = true }
 "brew-cask:hyperkey" = { os = "macos", adopt = true }
+"brew-cask:incident-io" = { os = "macos", adopt = true }
 "brew-cask:karabiner-elements" = { os = "macos", adopt = true }
 "brew-cask:linear" = { os = "macos", adopt = true }
 "brew-cask:opencode-desktop" = { os = "macos", adopt = true }
