@@ -165,6 +165,18 @@ describe("legacy Linux process identification", () => {
     expect(fixture.signals).toEqual([])
   })
 
+  test("skips protected same-user processes while identifying the readable server", async () => {
+    const fixture = legacyFixture()
+    fixture.addProcess("42")
+    fixture.addProcess("43")
+    const readText = async (path: string) => {
+      if (path.endsWith("/42/cmdline")) throw Object.assign(new Error("permission denied"), { code: "EACCES" })
+      return readFileSync(path, "utf8")
+    }
+    await restartLegacyLinuxServer(fixture.socket, { ...fixture.options, readText })
+    expect(fixture.signals).toEqual([43])
+  })
+
   test("does not signal a reused PID or a replaced listening socket", async () => {
     for (const mode of ["pid", "socket"]) {
       const fixture = legacyFixture()

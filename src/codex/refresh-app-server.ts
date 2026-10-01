@@ -106,7 +106,9 @@ export const restartLegacyLinuxServer = async (socketPath: string, options: Lega
       if (!await ownsSocket(procRoot, pid, inode) || !await isServer(pid)) continue
       candidates.push({ pid, start: await startTime(pid) })
     } catch (error) {
-      if (!["ENOENT", "ESRCH"].includes((error as NodeJS.ErrnoException).code ?? "")) throw error
+      // Linux can expose a same-user process directory while protecting its descriptors
+      // (for example, after a privileged exec). Such a process cannot be verified as our server.
+      if (!["ENOENT", "ESRCH", "EACCES", "EPERM"].includes((error as NodeJS.ErrnoException).code ?? "")) throw error
     }
   }
   if (candidates.length !== 1) throw new Error("Cannot identify a unique, user-owned Codex app-server process; no process was stopped.")
