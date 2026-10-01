@@ -5,8 +5,14 @@ plan_mode_reasoning_effort = "xhigh"
 personality = "pragmatic"
 sandbox_mode = "workspace-write"
 
+[features]
+remote_plugin = true
+
 # Keep user-level plugin choices portable. Marketplace caches and service
 # authentication remain machine-local and are recreated by Codex.
+[mcp_servers.buildkite]
+url = "https://mcp.buildkite.com/mcp/readonly"
+
 [plugins."google-calendar@openai-curated"]
 enabled = true
 
