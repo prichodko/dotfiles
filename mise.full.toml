@@ -21,7 +21,7 @@
 "brew-cask:raycast" = { os = "macos", adopt = true }
 "brew-cask:slack" = { os = "macos", adopt = true }
 "brew-cask:spotify" = { os = "macos", adopt = true }
-"brew-cask:t3-code" = { os = "macos", adopt = true }
+"brew-cask:t3-code@nightly" = { os = "macos", adopt = true }
 "brew-cask:tailscale-app" = { os = "macos", adopt = true }
 "brew-cask:visual-studio-code" = { os = "macos", adopt = true }
 "brew-cask:zed" = { os = "macos", adopt = true }
@@ -46,3 +46,4 @@
 "npm:sharp-cli" = "latest"
 "npm:svgo" = "latest"
 "npm:@tanstack/cli" = "latest"
+"npm:cf" = "latest"
