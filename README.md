@@ -318,6 +318,10 @@ The command uses exit code `0` for success, `1` for an operational failure, `2` 
 
 Claude receives individual links from `.claude/skills/`.
 
+Claude subagents live in `.claude/agents/` and link individually to `~/.claude/agents/`.
+
+The `datadog` subagent owns the Datadog MCP server. `base.json` denies the `claude.ai Datadog` connector, so Datadog tools stay out of the main context until the subagent is invoked.
+
 The `trail-create` skill creates one Entire trail and owns the related commit, push, and trail workflow when explicitly invoked.
 
 The `trail-findings` skill reads every finding for the current branch trail without changing findings or code.
