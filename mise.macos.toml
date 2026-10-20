@@ -46,3 +46,4 @@ login_shell = "/bin/zsh"
 "~/.config/zed/keymap.json" = { source = "~/.dotfiles/user/macos/.config/zed/keymap.json" }
 "~/.config/zed/settings.json" = { source = "~/.dotfiles/user/macos/.config/zed/settings.json" }
 "~/.ssh/config" = { source = "~/.dotfiles/user/macos/.ssh/config" }
+"~/.t3/userdata/settings.json" = { source = "~/.dotfiles/user/macos/.t3/userdata/settings.json" }
