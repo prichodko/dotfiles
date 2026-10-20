@@ -13,9 +13,6 @@
     "pr-review-toolkit@claude-plugins-official": true,
     "figma@claude-plugins-official": false
   },
-  "deniedMcpServers": [
-    { "serverName": "claude.ai Datadog" }
-  ],
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
       "source": {
