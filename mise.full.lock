@@ -127,11 +127,6 @@ version = "0.4.1"
 backend = "npm:calldiff"
 specifiers = ["latest"]
 
-[[tools."npm:cf"]]
-version = "0.15.0"
-backend = "npm:cf"
-specifiers = ["latest"]
-
 [[tools."npm:dev3000"]]
 version = "0.0.178"
 backend = "npm:dev3000"
