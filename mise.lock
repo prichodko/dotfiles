@@ -982,54 +982,54 @@ checksum = "sha256:0fde04e8b092156b97fe6432e899baf16d9ed6ce52cbb4218d2d9c07a2f82
 url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.3/bun-darwin-x64-baseline.zip"
 
 [[tools."github:entireio/cli"]]
-version = "0.11.6-nightly.202610180623.a334cb698"
+version = "0.12.1-nightly.202610240623.b9639ba5b"
 backend = "github:entireio/cli"
 specifiers = ["latest"]
 
 [tools."github:entireio/cli"."platforms.linux-arm64"]
-checksum = "sha256:42209f735f647bece4c441fccb353a3f02600e857e384a0e5a2819142f838ec5"
-url = "https://github.com/entireio/cli/releases/download/v0.11.6-nightly.202610180623.a334cb698/entire_linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/652693532"
+checksum = "sha256:fccc3337773467d206180710cd03caa54724ad2398f64f9389a7cfa534469f0d"
+url = "https://github.com/entireio/cli/releases/download/v0.12.1-nightly.202610240623.b9639ba5b/entire_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/671486302"
 
 [tools."github:entireio/cli"."platforms.linux-arm64-musl"]
-checksum = "sha256:42209f735f647bece4c441fccb353a3f02600e857e384a0e5a2819142f838ec5"
-url = "https://github.com/entireio/cli/releases/download/v0.11.6-nightly.202610180623.a334cb698/entire_linux_arm64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/652693532"
+checksum = "sha256:fccc3337773467d206180710cd03caa54724ad2398f64f9389a7cfa534469f0d"
+url = "https://github.com/entireio/cli/releases/download/v0.12.1-nightly.202610240623.b9639ba5b/entire_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/671486302"
 
 [tools."github:entireio/cli"."platforms.linux-x64"]
-checksum = "sha256:d1f99e17b9aac366f4cb56bc1a5991b3a626172c080f1a958949eb4cf7fa5ae8"
-url = "https://github.com/entireio/cli/releases/download/v0.11.6-nightly.202610180623.a334cb698/entire_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/652693537"
+checksum = "sha256:a2b7167fd1d2e58227ef656df363d8bcb3db838f9bd2a3f204bb48fe06570f7e"
+url = "https://github.com/entireio/cli/releases/download/v0.12.1-nightly.202610240623.b9639ba5b/entire_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/671486305"
 
 [tools."github:entireio/cli"."platforms.linux-x64-baseline"]
-checksum = "sha256:d1f99e17b9aac366f4cb56bc1a5991b3a626172c080f1a958949eb4cf7fa5ae8"
-url = "https://github.com/entireio/cli/releases/download/v0.11.6-nightly.202610180623.a334cb698/entire_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/652693537"
+checksum = "sha256:a2b7167fd1d2e58227ef656df363d8bcb3db838f9bd2a3f204bb48fe06570f7e"
+url = "https://github.com/entireio/cli/releases/download/v0.12.1-nightly.202610240623.b9639ba5b/entire_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/671486305"
 
 [tools."github:entireio/cli"."platforms.linux-x64-musl"]
-checksum = "sha256:d1f99e17b9aac366f4cb56bc1a5991b3a626172c080f1a958949eb4cf7fa5ae8"
-url = "https://github.com/entireio/cli/releases/download/v0.11.6-nightly.202610180623.a334cb698/entire_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/652693537"
+checksum = "sha256:a2b7167fd1d2e58227ef656df363d8bcb3db838f9bd2a3f204bb48fe06570f7e"
+url = "https://github.com/entireio/cli/releases/download/v0.12.1-nightly.202610240623.b9639ba5b/entire_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/671486305"
 
 [tools."github:entireio/cli"."platforms.linux-x64-musl-baseline"]
-checksum = "sha256:d1f99e17b9aac366f4cb56bc1a5991b3a626172c080f1a958949eb4cf7fa5ae8"
-url = "https://github.com/entireio/cli/releases/download/v0.11.6-nightly.202610180623.a334cb698/entire_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/652693537"
+checksum = "sha256:a2b7167fd1d2e58227ef656df363d8bcb3db838f9bd2a3f204bb48fe06570f7e"
+url = "https://github.com/entireio/cli/releases/download/v0.12.1-nightly.202610240623.b9639ba5b/entire_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/671486305"
 
 [tools."github:entireio/cli"."platforms.macos-arm64"]
-checksum = "sha256:0b34e55d3fdfe5e18e8be450c82068fef97492de04f928d56c4ca64337354fd6"
-url = "https://github.com/entireio/cli/releases/download/v0.11.6-nightly.202610180623.a334cb698/entire_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/652693529"
+checksum = "sha256:c44fc4ccc7a705cc44de3c5738364906aa91fe8d692b225d24349c1d9e23b23f"
+url = "https://github.com/entireio/cli/releases/download/v0.12.1-nightly.202610240623.b9639ba5b/entire_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/671486295"
 
 [tools."github:entireio/cli"."platforms.macos-x64"]
-checksum = "sha256:23b0975ba2aa72f516d8dd2aeb5bb2aa871d13b49f595fa1bfdeb5a29b1f374b"
-url = "https://github.com/entireio/cli/releases/download/v0.11.6-nightly.202610180623.a334cb698/entire_darwin_amd64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/652693534"
+checksum = "sha256:e8f83c1aad4ea2ead9a509806ca98a753d986123c737aaa7d1931e2aefdd0704"
+url = "https://github.com/entireio/cli/releases/download/v0.12.1-nightly.202610240623.b9639ba5b/entire_darwin_amd64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/671486306"
 
 [tools."github:entireio/cli"."platforms.macos-x64-baseline"]
-checksum = "sha256:23b0975ba2aa72f516d8dd2aeb5bb2aa871d13b49f595fa1bfdeb5a29b1f374b"
-url = "https://github.com/entireio/cli/releases/download/v0.11.6-nightly.202610180623.a334cb698/entire_darwin_amd64.tar.gz"
-url_api = "https://api.github.com/repos/entireio/cli/releases/assets/652693534"
+checksum = "sha256:e8f83c1aad4ea2ead9a509806ca98a753d986123c737aaa7d1931e2aefdd0704"
+url = "https://github.com/entireio/cli/releases/download/v0.12.1-nightly.202610240623.b9639ba5b/entire_darwin_amd64.tar.gz"
+url_api = "https://api.github.com/repos/entireio/cli/releases/assets/671486306"
 
 [[tools.go]]
 version = "1.27.2"
