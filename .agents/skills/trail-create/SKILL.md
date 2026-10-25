@@ -1,11 +1,11 @@
 ---
 name: trail-create
-description: Commit relevant current work and create an Entire trail for the current repository. Use only when the user explicitly invokes `$trail-create` in Codex or `/trail-create` in Claude.
+description: Commit relevant current work and create an Entire trail for the current repository. Use when the user invokes `$trail-create` in Codex or `/trail-create` in Claude, or after finishing and verifying a code-change task in an Entire-enabled repository, unless the user said to keep the work uncommitted or unpushed or the branch already has a trail.
 ---
 
 # Create an Entire trail
 
-Create one trail for the current repository. Treat explicit invocation as authorization to commit the trail-related changes, push the branch, and create the remote trail.
+Create one trail for the current repository. Treat explicit invocation, or finished and verified code-change work under the user's standing instruction to create trails, as authorization to commit the trail-related changes, push the branch, and create the remote trail. Skip unprompted use when the user said to keep the work uncommitted or unpushed, or when the branch already has a trail.
 
 Read [references/entire-trail-cli.md](references/entire-trail-cli.md) before selecting an `entire trail` command or flag. The reference contains the complete API for the captured CLI version. If the installed version differs, run `entire agent-help trail --json` in an Entire-enabled repository and use the live output as authoritative.
 
