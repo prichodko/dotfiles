@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-test_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+test_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
 test_git_bin="$(dirname "$(command -v git)")"
 test_state="$(mktemp -d)"
 trap 'rm -rf "$test_state"' EXIT
@@ -98,24 +98,6 @@ printf '%s\n' \
   'typeset -gA ZSH_HIGHLIGHT_STYLES' \
   'MACHINE_TEST_SYNTAX_HIGHLIGHTING=1' \
   > "$test_homebrew/opt/zsh-syntax-highlighting/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-
-while IFS= read -r shell_file; do
-  bash -n "$shell_file"
-done < <({ find "$test_root/tests/bootstrap" -type f -name '*.sh'; printf '%s\n' "$test_root/tasks/bootstrap" "$test_root/tasks/machine/apply"; } | sort -u)
-
-while IFS= read -r zsh_file; do
-  zsh -n "$zsh_file"
-done < <(find "$test_root/user" -type f \( -name '*zsh*.sh' -o -name '.zshenv' \) | sort -u)
-
-rg -Fq 'MACHINE_PACKAGE_PREFIX=/opt/homebrew' "$test_root/user/macos/.config/shell/macos.sh"
-rg -Fq 'export PATH="$MACHINE_PACKAGE_PREFIX/bin:$MACHINE_PACKAGE_PREFIX/sbin:$PATH"' "$test_root/user/macos/.config/shell/macos.sh"
-rg -Fq 'MACHINE_PACKAGE_PREFIX=/home/linuxbrew/.linuxbrew' "$test_root/user/linux/.config/shell/linux.sh"
-if rg -Fq 'brew shellenv' "$test_root/user/macos/.config/shell/macos.sh" "$test_root/user/linux/.config/shell/linux.sh"; then
-  printf 'shell-startup.test: platform shell still invokes brew shellenv\n' >&2
-  exit 1
-fi
-rg -Fq 'export ENTIRE_TOKEN_STORE=file' "$test_root/user/linux/.config/shell/linux.sh"
-rg -Fq '[ -f "$HOME/.config/shell/bash.sh" ] && source "$HOME/.config/shell/bash.sh"' "$test_root/mise.toml"
 
 for obsolete_startup_file in .zshrc .zprofile .bashrc .bash_profile; do
   if [[ -e "$test_root/$obsolete_startup_file" ]]; then

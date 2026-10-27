@@ -34,7 +34,6 @@ exclude = [
   ".codex/**",
   ".ssh/config",
   ".DS_Store",
-  "tests/tmp/**",
 ]
 
 [dotfiles]
@@ -62,6 +61,7 @@ exclude = [
 "~/.claude/settings.json/base" = { source = "~/.dotfiles/user/common/.claude/base.json", merge = true }
 "~/.codex/config.toml/base" = { source = "~/.dotfiles/user/common/.codex/base.toml", merge = true }
 "~/.codex/AGENTS.md" = { source = "~/.dotfiles/user/common/.codex/AGENTS.md" }
+"~/.config/git/hk.conf" = { source = "~/.dotfiles/user/common/.config/git/hk.conf" }
 "~/.config/git/ignore" = { source = "~/.dotfiles/user/common/.config/git/ignore" }
 "~/.config/hk/config.pkl" = { source = "~/.dotfiles/user/common/.config/hk/config.pkl" }
 "~/.config/mise/config.toml" = { source = "~/.dotfiles/user/common/.config/mise/config.toml" }
@@ -85,7 +85,7 @@ hint = "Run `mise bootstrap` and open a new shell."
 [doctor.checks.bootstrap]
 description = "Bootstrap is complete"
 run = "mise bootstrap status --missing"
-hint = "Run `mise run machine:apply`."
+hint = "Run `mise run dotfiles:apply`."
 timeout = "60s"
 
 [doctor.checks.signing]
@@ -114,41 +114,23 @@ description = "Claude Code is signed in"
 run = "claude auth status"
 hint = "claude auth login"
 
-[tasks."dotfiles:check"]
-description = "Validate managed dotfiles and scan for secrets"
-run = "tasks/dotfiles/check.ts"
+[doctor.checks.codex-app-server]
+description = "A running Codex app-server matches the installed Codex CLI"
+run = '''
+socket="${CODEX_HOME:-$HOME/.codex}/app-server-control/app-server-control.sock"
+[ -S "$socket" ] || exit 0
+codex app-server daemon version | jq -e '.status != "running" or .cliVersion == .appServerVersion' >/dev/null
+'''
+hint = "Restart the Codex app, or reconnect the VM in it, to load the upgraded CLI."
+
+[tasks."dotfiles:apply"]
+description = "Apply this checkout to the machine without pulling"
+run = "mise bootstrap --locked --skip repos --yes"
 
 [tasks."dotfiles:pull"]
-description = "Pull and apply dotfiles without publishing local changes"
-run = "tasks/dotfiles/update.ts"
+description = "Fast-forward ~/.dotfiles from origin/main, then apply"
+run = "mise bootstrap --locked --yes"
 
-[tasks."dotfiles:sync"]
-description = "Update dotfiles without committing or publishing local changes"
-run = "tasks/dotfiles/sync.ts"
-
-[tasks."dotfiles:publish"]
-description = "Explicitly commit and publish tracked changes after validation"
-run = "tasks/dotfiles/publish.ts"
-
-[tasks."machine:apply"]
-description = "Apply the native mise machine bootstrap"
-run = "tasks/machine/apply"
-
-[tasks."machine:refresh-codex"]
-run = "tasks/machine/refresh-codex.ts"
-
-[tasks.bootstrap]
-description = "Install repository TypeScript dependencies"
-file = "tasks/bootstrap"
-
-[tasks.typecheck]
-description = "Type-check TypeScript"
-run = "bun run typecheck"
-
-[tasks.test]
-description = "Run safe tests"
-run = [
-  "bun test",
-  "tests/bootstrap/machine-apply.test.sh",
-  "tests/bootstrap/shell-startup.test.sh",
-]
+[tasks."dotfiles:check"]
+description = "Validate config, links, locks, hooks and shell startup; scan for secrets"
+file = "tasks/check"

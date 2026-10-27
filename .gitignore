@@ -4,8 +4,6 @@
 .env.mise
 .mise.local.toml
 *.local.lock
-tests/tmp/
-node_modules/
 /.codex/config.toml
 
 # SSH private keys

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+#MISE description="Validate config, links, locks, hooks and shell startup; scan for secrets"
+
+set -euo pipefail
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+# Run a step silently; print its output only when it fails.
+step() {
+  local name=$1 output
+  shift
+  printf '==> %s\n' "$name"
+  output=$("$@" 2>&1) || { printf '%s\n' "$output" >&2; return 1; }
+}
+
+shell_syntax() {
+  local file
+  while IFS= read -r file; do
+    case "$file" in
+      *zsh*|*.zshenv) zsh -n "$file" ;;
+      *) bash -n "$file" ;;
+    esac
+  done < <(git ls-files '*.sh' tasks user/common/.zshenv)
+}
+
+managed_files() {
+  mise dot status --missing >/dev/null 2>&1 || { mise dot diff; return 1; }
+}
+
+hk_config() {
+  HK_FILE=user/common/.config/hk/config.pkl mise x hk -- hk validate
+  mise x hk -- hk validate
+}
+
+secrets() {
+  gitleaks dir --no-banner --redact --log-level warn .
+  if ! git diff --cached --quiet; then
+    gitleaks git --staged --no-banner --redact --log-level warn .
+  fi
+}
+
+step "shell syntax" shell_syntax
+step "mise tasks" mise tasks validate
+step "locked tools" mise install --locked --dry-run
+step "managed files" managed_files
+step "hk config" hk_config
+step "shell startup" tests/shell-startup.test.sh
+step "secrets" secrets
+
+printf 'dotfiles:check passed\n'
