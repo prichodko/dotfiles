@@ -1,159 +1,83 @@
 # New machine
 
-This guide configures a new Apple Silicon Mac from the dotfiles repository.
-
-The full profile installs personal applications and additional tools.
-
-The core profile installs the portable machine environment only.
+Set up an Apple Silicon Mac. The `full` profile adds personal apps and extra tools; `core` is the portable environment only.
 
 ## Before bootstrap
 
-Install current macOS updates.
+1. Install macOS updates and enable FileVault.
+2. Install Xcode Command Line Tools and wait for it to finish:
 
-Enable FileVault.
+   ```sh
+   xcode-select --install
+   ```
 
-Install Xcode Command Line Tools:
+3. Install mise:
 
-```sh
-xcode-select --install
-```
+   ```sh
+   curl https://mise.run | sh
+   ```
 
-Wait for the installation to finish.
-
-Rust is installed and selected by mise with the core profile.
-
-Install the official mise binary:
-
-```sh
-curl https://mise.run | sh
-```
-
-## Full profile
-
-Run the complete personal-machine bootstrap:
+## Bootstrap
 
 ```sh
-~/.local/bin/mise \
-  -E full \
-  --locked \
-  bootstrap \
+~/.local/bin/mise -E full --locked bootstrap \
   --from https://github.com/prichodko/dotfiles.git \
   --from-dir "$HOME/.dotfiles" \
-  --update \
-  --yes
+  --update --yes
 ```
 
-## Core profile
-
-Run the portable bootstrap without the full overlay:
-
-```sh
-~/.local/bin/mise \
-  --locked \
-  bootstrap \
-  --from https://github.com/prichodko/dotfiles.git \
-  --from-dir "$HOME/.dotfiles" \
-  --update \
-  --yes
-```
-
-Do not add `--force-dotfiles`.
-
-Do not add `--skip-dirty`.
-
-Stop and inspect the files when bootstrap reports a conflict.
+Drop `-E full` for core only. Never add `--force-dotfiles` or `--skip-dirty`; if bootstrap reports a conflict, stop and inspect the files. Rust comes from mise in both profiles.
 
 ## Manual setup
 
-Start a new login Shell.
+1. Start a new login shell.
+2. Sign in to Apple ID/iCloud and 1Password; enable the 1Password SSH agent.
+3. Grant Accessibility, Screen Recording, and Full Disk Access where needed.
+4. Authenticate CLIs:
 
-Sign in to Apple ID and iCloud.
+   ```sh
+   gh auth login --git-protocol ssh --web --skip-ssh-key
+   entire auth login
+   codex login
+   claude auth login
+   ```
 
-Sign in to 1Password.
-
-Enable the 1Password SSH agent.
-
-Grant the required Accessibility permissions.
-
-Grant the required Screen Recording permissions.
-
-Grant the required Full Disk Access permissions.
-
-Authenticate the command-line tools:
-
-```sh
-gh auth login --git-protocol ssh --web --skip-ssh-key
-entire auth login
-codex login
-claude auth login
-```
-
-Restore browser profiles, application data, project repositories, and other untracked data from backup.
-
-Mise does not copy credentials from another machine.
+5. Restore browser profiles, app data, and repos from backup. Mise copies no credentials.
 
 ## Validation
-
-Validate the complete machine:
 
 ```sh
 cd "$HOME/.dotfiles"
 mise run machine:validate full
-```
-
-Verify the managed Rust compiler and macOS SDK:
-
-```sh
 mise exec -- rustc --version
 mise exec -- cargo --version
 mise exec -- xcrun --show-sdk-version
-```
-
-Verify Git and GitHub SSH:
-
-```sh
-command -v git
 git --version
 ssh -T git@github.com
 ```
 
-Create a signed commit in a temporary repository.
+Then, in a temporary repo:
 
-Confirm that 1Password approves the signature.
-
-Create a temporary repository with an available `node_modules/.bin/oxfmt` executable.
-
-Confirm that the global hk pre-commit hook runs the formatter.
+- make a signed commit and confirm 1Password approves it;
+- with `node_modules/.bin/oxfmt` present, confirm the global hk pre-commit hook formats staged files.
 
 ## Maintenance
 
-Upgrade one managed tool within its declared version range:
+Tools:
 
 ```sh
-mise upgrade hk
+mise upgrade hk              # one tool, within its declared range
+mise -C ~ upgrade            # all core tools
+mise -C ~ -E full upgrade    # core + full
 ```
 
-Upgrade every core tool, or include the full profile:
+Upgrades rewrite the repo lock files. Review the diff, run `mise run dotfiles:check`, and try the tools in your projects before committing. On a new machine, bootstrap with the current locks first and upgrade only after validation passes.
 
-```sh
-mise -C ~ upgrade
-mise -C ~ -E full upgrade
-```
-
-The linked global configuration writes version changes to the canonical repository lock files. Review the diff, run `mise run dotfiles:check`, and try the upgraded tools in your projects before committing and pushing the lock-file changes.
-
-For a new machine, bootstrap with the current tested locks first. Upgrade tools only after the initial setup validates successfully.
-
-Preview native package and application upgrades:
+Native packages and apps:
 
 ```sh
 mise -E full bootstrap packages upgrade --dry-run
-```
-
-Apply approved native package and application upgrades:
-
-```sh
 mise -E full bootstrap packages upgrade --yes
 ```
 
-An application upgrade can require new macOS privacy approval.
+App upgrades can require new macOS privacy approvals.

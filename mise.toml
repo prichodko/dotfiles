@@ -1,7 +1,6 @@
 min_version = "2026.8.16"
 
 [settings]
-experimental = true
 lockfile = true
 dotfiles.root = "~/.dotfiles"
 dotfiles.default_mode = "symlink"

@@ -21,8 +21,6 @@ i() {
     pnpm install
   elif [[ -f yarn.lock ]]; then
     yarn install
-  elif [[ -f package-lock.json ]]; then
-    npm install
   elif [[ -f package.json ]]; then
     npm install
   else
