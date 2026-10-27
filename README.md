@@ -4,7 +4,7 @@ Portable config, tools, and lifecycle management for local and remote machines.
 
 - **mise** is the public interface: bootstrap, tools, managed files, tasks.
 - **Bun** runs the TypeScript automation; **Effect** handles processes, cleanup, retries, typed failures, and the CLI.
-- Requires mise `2026.8.16`+.
+- Requires mise `2026.10.17`+.
 
 ## Profiles
 
