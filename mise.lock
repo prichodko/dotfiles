@@ -1034,6 +1034,56 @@ checksum = "sha256:eeee861cf4661d689c331c95fb398a32404abde6edf76c34e3b42bcdb129b
 url = "https://github.com/entireio/cli/releases/download/v0.12.3-nightly.202610261136.c4f103d8d/entire_darwin_amd64.tar.gz"
 url_api = "https://api.github.com/repos/entireio/cli/releases/assets/677998471"
 
+[[tools."github:theseus-rs/postgresql-binaries"]]
+version = "18.4.0"
+backend = "github:theseus-rs/postgresql-binaries"
+specifiers = ["18"]
+
+[tools."github:theseus-rs/postgresql-binaries"."platforms.linux-arm64"]
+checksum = "sha256:569984d426365c6ca3c197d2b3a999b73161ff1f3abc963824a8c3624620e5dd"
+url = "https://github.com/theseus-rs/postgresql-binaries/releases/download/18.4.0/postgresql-18.4.0-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/theseus-rs/postgresql-binaries/releases/assets/439426549"
+
+[tools."github:theseus-rs/postgresql-binaries"."platforms.linux-arm64-musl"]
+checksum = "sha256:10c149f8be1b109f337d35513caf27844ecf2f25929067c1876bde0d7f15bc2e"
+url = "https://github.com/theseus-rs/postgresql-binaries/releases/download/18.4.0/postgresql-18.4.0-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/theseus-rs/postgresql-binaries/releases/assets/439500518"
+
+[tools."github:theseus-rs/postgresql-binaries"."platforms.linux-x64"]
+checksum = "sha256:65c06cf318b9a57525d842d658d6d18cd461d12b3a89b57d6d8ed7cccbe2db53"
+url = "https://github.com/theseus-rs/postgresql-binaries/releases/download/18.4.0/postgresql-18.4.0-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/theseus-rs/postgresql-binaries/releases/assets/439446004"
+
+[tools."github:theseus-rs/postgresql-binaries"."platforms.linux-x64-baseline"]
+checksum = "sha256:65c06cf318b9a57525d842d658d6d18cd461d12b3a89b57d6d8ed7cccbe2db53"
+url = "https://github.com/theseus-rs/postgresql-binaries/releases/download/18.4.0/postgresql-18.4.0-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/theseus-rs/postgresql-binaries/releases/assets/439446004"
+
+[tools."github:theseus-rs/postgresql-binaries"."platforms.linux-x64-musl"]
+checksum = "sha256:5e816e0525079f0e68e97a6f5ea9639df369bd33c24e5791dc2ac123436ce1ba"
+url = "https://github.com/theseus-rs/postgresql-binaries/releases/download/18.4.0/postgresql-18.4.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/theseus-rs/postgresql-binaries/releases/assets/439430831"
+
+[tools."github:theseus-rs/postgresql-binaries"."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:5e816e0525079f0e68e97a6f5ea9639df369bd33c24e5791dc2ac123436ce1ba"
+url = "https://github.com/theseus-rs/postgresql-binaries/releases/download/18.4.0/postgresql-18.4.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/theseus-rs/postgresql-binaries/releases/assets/439430831"
+
+[tools."github:theseus-rs/postgresql-binaries"."platforms.macos-arm64"]
+checksum = "sha256:1b68828f524b638a24918e258b173d0f16773547a0d3b83d9ba74473b61649f2"
+url = "https://github.com/theseus-rs/postgresql-binaries/releases/download/18.4.0/postgresql-18.4.0-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/theseus-rs/postgresql-binaries/releases/assets/439433966"
+
+[tools."github:theseus-rs/postgresql-binaries"."platforms.macos-x64"]
+checksum = "sha256:cbc38067a795d10bbddc730e61c835df0b351c36a7bd2544d388790fcf50aa4d"
+url = "https://github.com/theseus-rs/postgresql-binaries/releases/download/18.4.0/postgresql-18.4.0-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/theseus-rs/postgresql-binaries/releases/assets/439430204"
+
+[tools."github:theseus-rs/postgresql-binaries"."platforms.macos-x64-baseline"]
+checksum = "sha256:cbc38067a795d10bbddc730e61c835df0b351c36a7bd2544d388790fcf50aa4d"
+url = "https://github.com/theseus-rs/postgresql-binaries/releases/download/18.4.0/postgresql-18.4.0-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/theseus-rs/postgresql-binaries/releases/assets/439430204"
+
 [[tools.go]]
 version = "1.27.3"
 backend = "core:go"

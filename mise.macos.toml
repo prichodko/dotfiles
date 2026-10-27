@@ -9,7 +9,6 @@ _.path = ["/opt/homebrew/bin", "/opt/homebrew/sbin"]
 "brew:herdr" = {}
 "brew:pinentry-mac" = {}
 "brew:planetscale/tap/pscale" = {}
-"brew:postgresql@18" = {}
 "brew:trash" = {}
 "brew-cask:1password" = { adopt = true }
 "brew-cask:1password-cli" = { adopt = true }
