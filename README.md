@@ -8,11 +8,10 @@ Requires mise `2026.10.17`+.
 
 | Path | Loaded | Owns |
 |---|---|---|
-| `mise/conf.d/core.toml` | always (global) | CLI tools for every machine |
+| `mise/` | always (global): `~/.config/mise` links here | `config.toml` settings, `conf.d/core.toml` CLI tools for every machine, `mise.lock`, `miserc.toml` |
 | `mise.toml` | always | shared packages, managed files, doctor checks, tasks |
 | `mise.macos.toml` | macOS | brew packages, casks, fonts, macOS defaults, Mac dotfiles |
 | `mise.linux.toml` | Linux (= agent VMs) | apt packages, login-shell hook, VM signing key, Linux dotfiles |
-| `mise.lock` | | pinned tool versions |
 | `user/common/`, `user/{macos,linux}/` | | files linked or merged into `~` |
 | `tasks/check` | | `dotfiles:check` |
 | `hk.pkl` | | repo pre-push hook |
@@ -53,6 +52,7 @@ curl https://mise.run | sh
 ~/.local/bin/mise --locked bootstrap \
   --from https://github.com/prichodko/dotfiles.git \
   --from-dir "$HOME/.dotfiles" \
+  --config-dir mise \
   --update --yes
 ```
 
@@ -63,7 +63,7 @@ For a VM, run `mise bootstrap remote --host <ssh-destination>` from this checkou
 | Config | Policy |
 |---|---|
 | Shell, Git, hk hooks, SSH, editor config | Symlinked from `user/` |
-| Global mise config and lock | Symlinked to the repo files |
+| Global mise config (`~/.config/mise`) | Symlinked to `mise/` as one directory |
 | Claude `settings.json`, Codex `config.toml` | `merge = true`: keys in `user/common/.claude/base.json` / `user/common/.codex/base.toml` win; other local keys are kept |
 | Credentials, app state | Local only |
 
@@ -73,11 +73,11 @@ Removing a key from a base file stops managing it; the local value stays. Never 
 
 ```sh
 mise upgrade hk                              # one tool, within its declared range
-mise -C ~ upgrade                            # all tools; rewrites mise.lock
+mise -C ~ upgrade                            # all tools; rewrites mise/mise.lock
 mise bootstrap packages upgrade --dry-run    # brew/apt packages and apps
 ```
 
-Review the `mise.lock` diff and run `dotfiles:check` before committing.
+Review the `mise/mise.lock` diff and run `dotfiles:check` before committing.
 
 ## Git hooks
 

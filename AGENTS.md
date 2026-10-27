@@ -1,7 +1,7 @@
 ## Repository structure
 
 - Use mise as the public interface: `mise bootstrap`, `[dotfiles]`, `[doctor.checks]`, and tasks in `mise.toml`.
-- Keep CLI tools for every machine in `mise/conf.d/core.toml`; tag Mac-only tools with `os = "macos"`.
+- `mise/` is the global mise config dir (`~/.config/mise` links to it). Keep CLI tools for every machine in `mise/conf.d/core.toml`; tag Mac-only tools with `os = "macos"`.
 - Keep platform packages and settings in `mise.macos.toml` and `mise.linux.toml` (Linux = agent VMs).
 - Prefer built-in mise features over custom code; keep any remaining automation as small shell tasks in `tasks/`.
 

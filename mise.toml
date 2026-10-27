@@ -64,10 +64,7 @@ exclude = [
 "~/.config/git/hk.conf" = { source = "~/.dotfiles/user/common/.config/git/hk.conf" }
 "~/.config/git/ignore" = { source = "~/.dotfiles/user/common/.config/git/ignore" }
 "~/.config/hk/config.pkl" = { source = "~/.dotfiles/user/common/.config/hk/config.pkl" }
-"~/.config/mise/config.toml" = { source = "~/.dotfiles/user/common/.config/mise/config.toml" }
-"~/.config/mise/conf.d/core.toml" = { source = "~/.dotfiles/mise/conf.d/core.toml" }
-"~/.config/mise/mise.lock" = { source = "~/.dotfiles/mise.lock" }
-"~/.config/mise/miserc.toml" = { source = "~/.dotfiles/.miserc.toml", mode = "copy" }
+"~/.config/mise" = { source = "~/.dotfiles/mise" }
 "~/.config/opencode/AGENTS.md" = { source = "~/.dotfiles/.agents/AGENTS.md" }
 "~/.config/opencode/opencode.jsonc" = { source = "~/.dotfiles/user/common/.config/opencode/opencode.jsonc" }
 "~/.config/shell/bash.sh" = { source = "~/.dotfiles/user/common/.config/shell/bash.sh" }

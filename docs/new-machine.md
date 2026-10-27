@@ -23,6 +23,7 @@ Set up an Apple Silicon Mac.
 ~/.local/bin/mise --locked bootstrap \
   --from https://github.com/prichodko/dotfiles.git \
   --from-dir "$HOME/.dotfiles" \
+  --config-dir mise \
   --update --yes
 ```
 
@@ -66,7 +67,7 @@ mise upgrade hk      # one tool, within its declared range
 mise -C ~ upgrade    # all tools
 ```
 
-Upgrades rewrite the repo lock file. Review the diff, run `mise run dotfiles:check`, and try the tools in your projects before committing. On a new machine, bootstrap with the current lock first and upgrade only after validation passes.
+Upgrades rewrite `mise/mise.lock`. Review the diff, run `mise run dotfiles:check`, and try the tools in your projects before committing. On a new machine, bootstrap with the current lock first and upgrade only after validation passes.
 
 Native packages and apps:
 
