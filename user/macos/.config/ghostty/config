@@ -1,5 +1,5 @@
 theme = GitHub Dark High Contrast
-font-family = GeistMono NF
+font-family = Geist Mono
 macos-titlebar-style = tabs
 macos-titlebar-proxy-icon = hidden
 split-divider-color = #222

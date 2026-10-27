@@ -1,6 +1,6 @@
 # New machine
 
-Set up an Apple Silicon Mac. The `full` profile adds personal apps and extra tools; `core` is the portable environment only.
+Set up an Apple Silicon Mac.
 
 ## Before bootstrap
 
@@ -20,13 +20,13 @@ Set up an Apple Silicon Mac. The `full` profile adds personal apps and extra too
 ## Bootstrap
 
 ```sh
-~/.local/bin/mise -E full --locked bootstrap \
+~/.local/bin/mise --locked bootstrap \
   --from https://github.com/prichodko/dotfiles.git \
   --from-dir "$HOME/.dotfiles" \
   --update --yes
 ```
 
-Drop `-E full` for core only. Never add `--force-dotfiles` or `--skip-dirty`; if bootstrap reports a conflict, stop and inspect the files. Rust comes from mise in both profiles.
+Never add `--force-dotfiles` or `--skip-dirty`; if bootstrap reports a conflict, stop and inspect the files.
 
 ## Manual setup
 
@@ -48,11 +48,7 @@ Drop `-E full` for core only. Never add `--force-dotfiles` or `--skip-dirty`; if
 
 ```sh
 cd "$HOME/.dotfiles"
-mise run machine:validate full
-mise exec -- rustc --version
-mise exec -- cargo --version
-mise exec -- xcrun --show-sdk-version
-git --version
+mise doctor project
 ssh -T git@github.com
 ```
 
@@ -66,18 +62,17 @@ Then, in a temporary repo:
 Tools:
 
 ```sh
-mise upgrade hk              # one tool, within its declared range
-mise -C ~ upgrade            # all core tools
-mise -C ~ -E full upgrade    # core + full
+mise upgrade hk      # one tool, within its declared range
+mise -C ~ upgrade    # all tools
 ```
 
-Upgrades rewrite the repo lock files. Review the diff, run `mise run dotfiles:check`, and try the tools in your projects before committing. On a new machine, bootstrap with the current locks first and upgrade only after validation passes.
+Upgrades rewrite the repo lock file. Review the diff, run `mise run dotfiles:check`, and try the tools in your projects before committing. On a new machine, bootstrap with the current lock first and upgrade only after validation passes.
 
 Native packages and apps:
 
 ```sh
-mise -E full bootstrap packages upgrade --dry-run
-mise -E full bootstrap packages upgrade --yes
+mise bootstrap packages upgrade --dry-run
+mise bootstrap packages upgrade --yes
 ```
 
 App upgrades can require new macOS privacy approvals.

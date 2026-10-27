@@ -11,7 +11,6 @@ alias lt='eza --tree --level=2'
 alias top='btop'
 alias f='fd'
 alias grep='rg'
-alias help='tldr'
 
 # tools
 i() {

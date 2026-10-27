@@ -7,8 +7,6 @@ import { LiveCodexConfigurationLayer } from "../codex/config/codex-configuration
 import { LiveDotfilesRepositoryLayer } from "../dotfiles/repository/live-dotfiles-repository.ts"
 import { LiveRepositoryValidationLayer } from "../dotfiles/validation/validate-repository.ts"
 import { LiveHkConfigurationLayer } from "../hk/configuration/hk-configuration.ts"
-import { ExeMachineProviderLayer } from "../machine/providers/exe/exe-machine-provider.ts"
-import { LiveMachineValidationLayer } from "../machine/validation/validate-machine.ts"
 import { LiveNotificationServiceLayer } from "../notification/live-notification-service.ts"
 import { EffectCommandRunnerLayer } from "../process/effect-command-runner.ts"
 
@@ -27,9 +25,7 @@ export const ApplicationLayer = Layer.mergeAll(
   hkConfigurationLayer,
   LiveNotificationServiceLayer.pipe(Layer.provide(commandRunnerLayer)),
   dotfilesRepositoryLayer,
-  repositoryValidationLayer,
-  ExeMachineProviderLayer.pipe(Layer.provide(commandRunnerLayer)),
-  LiveMachineValidationLayer.pipe(Layer.provide(Layer.mergeAll(commandRunnerLayer, repositoryValidationLayer, codexConfigurationLayer, hkConfigurationLayer)))
+  repositoryValidationLayer
 )
 
 const formatFailure = (error: unknown, cause: Cause.Cause<unknown>): string => {
@@ -54,15 +50,7 @@ export const runProgram = <A, E>(program: Effect.Effect<A, E, LayerTypes.Success
     Effect.catchCause((cause) => {
       const error = Cause.findErrorOption(cause)
       const cliFailure = Option.isSome(error) && CliError.isCliError(error.value)
-      const domainInputFailure = Option.isSome(error) && error.value !== null && typeof error.value === "object" &&
-        "_tag" in error.value && (
-          error.value._tag === "InvalidMachineName" ||
-          error.value._tag === "InvalidMachineProfile" ||
-          error.value._tag === "InvalidMachineResources" ||
-          error.value._tag === "InvalidMachineTaskArguments" ||
-          error.value._tag === "InvalidMachineCliInput"
-        )
-      const exitCode = Cause.hasInterrupts(cause) ? 130 : cliFailure || domainInputFailure ? 2 : 1
+      const exitCode = Cause.hasInterrupts(cause) ? 130 : cliFailure ? 2 : 1
       const setExitCode = Effect.sync(() => { process.exitCode = exitCode })
       return cliFailure ? setExitCode : Console.error(formatFailure(Option.getOrUndefined(error), cause)).pipe(Effect.andThen(setExitCode))
     })

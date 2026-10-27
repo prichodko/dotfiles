@@ -9,12 +9,12 @@ test("removed domain name and Effect internals are absent", () => {
   const removedName = ["de", "venv"].join("")
   const nameResult = Bun.spawnSync(["rg", "-n", "--hidden", "--glob", "!.git/**", "--glob", "!node_modules/**", removedName, root])
   expect(nameResult.exitCode).toBe(1)
-  const internals = Bun.spawnSync(["rg", "-n", "effect/(src|internal)", `${root}/src`, `${root}/tasks`, `${root}/bin`])
+  const internals = Bun.spawnSync(["rg", "-n", "effect/(src|internal)", `${root}/src`, `${root}/tasks`])
   expect(internals.exitCode).toBe(1)
 })
 
 test("source files have no default exports or barrel files", () => {
-  const exports = Bun.spawnSync(["rg", "-n", "export default", `${root}/src`, `${root}/tasks`, `${root}/bin`])
+  const exports = Bun.spawnSync(["rg", "-n", "export default", `${root}/src`, `${root}/tasks`])
   expect(exports.exitCode).toBe(1)
   const barrels = Bun.spawnSync(["find", `${root}/src`, "-name", "index.ts"])
   expect(barrels.stdout.toString().trim()).toBe("")
@@ -84,10 +84,7 @@ test("task entrypoints use the shared runtime", async () => {
     "tasks/dotfiles/sync.ts",
     "tasks/dotfiles/publish.ts",
     "tasks/dotfiles/check-source.ts",
-    "tasks/machine/validate.ts",
-    "tasks/machine/finish-bootstrap.ts",
-    "tasks/machine/exe/create.ts",
-    "tasks/machine/exe/apply.ts"
+    "tasks/machine/finish-bootstrap.ts"
   ]
   for (const task of typeScriptTasks) expect(await Bun.file(`${root}/${task}`).text()).toContain("runProgram")
   const machineApply = await Bun.file(`${root}/tasks/machine/apply`).text()

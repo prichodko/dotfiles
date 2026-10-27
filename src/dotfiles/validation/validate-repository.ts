@@ -2,7 +2,6 @@ import { ClaudeConfiguration } from "../../claude/config/claude-configuration.ts
 import { Context, Data, Effect, FileSystem, Layer } from "effect"
 import { parseCodexConfig } from "../../codex/config/codex-config.ts"
 import { HkConfiguration } from "../../hk/configuration/hk-configuration.ts"
-import { resolveMachineProfileEnvironments } from "../../machine/profile.ts"
 import { CommandRunner, describeCommandError } from "../../process/command-runner.ts"
 import { DOTFILES_ROOT } from "../repository/live-dotfiles-repository.ts"
 
@@ -25,8 +24,7 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
   const fileSystem = yield* FileSystem.FileSystem
   const hkConfiguration = yield* HkConfiguration
   const claudeConfiguration = yield* ClaudeConfiguration
-  const miseEnv = (profile: "core" | "full") => ({
-    MISE_ENV: resolveMachineProfileEnvironments(process.env.MISE_ENV, profile),
+  const miseEnv = () => ({
     MISE_IGNORED_CONFIG_PATHS: `${process.env.HOME}/.config/mise/config.toml:${DOTFILES_ROOT}/.config/mise/config.toml`
   })
   const run = (check: string, command: string, args: ReadonlyArray<string>, env?: Readonly<Record<string, string | undefined>>) =>
@@ -53,7 +51,7 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
     yield* Effect.forEach(zshFiles, (path) => run(`zsh syntax: ${path}`, "zsh", ["-n", path]), { concurrency: "unbounded", discard: true })
   })
   const validateLocks = Effect.gen(function*() {
-    for (const name of ["mise.lock", "mise.full.lock", "bun.lock"]) {
+    for (const name of ["mise.lock", "bun.lock"]) {
       const path = `${DOTFILES_ROOT}/${name}`
       const exists = yield* fileSystem.exists(path).pipe(Effect.mapError((cause) => new RepositoryValidationFailure({ check: "lock files", detail: String(cause), cause })))
       if (!exists) return yield* new RepositoryValidationFailure({ check: "lock files", detail: `Lock file is missing: ${path}` })
@@ -71,7 +69,7 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
   const validateArchitecture = Effect.gen(function*() {
     const forbiddenName = yield* runner.run({ command: "rg", args: ["-n", "--hidden", "--glob", "!.git/**", "--glob", "!node_modules/**", "de" + "venv", DOTFILES_ROOT], cwd: DOTFILES_ROOT, allowFailure: true })
     if (forbiddenName.exitCode === 0) return yield* new RepositoryValidationFailure({ check: "architecture", detail: `A removed domain identifier remains:\n${forbiddenName.stdout}` })
-    const internalImports = yield* runner.run({ command: "rg", args: ["-n", "effect/(src|internal)", `${DOTFILES_ROOT}/src`, `${DOTFILES_ROOT}/tasks`, `${DOTFILES_ROOT}/bin`], cwd: DOTFILES_ROOT, allowFailure: true })
+    const internalImports = yield* runner.run({ command: "rg", args: ["-n", "effect/(src|internal)", `${DOTFILES_ROOT}/src`, `${DOTFILES_ROOT}/tasks`], cwd: DOTFILES_ROOT, allowFailure: true })
     if (internalImports.exitCode === 0) return yield* new RepositoryValidationFailure({ check: "architecture", detail: `An Effect internal import remains:\n${internalImports.stdout}` })
   }).pipe(Effect.mapError((cause) => cause instanceof RepositoryValidationFailure ? cause : new RepositoryValidationFailure({ check: "architecture", detail: String(cause), cause })))
   const validateCodexBase = fileSystem.readFileString(`${DOTFILES_ROOT}/user/common/.codex/base.toml`).pipe(
@@ -91,24 +89,20 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
     )
     yield* validateShell
     yield* Effect.all([
-      run("mise macOS configuration", "mise", ["-C", DOTFILES_ROOT, "-E", "macos", "config", "ls"], miseEnv("core")),
-      run("mise Linux configuration", "mise", ["-C", DOTFILES_ROOT, "-E", "linux", "config", "ls"], miseEnv("core")),
-      run("mise Exe configuration", "mise", ["-C", DOTFILES_ROOT, "-E", "linux", "-E", "exe", "config", "ls"], miseEnv("core")),
-      run("mise tasks", "mise", ["-C", DOTFILES_ROOT, "tasks", "validate"], miseEnv("core"))
+      run("mise macOS configuration", "mise", ["-C", DOTFILES_ROOT, "-E", "macos", "config", "ls"], miseEnv()),
+      run("mise Linux configuration", "mise", ["-C", DOTFILES_ROOT, "-E", "linux", "config", "ls"], miseEnv()),
+      run("mise tasks", "mise", ["-C", DOTFILES_ROOT, "tasks", "validate"], miseEnv())
     ], { concurrency: "unbounded", discard: true })
     yield* validateLocks
     yield* validateLinks
-    yield* Effect.all([
-      run("core locked install", "mise", ["-C", DOTFILES_ROOT, "install", "--locked", "--dry-run"], miseEnv("core")),
-      run("full locked install", "mise", ["-C", DOTFILES_ROOT, "install", "--locked", "--dry-run"], miseEnv("full"))
-    ], { concurrency: "unbounded", discard: true })
+    yield* run("locked install", "mise", ["-C", DOTFILES_ROOT, "install", "--locked", "--dry-run"], miseEnv())
     yield* run("gitleaks directory", "gitleaks", ["dir", "--no-banner", "--redact", "--config", `${DOTFILES_ROOT}/.gitleaks.toml`, DOTFILES_ROOT])
     const staged = yield* gitOutput(["diff", "--cached", "--name-only"])
     if (staged.trim() !== "") yield* run("gitleaks staged", "gitleaks", ["git", "--staged", "--no-banner", "--redact", "--config", `${DOTFILES_ROOT}/.gitleaks.toml`, DOTFILES_ROOT])
     yield* validateArchitecture
   })
   const validateApplied = Effect.gen(function*() {
-    yield* run("dotfile status", "mise", dotfileStatusArguments, miseEnv("core"))
+    yield* run("dotfile status", "mise", dotfileStatusArguments, miseEnv())
     yield* claudeConfiguration.validateApplied.pipe(Effect.mapError((cause) => new RepositoryValidationFailure({ check: "Claude configuration", detail: cause.detail, cause })))
   })
   const validate = Effect.gen(function*() {

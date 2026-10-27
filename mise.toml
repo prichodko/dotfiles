@@ -14,26 +14,9 @@ HK_PKL_BACKEND = "pklr"
 HK_MISE = "1"
 
 [bootstrap.packages]
-"apt:build-essential" = { os = "linux" }
-"apt:btop" = { os = "linux" }
-"apt:ca-certificates" = { os = "linux" }
-"apt:curl" = { os = "linux" }
-"apt:git" = { os = "linux" }
-"apt:gnupg" = { os = "linux" }
-"apt:openssh-client" = { os = "linux" }
-"apt:tar" = { os = "linux" }
-"apt:unzip" = { os = "linux" }
-"apt:xz-utils" = { os = "linux" }
-"apt:zip" = { os = "linux" }
-"apt:zsh" = { os = "linux" }
-"brew:git" = { os = ["linux", "macos"] }
-"brew:btop" = { os = "macos" }
-"brew:eza" = { os = "macos" }
-"brew:gnupg" = { os = "macos" }
-"brew:pinentry-mac" = { os = "macos" }
-"brew:trash" = { os = "macos" }
-"brew:zsh-syntax-highlighting" = { os = ["linux", "macos"] }
-"brew:fzf-tab" = { os = ["linux", "macos"] }
+"brew:git" = {}
+"brew:zsh-syntax-highlighting" = {}
+"brew:fzf-tab" = {}
 
 [bootstrap.repos]
 "~/.dotfiles" = { url = "https://github.com/prichodko/dotfiles.git", ref = "main" }
@@ -80,17 +63,54 @@ exclude = [
 "~/.config/git/ignore" = { source = "~/.dotfiles/user/common/.config/git/ignore" }
 "~/.config/hk/config.pkl" = { source = "~/.dotfiles/user/common/.config/hk/config.pkl" }
 "~/.config/mise/config.toml" = { source = "~/.dotfiles/user/common/.config/mise/config.toml" }
-"~/.config/mise/config.full.toml" = { source = "~/.dotfiles/mise.full.toml" }
 "~/.config/mise/conf.d/core.toml" = { source = "~/.dotfiles/mise/conf.d/core.toml" }
 "~/.config/mise/mise.lock" = { source = "~/.dotfiles/mise.lock" }
-"~/.config/mise/mise.full.lock" = { source = "~/.dotfiles/mise.full.lock" }
 "~/.config/mise/miserc.toml" = { source = "~/.dotfiles/.miserc.toml", mode = "copy" }
 "~/.config/opencode/AGENTS.md" = { source = "~/.dotfiles/.agents/AGENTS.md" }
 "~/.config/opencode/opencode.jsonc" = { source = "~/.dotfiles/user/common/.config/opencode/opencode.jsonc" }
 "~/.config/shell/bash.sh" = { source = "~/.dotfiles/user/common/.config/shell/bash.sh" }
 "~/.config/shell/common.sh" = { source = "~/.dotfiles/user/common/.config/shell/common.sh" }
 "~/.config/shell/zsh.sh" = { source = "~/.dotfiles/user/common/.config/shell/zsh.sh" }
-"~/.local/bin/machine" = { source = "~/.dotfiles/bin/machine.ts" }
+
+[doctor.checks.git]
+description = "Homebrew Git 2.54+ (config-based global hooks) is first on PATH"
+run = '''
+case "$(command -v git)" in /opt/homebrew/*|/home/linuxbrew/*) ;; *) exit 1 ;; esac
+git --version | awk '{ split($3, v, "."); exit !(v[1] > 2 || (v[1] == 2 && v[2] >= 54)) }'
+'''
+hint = "Run `mise bootstrap` and open a new shell."
+
+[doctor.checks.bootstrap]
+description = "Bootstrap is complete"
+run = "mise bootstrap status --missing"
+hint = "Run `mise run machine:apply`."
+timeout = "60s"
+
+[doctor.checks.signing]
+description = "Commits are signed through the 1Password SSH agent"
+os = "macos"
+run = 'test "$(git config --global --get gpg.format)" = ssh && test -x "$(git config --global --includes --get gpg.ssh.program)" && ssh -G github.com | grep -q 2BUA8C4S2C.com.1password/t/agent.sock'
+hint = "Install 1Password and enable its SSH agent."
+
+[doctor.checks."auth:gh"]
+description = "GitHub CLI is signed in"
+run = "gh auth status"
+hint = "gh auth login --git-protocol ssh --web --skip-ssh-key"
+
+[doctor.checks."auth:entire"]
+description = "Entire CLI is signed in"
+run = "entire auth status"
+hint = "entire auth login"
+
+[doctor.checks."auth:codex"]
+description = "Codex is signed in"
+run = "codex login status"
+hint = "codex login"
+
+[doctor.checks."auth:claude"]
+description = "Claude Code is signed in"
+run = "claude auth status"
+hint = "claude auth login"
 
 [tasks."dotfiles:check"]
 description = "Validate managed dotfiles and scan for secrets"
@@ -112,20 +132,8 @@ run = "tasks/dotfiles/publish.ts"
 description = "Apply the native mise machine bootstrap"
 run = "tasks/machine/apply"
 
-[tasks."machine:validate"]
-description = "Validate the complete machine environment"
-run = "tasks/machine/validate.ts"
-
 [tasks."machine:refresh-codex"]
 run = "tasks/machine/refresh-codex.ts"
-
-[tasks."machine:exe:create"]
-description = "Create and bootstrap an Exe machine"
-run = "tasks/machine/exe/create.ts"
-
-[tasks."machine:exe:apply"]
-description = "Update and reapply an Exe machine"
-run = "tasks/machine/exe/apply.ts"
 
 [tasks.bootstrap]
 description = "Install repository TypeScript dependencies"
@@ -140,6 +148,5 @@ description = "Run safe tests"
 run = [
   "bun test",
   "tests/bootstrap/machine-apply.test.sh",
-  "tests/bootstrap/managed-files.test.sh",
   "tests/bootstrap/shell-startup.test.sh",
 ]

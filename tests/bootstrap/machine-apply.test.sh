@@ -9,40 +9,17 @@ test_log="$test_state/mise.log"
 test_path="$test_root/tests/fixtures/bin:$PATH"
 
 HOME="$test_state" PATH="$test_path" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply"
-HOME="$test_state" PATH="$test_path" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply" full
-HOME="$test_state" PATH="$test_path" MISE_ENV="linux,exe" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply"
-HOME="$test_state" PATH="$test_path" MISE_ENV="linux,exe" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply" full
-HOME="$test_state" PATH="$test_path" MISE_ENV="linux,exe,full" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply" full
-HOME="$test_state" PATH="$test_path" MISE_ENV="linux,exe,full" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply"
-for invalid_arguments in "other" "full extra"; do
-  read -r -a arguments <<< "$invalid_arguments"
-  if HOME="$test_state" PATH="$test_path" MISE_TEST_LOG="$test_log" "$test_root/tasks/machine/apply" "${arguments[@]}" >/dev/null 2>&1; then
-    printf 'machine apply accepted invalid arguments: %s\n' "$invalid_arguments" >&2
-    exit 1
-  fi
-done
+if HOME="$test_state" PATH="$test_path" "$test_root/tasks/machine/apply" full >/dev/null 2>&1; then
+  printf 'machine apply accepted an argument.\n' >&2
+  exit 1
+fi
 
-expected_command="-C $test_root bootstrap --skip-dirty --yes --locked"
-expected_status="-C $test_root bootstrap status --missing"
-for index in 1 2 3 4 5 6; do
-  case "$index" in
-    1) environment=core ;;
-    2) environment=full ;;
-    3) environment=linux,exe ;;
-    *) environment=linux,exe,full ;;
-  esac
-  install_line=$((index * 5 - 4))
-  validation_line=$((index * 5 - 3))
-  command_line=$((index * 5 - 2))
-  status_line=$((index * 5 - 1))
-  refresh_line=$((index * 5))
-  [[ "$(sed -n "${install_line}p" "$test_log")" == "$environment"$'\t'"-C $test_root --locked exec -- bun install --frozen-lockfile --ignore-scripts" ]]
-  [[ "$(sed -n "${validation_line}p" "$test_log")" == "$environment"$'\t'"-C $test_root --locked exec -- bun run tasks/dotfiles/check-source.ts" ]]
-  [[ "$(sed -n "${command_line}p" "$test_log")" == "$environment"$'\t'"$expected_command" ]]
-  [[ "$(sed -n "${status_line}p" "$test_log")" == "$environment"$'\t'"$expected_status" ]]
-  [[ "$(sed -n "${refresh_line}p" "$test_log")" == "$environment"$'\t'"-C $test_root --locked exec -- bun run tasks/machine/refresh-codex.ts" ]]
-done
-[[ "$(wc -l < "$test_log" | tr -d ' ')" == "30" ]]
+expected="-C $test_root --locked exec -- bun install --frozen-lockfile --ignore-scripts
+-C $test_root --locked exec -- bun run tasks/dotfiles/check-source.ts
+-C $test_root bootstrap --skip-dirty --yes --locked
+-C $test_root bootstrap status --missing
+-C $test_root --locked exec -- bun run tasks/machine/refresh-codex.ts"
+[[ "$(cat "$test_log")" == "$expected" ]]
 
 failure_log="$test_state/failure.log"
 if HOME="$test_state" PATH="$test_path" MISE_TEST_LOG="$failure_log" MISE_TEST_FAIL_MATCH="check-source.ts" "$test_root/tasks/machine/apply"; then

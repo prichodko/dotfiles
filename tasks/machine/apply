@@ -4,22 +4,12 @@
 set -euo pipefail
 
 task_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
-case "$#:${1:-}" in
-  0:|1:full) ;;
-  *)
-    printf 'error: The only valid explicit profile is full.\n' >&2
-    exit 1
-    ;;
-esac
-
-profile="${1:-}"
-mise_environment="${MISE_ENV:-}"
-if [[ "$profile" == "full" && ",${mise_environment}," != *,full,* ]]; then
-  mise_environment="${mise_environment:+${mise_environment},}full"
+if (( $# > 0 )); then
+  printf 'error: machine apply takes no arguments.\n' >&2
+  exit 1
 fi
-ignored_config_paths="$HOME/.config/mise/config.toml:$task_root/.config/mise/config.toml"
-export MISE_IGNORED_CONFIG_PATHS="$ignored_config_paths"
-export MISE_ENV="$mise_environment"
+
+export MISE_IGNORED_CONFIG_PATHS="$HOME/.config/mise/config.toml:$task_root/.config/mise/config.toml"
 mise -C "$task_root" --locked exec -- bun install --frozen-lockfile --ignore-scripts
 mise -C "$task_root" --locked exec -- bun run tasks/dotfiles/check-source.ts
 mise -C "$task_root" bootstrap --skip-dirty --yes --locked

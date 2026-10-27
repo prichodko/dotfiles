@@ -1,33 +1,31 @@
 # dotfiles
 
-Portable config, tools, and lifecycle management for local and remote machines.
+Portable config, tools, and lifecycle management for my Mac and agent VMs.
 
-- **mise** is the public interface: bootstrap, tools, managed files, tasks.
-- **Bun** runs the TypeScript automation; **Effect** handles processes, cleanup, retries, typed failures, and the CLI.
+- **mise** is the public interface: bootstrap, tools, managed files, health checks, tasks.
+- **Bun** runs the remaining TypeScript automation; **Effect** handles processes, cleanup, retries, and typed failures.
 - Requires mise `2026.10.17`+.
 
-## Profiles
+## Platforms
 
-| Profile | For | Config |
+No profiles or `MISE_ENV`: mise loads the overlay for the current OS automatically.
+
+| File | Loaded | Contains |
 |---|---|---|
-| `core` (default) | Every machine | `mise/conf.d/core.toml` + platform overlay |
-| `full` | Personal machines: apps and extra tools; includes `core` | `mise.full.toml` |
+| `mise/conf.d/core.toml` | always (global) | CLI tools for every machine |
+| `mise.toml` | always | shared packages, managed files, doctor checks, tasks |
+| `mise.macos.toml` | macOS | brew packages, casks, fonts, macOS defaults, Mac dotfiles |
+| `mise.linux.toml` | Linux (agent VMs) | apt packages, login-shell hook, VM signing key, Linux dotfiles |
 
-`mise.lock` and `mise.full.lock` pin both profiles.
+`mise.lock` pins every tool.
 
 ## Layout
 
 | Path | Owns |
 |---|---|
-| `mise.toml` | Bootstrap packages, managed files, remote settings, tasks |
-| `mise/conf.d/core.toml` | Core tools |
-| `mise.full.toml` | Full-profile packages and tools |
-| `mise.{macos,linux,exe}.toml` | Platform and provider overlays |
 | `user/common/`, `user/{macos,linux}/` | User config, portable and per-platform |
-| `bin/machine.ts` | Global `machine` command |
 | `tasks/` | Mise task entrypoints |
 | `src/dotfiles/` | Validation, updates, optional publication |
-| `src/machine/` | Machine lifecycle, validation, CLI, providers (Exe) |
 | `.agents/` | Shared agent instructions and skills |
 
 ## Bootstrap
@@ -43,9 +41,17 @@ curl https://mise.run | sh
   --update --yes
 ```
 
-Add `-E full` before `--locked` for the full profile.
+For a VM, run `mise bootstrap remote --host <ssh-destination>` from this checkout; it uses `[bootstrap.remote]` in `mise.toml`.
 
-Bootstrap installs packages, links managed files, merges Claude and Codex defaults, installs the global hk hook, runs `bun install --frozen-lockfile --ignore-scripts`, then validates the checkout. Credentials are never copied: authenticate GitHub, Entire, Codex, and Claude manually; `machine validate` reports what's missing.
+Bootstrap installs packages, links managed files, merges Claude and Codex defaults, installs the global hk hook, runs `bun install --frozen-lockfile --ignore-scripts`, then validates the checkout. Credentials are never copied: authenticate GitHub, Entire, Codex, and Claude manually.
+
+## Health checks
+
+```sh
+mise doctor project
+```
+
+Checks Homebrew Git 2.54+, bootstrap completeness, 1Password commit signing (macOS), and CLI sign-in. They're declared under `[doctor.checks]` in `mise.toml`.
 
 ## Managed files
 
@@ -54,7 +60,7 @@ Mise links files from `user/common/` and the platform directory, and owns the sh
 | Config | Policy |
 |---|---|
 | Shell, Git, SSH, editor config | Linked from the repo |
-| Global mise fragments and locks | Linked to the canonical repo files |
+| Global mise config and lock | Linked to the canonical repo files |
 | Claude `settings.json`, Codex `config.toml` | Base keys (`user/common/.claude/base.json`, `user/common/.codex/base.toml`) merged atomically; unmanaged local keys preserved |
 | Credentials, hooks, status lines, app state | Local only |
 
@@ -63,12 +69,11 @@ Removing a key from a base file relinquishes ownership; it doesn't delete the lo
 ## Upgrading tools
 
 ```sh
-mise upgrade hk              # one tool, within its declared range
-mise -C ~ upgrade            # all core tools
-mise -C ~ -E full upgrade    # core + full
+mise upgrade hk      # one tool, within its declared range
+mise -C ~ upgrade    # all tools
 ```
 
-The global config is linked to this repo, so upgrades rewrite the canonical lock files. Review the diff and run `mise run dotfiles:check` before committing. Native packages and apps upgrade separately; see [maintenance](docs/new-machine.md#maintenance).
+The global config is linked to this repo, so upgrades rewrite the canonical lock file. Review the diff and run `mise run dotfiles:check` before committing. Native packages and apps upgrade separately; see [maintenance](docs/new-machine.md#maintenance).
 
 ## Dotfiles tasks
 
@@ -77,6 +82,7 @@ mise run dotfiles:check    # typecheck, shell syntax, mise config/locks/links, m
 mise run dotfiles:pull     # fast-forward origin/main and apply
 mise run dotfiles:sync     # same as pull
 mise run dotfiles:publish  # explicit: commit, validate, push tracked changes
+mise run machine:apply     # apply this checkout
 ```
 
 `pull`/`sync` require clean tracked files on `main`, take a process lock, fast-forward only, then run `tasks/machine/apply` (locked deps → source validation → `mise bootstrap` → status check → Codex app-server refresh). Failed applies are safe to repeat.
@@ -85,35 +91,12 @@ mise run dotfiles:publish  # explicit: commit, validate, push tracked changes
 
 The Codex refresh updates a stale app-server from the mise-selected CLI and may interrupt an active Codex turn. Run it alone with `mise run machine:refresh-codex`.
 
-## Machines
-
-```text
-machine create <name> [--profile core|full] [--cpu 2] [--memory 8GB] [--disk 25GB]
-machine apply [target] [--profile core|full]
-machine validate [target] [--profile core|full]
-machine list [--json]
-machine status [target] [--json]
-machine shell <name> [-- <command>...]
-machine remove <name> [--yes]
-```
-
-- `apply`, `validate`, `status` default to `local` (reserved name). Remote names: 5–52 lowercase letters/digits, single hyphens.
-- `--profile` overrides an inherited `MISE_ENV` profile but keeps provider environments.
-- `create` and remote `apply` require clean local `main` matching `origin/main`.
-- Exe machines use mise envs `linux,exe` (+ `full`). The Exe overlay sets the login shell to zsh via `sudo -n chsh` only when needed.
-- Failed create/bootstrap keeps the machine. Only `machine remove` deletes one, with confirmation or `--yes`.
-- Exit codes: `0` ok, `1` operational failure, `2` invalid input, `130` interrupted.
-
-Mise task equivalents: `machine:validate`, `machine:exe:create`, `machine:exe:apply`.
-
 ## SSH
 
 - 1Password SSH agent for GitHub, Exe, and Tailscale hosts.
 - `agent-controller`, `entire-exe-dev`, `haven`: Tailscale SSH aliases as `exedev`.
-- Linux agents sign commits with a per-machine key that stays on the machine.
-- Exe hosts use strict checking against `user/common/.ssh/exe_known_hosts` only. Official fingerprint: `SHA256:JJOP/lwiBGOMilfONPWZCXUrfK154cnJFXcqlsi6lPo`.
-
-To rotate the Exe host key: get the new key and fingerprint from an official Exe source, update `exe_known_hosts` and `EXE_SSH_HOST_KEY_FINGERPRINT` in `src/machine/providers/exe/exe-ssh-policy.ts` together, verify with `ssh-keygen -lf user/common/.ssh/exe_known_hosts`, and run the tests.
+- Linux VMs sign commits with a per-machine key (`~/.ssh/agent_commit_signing`) that stays on the machine.
+- Exe hosts use strict checking against `user/common/.ssh/exe_known_hosts` only. Official fingerprint: `SHA256:JJOP/lwiBGOMilfONPWZCXUrfK154cnJFXcqlsi6lPo`. To rotate, get the new key from an official Exe source, update the file, and verify with `ssh-keygen -lf user/common/.ssh/exe_known_hosts`.
 
 ## Git hooks
 
@@ -132,4 +115,4 @@ mise run test
 mise run dotfiles:check
 ```
 
-Tests never create Exe machines or push to GitHub.
+Tests never create VMs or push to GitHub.

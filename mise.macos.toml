@@ -1,6 +1,41 @@
 [env]
 _.path = ["/opt/homebrew/bin", "/opt/homebrew/sbin"]
 
+[bootstrap.packages]
+"brew:btop" = {}
+"brew:eza" = {}
+"brew:ffmpeg" = {}
+"brew:gnupg" = {}
+"brew:herdr" = {}
+"brew:pinentry-mac" = {}
+"brew:planetscale/tap/pscale" = {}
+"brew:postgresql@18" = {}
+"brew:trash" = {}
+"brew-cask:1password" = { adopt = true }
+"brew-cask:1password-cli" = { adopt = true }
+"brew-cask:chatgpt" = { adopt = true }
+"brew-cask:claude" = { adopt = true }
+"brew-cask:cleanshot" = { adopt = true }
+"brew-cask:cloudflare-warp" = { adopt = true }
+"brew-cask:cursor" = { adopt = true }
+"brew-cask:figma" = { adopt = true }
+"brew-cask:ghostty" = { adopt = true }
+"brew-cask:google-chrome" = { adopt = true }
+"brew-cask:google-chrome@canary" = { adopt = true }
+"brew-cask:hyperkey" = { adopt = true }
+"brew-cask:incident-io" = { adopt = true }
+"brew-cask:linear" = { adopt = true }
+"brew-cask:opencode-desktop" = { adopt = true }
+"brew-cask:orbstack" = { adopt = true }
+"brew-cask:raycast" = { adopt = true }
+"brew-cask:slack" = { adopt = true }
+"brew-cask:t3-code@nightly" = { adopt = true }
+"brew-cask:tailscale-app" = { adopt = true }
+"brew-cask:visual-studio-code" = { adopt = true }
+"brew-cask:zed" = { adopt = true }
+"brew-cask:zoom" = { adopt = true }
+"brew-cask:font-geist-mono" = { adopt = true }
+
 [bootstrap.macos.dock]
 autohide = true
 tilesize = 57
@@ -41,7 +76,6 @@ login_shell = "/bin/zsh"
 [dotfiles]
 "~/.config/ghostty/config" = { source = "~/.dotfiles/user/macos/.config/ghostty/config" }
 "~/.config/git/platform.conf" = { source = "~/.dotfiles/user/macos/.config/git/platform.conf" }
-"~/.config/karabiner/karabiner.json" = { source = "~/.dotfiles/user/macos/.config/karabiner/karabiner.json" }
 "~/.config/shell/platform.sh" = { source = "~/.dotfiles/user/macos/.config/shell/macos.sh" }
 "~/.config/zed/keymap.json" = { source = "~/.dotfiles/user/macos/.config/zed/keymap.json" }
 "~/.config/zed/settings.json" = { source = "~/.dotfiles/user/macos/.config/zed/settings.json" }

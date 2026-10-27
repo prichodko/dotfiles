@@ -115,8 +115,6 @@ if rg -Fq 'brew shellenv' "$test_root/user/macos/.config/shell/macos.sh" "$test_
   exit 1
 fi
 rg -Fq 'export ENTIRE_TOKEN_STORE=file' "$test_root/user/linux/.config/shell/linux.sh"
-rg -Fq '"brew:zsh-syntax-highlighting" = { os = ["linux", "macos"] }' "$test_root/mise.toml"
-rg -Fq '"brew:fzf-tab" = { os = ["linux", "macos"] }' "$test_root/mise.toml"
 rg -Fq '[ -f "$HOME/.config/shell/bash.sh" ] && source "$HOME/.config/shell/bash.sh"' "$test_root/mise.toml"
 
 for obsolete_startup_file in .zshrc .zprofile .bashrc .bash_profile; do
