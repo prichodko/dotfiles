@@ -85,8 +85,8 @@ Homebrew Git 2.54+ runs config-based global hooks from `~/.config/git/hk.conf` (
 
 ## SSH
 
-- 1Password SSH agent for GitHub, Exe, and Tailscale hosts.
-- `agent-controller`, `entire-exe-dev`, `haven`: Tailscale SSH aliases as `exedev`.
+- 1Password SSH agent for GitHub and Exe hosts.
+- `agent-controller`, `entire-exe-dev`, `haven`: Tailscale SSH aliases as `exedev`; Tailscale authenticates, so no key or 1Password prompt.
 - VMs sign commits with a per-machine key (`~/.ssh/agent_commit_signing`) that never leaves the machine.
 - Exe hosts use strict checking against `user/common/.ssh/exe_known_hosts` only. Official fingerprint: `SHA256:JJOP/lwiBGOMilfONPWZCXUrfK154cnJFXcqlsi6lPo`. To rotate, get the new key from an official Exe source, update the file, and verify with `ssh-keygen -lf user/common/.ssh/exe_known_hosts`.
 
