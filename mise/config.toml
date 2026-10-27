@@ -8,6 +8,10 @@ minimum_release_age_excludes = ["aqua:anthropics/claude-code", "aqua:openai/code
 [settings.npm]
 package_manager = "npm"
 
+# Keep mise itself current on every machine; tools stay pinned by mise.lock.
+[settings.self_update]
+auto = true
+
 [env]
 HK_PKL_BACKEND = "pklr"
 HK_MISE = "1"

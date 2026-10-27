@@ -79,6 +79,8 @@ mise bootstrap packages upgrade --dry-run    # brew/apt packages and apps
 
 Review the `mise/mise.lock` diff and run `dotfiles:check` before committing.
 
+mise updates itself automatically (`self_update.auto`, checked weekly). Tools never auto-update: they stay pinned by `mise/mise.lock` until you upgrade and commit.
+
 ## Git hooks
 
 Homebrew Git 2.54+ runs config-based global hooks from `~/.config/git/hk.conf` (linked, included by `~/.gitconfig`). The global pre-commit runs `~/.config/hk/config.pkl`: oxfmt on staged files when the repo has `node_modules/.bin/oxfmt`. Other hooks run only in repos with an `hk.pkl`, like this one (pre-push → `dotfiles:check`). Skip hooks once with `HK=0`.
