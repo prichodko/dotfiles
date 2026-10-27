@@ -5,12 +5,13 @@ import { join } from "node:path"
 
 const root = new URL("../../", import.meta.url).pathname.replace(/\/$/, "")
 
-test("applies managed files in an empty home and preserves local application state", () => {
+test("applies managed files in an empty home and merges Claude base keys into local settings", () => {
   const home = mkdtempSync(join(tmpdir(), "dotfiles-managed-home-"))
   try {
     symlinkSync(root, join(home, ".dotfiles"))
     mkdirSync(join(home, ".claude"))
     const localSettings = '{"hooks":{"SessionStart":[]},"localOnly":true}'
+    const base = JSON.parse(readFileSync(join(root, "user", "common", ".claude", "base.json"), "utf8"))
     writeFileSync(join(home, ".claude", "settings.json"), localSettings)
     const env = {
       ...process.env,
@@ -32,7 +33,8 @@ test("applies managed files in an empty home and preserves local application sta
       expect(readlinkSync(join(home, ".claude", "CLAUDE.md"))).toBe(join(home, ".dotfiles", ".agents", "AGENTS.md"))
       expect(readlinkSync(join(home, ".config", "opencode", "AGENTS.md"))).toBe(join(home, ".dotfiles", ".agents", "AGENTS.md"))
       expect(readlinkSync(join(home, ".codex", "AGENTS.md"))).toBe(join(home, ".dotfiles", "user", "common", ".codex", "AGENTS.md"))
-      expect(readFileSync(join(home, ".claude", "settings.json"), "utf8")).toBe(localSettings)
+      const settings = JSON.parse(readFileSync(join(home, ".claude", "settings.json"), "utf8"))
+      expect(settings).toMatchObject({ hooks: { SessionStart: [] }, localOnly: true, ...base })
       expect(readFileSync(join(home, ".zshrc"), "utf8")).toContain(".config/shell/zsh.sh")
       if (attempt === 0) {
         const trust = Bun.spawnSync(["mise", "trust", join(home, ".config", "mise", "config.toml")], {

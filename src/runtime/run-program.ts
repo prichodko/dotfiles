@@ -1,9 +1,7 @@
-import { LiveClaudeConfigurationLayer } from "../claude/config/claude-configuration.ts"
 import { BunRuntime, BunServices } from "@effect/platform-bun"
 import { Cause, Console, Effect, Layer, Option } from "effect"
 import type * as LayerTypes from "effect/Layer"
 import { CliError } from "effect/unstable/cli"
-import { LiveCodexConfigurationLayer } from "../codex/config/codex-configuration.ts"
 import { LiveDotfilesRepositoryLayer } from "../dotfiles/repository/live-dotfiles-repository.ts"
 import { LiveRepositoryValidationLayer } from "../dotfiles/validation/validate-repository.ts"
 import { LiveHkConfigurationLayer } from "../hk/configuration/hk-configuration.ts"
@@ -12,16 +10,12 @@ import { EffectCommandRunnerLayer } from "../process/effect-command-runner.ts"
 
 const commandRunnerLayer = EffectCommandRunnerLayer.pipe(Layer.provide(BunServices.layer))
 const platformLayer = Layer.merge(BunServices.layer, commandRunnerLayer)
-const claudeConfigurationLayer = LiveClaudeConfigurationLayer.pipe(Layer.provide(BunServices.layer))
-const codexConfigurationLayer = LiveCodexConfigurationLayer.pipe(Layer.provide(BunServices.layer))
 const hkConfigurationLayer = LiveHkConfigurationLayer.pipe(Layer.provide(platformLayer))
-const repositoryValidationLayer = LiveRepositoryValidationLayer.pipe(Layer.provide(Layer.mergeAll(platformLayer, hkConfigurationLayer, claudeConfigurationLayer)))
+const repositoryValidationLayer = LiveRepositoryValidationLayer.pipe(Layer.provide(Layer.mergeAll(platformLayer, hkConfigurationLayer)))
 const dotfilesRepositoryLayer = LiveDotfilesRepositoryLayer.pipe(Layer.provide(platformLayer))
 
 export const ApplicationLayer = Layer.mergeAll(
   platformLayer,
-  codexConfigurationLayer,
-  claudeConfigurationLayer,
   hkConfigurationLayer,
   LiveNotificationServiceLayer.pipe(Layer.provide(commandRunnerLayer)),
   dotfilesRepositoryLayer,

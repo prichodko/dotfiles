@@ -1,6 +1,4 @@
-import { ClaudeConfiguration } from "../../claude/config/claude-configuration.ts"
 import { Context, Data, Effect, FileSystem, Layer } from "effect"
-import { parseCodexConfig } from "../../codex/config/codex-config.ts"
 import { HkConfiguration } from "../../hk/configuration/hk-configuration.ts"
 import { CommandRunner, describeCommandError } from "../../process/command-runner.ts"
 import { DOTFILES_ROOT } from "../repository/live-dotfiles-repository.ts"
@@ -23,7 +21,6 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
   const runner = yield* CommandRunner
   const fileSystem = yield* FileSystem.FileSystem
   const hkConfiguration = yield* HkConfiguration
-  const claudeConfiguration = yield* ClaudeConfiguration
   const miseEnv = () => ({
     MISE_IGNORED_CONFIG_PATHS: `${process.env.HOME}/.config/mise/config.toml:${DOTFILES_ROOT}/.config/mise/config.toml`
   })
@@ -72,18 +69,8 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
     const internalImports = yield* runner.run({ command: "rg", args: ["-n", "effect/(src|internal)", `${DOTFILES_ROOT}/src`, `${DOTFILES_ROOT}/tasks`], cwd: DOTFILES_ROOT, allowFailure: true })
     if (internalImports.exitCode === 0) return yield* new RepositoryValidationFailure({ check: "architecture", detail: `An Effect internal import remains:\n${internalImports.stdout}` })
   }).pipe(Effect.mapError((cause) => cause instanceof RepositoryValidationFailure ? cause : new RepositoryValidationFailure({ check: "architecture", detail: String(cause), cause })))
-  const validateCodexBase = fileSystem.readFileString(`${DOTFILES_ROOT}/user/common/.codex/base.toml`).pipe(
-    Effect.mapError((cause) => new RepositoryValidationFailure({ check: "Codex base", detail: "The Codex base configuration could not be read.", cause })),
-    Effect.flatMap((source) => Effect.try({
-      try: () => parseCodexConfig(source),
-      catch: (cause) => new RepositoryValidationFailure({ check: "Codex base", detail: "The Codex base configuration is not valid TOML.", cause })
-    })),
-    Effect.asVoid
-  )
   const validateSource = Effect.gen(function*() {
     yield* run("TypeScript", "bun", ["run", "typecheck"])
-    yield* validateCodexBase
-    yield* claudeConfiguration.validateBase.pipe(Effect.mapError((cause) => new RepositoryValidationFailure({ check: "Claude base", detail: cause.detail, cause })))
     yield* hkConfiguration.validateSource.pipe(
       Effect.mapError((cause) => new RepositoryValidationFailure({ check: "hk configuration", detail: cause.detail, cause }))
     )
@@ -101,10 +88,7 @@ export const LiveRepositoryValidationLayer = Layer.effect(RepositoryValidation, 
     if (staged.trim() !== "") yield* run("gitleaks staged", "gitleaks", ["git", "--staged", "--no-banner", "--redact", "--config", `${DOTFILES_ROOT}/.gitleaks.toml`, DOTFILES_ROOT])
     yield* validateArchitecture
   })
-  const validateApplied = Effect.gen(function*() {
-    yield* run("dotfile status", "mise", dotfileStatusArguments, miseEnv())
-    yield* claudeConfiguration.validateApplied.pipe(Effect.mapError((cause) => new RepositoryValidationFailure({ check: "Claude configuration", detail: cause.detail, cause })))
-  })
+  const validateApplied = run("dotfile status", "mise", dotfileStatusArguments, miseEnv())
   const validate = Effect.gen(function*() {
     yield* validateSource
     yield* validateApplied

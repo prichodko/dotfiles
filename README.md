@@ -61,10 +61,10 @@ Mise links files from `user/common/` and the platform directory, and owns the sh
 |---|---|
 | Shell, Git, SSH, editor config | Linked from the repo |
 | Global mise config and lock | Linked to the canonical repo files |
-| Claude `settings.json`, Codex `config.toml` | Base keys (`user/common/.claude/base.json`, `user/common/.codex/base.toml`) merged atomically; unmanaged local keys preserved |
+| Claude `settings.json`, Codex `config.toml` | mise `merge = true` entries own the keys in `user/common/.claude/base.json` and `user/common/.codex/base.toml`; other local keys are preserved |
 | Credentials, hooks, status lines, app state | Local only |
 
-Removing a key from a base file relinquishes ownership; it doesn't delete the local value. Never link the live `~/.codex/config.toml` into the repo.
+Removing a key from a base file relinquishes ownership; it doesn't delete the local value. `mise dot diff` shows drift. Never link the live `~/.codex/config.toml` into the repo.
 
 ## Upgrading tools
 

@@ -59,6 +59,8 @@ exclude = [
 "~/.agents/skills" = { source = "~/.dotfiles/.agents/skills" }
 "~/.claude/CLAUDE.md" = { source = "~/.dotfiles/.agents/AGENTS.md" }
 "~/.claude/skills" = { source = "~/.dotfiles/.claude/skills", mode = "symlink-each" }
+"~/.claude/settings.json/base" = { source = "~/.dotfiles/user/common/.claude/base.json", merge = true }
+"~/.codex/config.toml/base" = { source = "~/.dotfiles/user/common/.codex/base.toml", merge = true }
 "~/.codex/AGENTS.md" = { source = "~/.dotfiles/user/common/.codex/AGENTS.md" }
 "~/.config/git/ignore" = { source = "~/.dotfiles/user/common/.config/git/ignore" }
 "~/.config/hk/config.pkl" = { source = "~/.dotfiles/user/common/.config/hk/config.pkl" }
