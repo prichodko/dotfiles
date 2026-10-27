@@ -6,6 +6,7 @@ aws-cli = { version = "2.36.29", symlink_bins = "true" }
 bun = "latest"
 "npm:cf" = "latest"
 "aqua:anthropics/claude-code" = "latest"
+"aqua:cloudflare/cloudflared" = "latest"
 "aqua:openai/codex" = "latest"
 "aqua:eza-community/eza" = { version = "v0.23.5", os = ["linux"] }
 "aqua:sharkdp/fd" = "latest"

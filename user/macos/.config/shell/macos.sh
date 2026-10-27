@@ -28,6 +28,7 @@ codex-personal() {
   open -n \
     --env "CODEX_HOME=$codex_home" \
     --env "CODEX_ELECTRON_USER_DATA_PATH=$app_data" \
+    --env "CODEX_BROWSER_USE_NODE_PATH=" \
     /Applications/ChatGPT.app \
     --args \
     --user-data-dir="$app_data"
