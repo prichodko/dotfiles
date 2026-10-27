@@ -91,6 +91,12 @@ os = "macos"
 run = 'test "$(git config --global --get gpg.format)" = ssh && test -x "$(git config --global --includes --get gpg.ssh.program)" && ssh -G github.com | grep -q 2BUA8C4S2C.com.1password/t/agent.sock'
 hint = "Install 1Password and enable its SSH agent."
 
+[doctor.checks."signing:vm"]
+description = "Commits are signed with this VM's own key"
+os = "linux"
+run = 'test -f ~/.ssh/agent_commit_signing && test "$(git config --global --includes --get user.signingkey)" = "~/.ssh/agent_commit_signing"'
+hint = 'ssh-keygen -t ed25519 -N "" -f ~/.ssh/agent_commit_signing -C "$(hostname) commit signing", then add ~/.ssh/agent_commit_signing.pub to GitHub as a signing key.'
+
 [doctor.checks."auth:gh"]
 description = "GitHub CLI is signed in"
 run = "gh auth status"
