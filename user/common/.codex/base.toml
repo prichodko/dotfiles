@@ -22,9 +22,6 @@ enabled = true
 [plugins."cloudflare@openai-curated"]
 enabled = true
 
-[plugins."sites@openai-bundled"]
-enabled = false
-
 [plugins."pdf@openai-primary-runtime"]
 enabled = true
 
