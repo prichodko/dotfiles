@@ -17,4 +17,5 @@ HK_PKL_BACKEND = "pklr"
 HK_MISE = "1"
 
 [tools]
+"conda:bash" = "5.2.37"
 coreutils = "0.12.0"
