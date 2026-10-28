@@ -917,30 +917,39 @@ backend = "aqua:aws/aws-cli"
 specifiers = ["2.36.29"]
 
 [tools.aws-cli."platforms.linux-arm64"]
+checksum = "sha256:d08073ff20ad0b4a5bdcee344b35052caf7aa51383caa66865708eca407125d0"
 url = "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-2.36.29.zip"
 
 [tools.aws-cli."platforms.linux-arm64-musl"]
+checksum = "sha256:d08073ff20ad0b4a5bdcee344b35052caf7aa51383caa66865708eca407125d0"
 url = "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-2.36.29.zip"
 
 [tools.aws-cli."platforms.linux-x64"]
+checksum = "sha256:cf000f7405c94742e2b3534e5436c8189e48752ccf548477ebaa1b6b8665cdb5"
 url = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.36.29.zip"
 
 [tools.aws-cli."platforms.linux-x64-baseline"]
+checksum = "sha256:cf000f7405c94742e2b3534e5436c8189e48752ccf548477ebaa1b6b8665cdb5"
 url = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.36.29.zip"
 
 [tools.aws-cli."platforms.linux-x64-musl"]
+checksum = "sha256:cf000f7405c94742e2b3534e5436c8189e48752ccf548477ebaa1b6b8665cdb5"
 url = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.36.29.zip"
 
 [tools.aws-cli."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:cf000f7405c94742e2b3534e5436c8189e48752ccf548477ebaa1b6b8665cdb5"
 url = "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.36.29.zip"
 
 [tools.aws-cli."platforms.macos-arm64"]
+checksum = "sha256:f2025d418e6d7e7aa2cd7ef237bd1b664522abe657c06172c2ded32bc1016ab9"
 url = "https://awscli.amazonaws.com/AWSCLIV2-2.36.29.pkg"
 
 [tools.aws-cli."platforms.macos-x64"]
+checksum = "sha256:f2025d418e6d7e7aa2cd7ef237bd1b664522abe657c06172c2ded32bc1016ab9"
 url = "https://awscli.amazonaws.com/AWSCLIV2-2.36.29.pkg"
 
 [tools.aws-cli."platforms.macos-x64-baseline"]
+checksum = "sha256:f2025d418e6d7e7aa2cd7ef237bd1b664522abe657c06172c2ded32bc1016ab9"
 url = "https://awscli.amazonaws.com/AWSCLIV2-2.36.29.pkg"
 
 [[tools.bun]]
@@ -983,6 +992,64 @@ url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-darwin-x6
 [tools.bun."platforms.macos-x64-baseline"]
 checksum = "sha256:d4a155adfbfd09155eb3ba05c9e3a544f39297d7a68616d3c7759f67ab5c47dc"
 url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-darwin-x64-baseline.zip"
+
+[[tools.coreutils]]
+version = "0.12.0"
+backend = "aqua:uutils/coreutils"
+specifiers = ["0.12.0"]
+
+[tools.coreutils."platforms.linux-arm64"]
+checksum = "sha256:8ded600eb3f6099d9f085d0e1ba8a5c002b8df1929d7f6c86d9cd03355ac3c5f"
+checksum_source = "mise-versions"
+url = "https://github.com/uutils/coreutils/releases/download/0.12.0/coreutils-0.12.0-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/uutils/coreutils/releases/assets/568983326"
+
+[tools.coreutils."platforms.linux-arm64-musl"]
+checksum = "sha256:614a0224ea49f85020cfc30ca980599965fa8501131f9588db4fa41c125a7805"
+checksum_source = "mise-versions"
+url = "https://github.com/uutils/coreutils/releases/download/0.12.0/coreutils-0.12.0-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/uutils/coreutils/releases/assets/569012618"
+
+[tools.coreutils."platforms.linux-x64"]
+checksum = "sha256:e08bd526f3c14717b145dfed4dbff5545848ca67a9b940be7ff7de5afea32786"
+checksum_source = "mise-versions"
+url = "https://github.com/uutils/coreutils/releases/download/0.12.0/coreutils-0.12.0-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/uutils/coreutils/releases/assets/569034668"
+
+[tools.coreutils."platforms.linux-x64-baseline"]
+checksum = "sha256:e08bd526f3c14717b145dfed4dbff5545848ca67a9b940be7ff7de5afea32786"
+checksum_source = "mise-versions"
+url = "https://github.com/uutils/coreutils/releases/download/0.12.0/coreutils-0.12.0-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/uutils/coreutils/releases/assets/569034668"
+
+[tools.coreutils."platforms.linux-x64-musl"]
+checksum = "sha256:9b555b01457279bcc3e46753f0ef324fd3d02a0535111200a4632d1297263b54"
+checksum_source = "mise-versions"
+url = "https://github.com/uutils/coreutils/releases/download/0.12.0/coreutils-0.12.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/uutils/coreutils/releases/assets/569012931"
+
+[tools.coreutils."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:9b555b01457279bcc3e46753f0ef324fd3d02a0535111200a4632d1297263b54"
+checksum_source = "mise-versions"
+url = "https://github.com/uutils/coreutils/releases/download/0.12.0/coreutils-0.12.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/uutils/coreutils/releases/assets/569012931"
+
+[tools.coreutils."platforms.macos-arm64"]
+checksum = "sha256:7caea447564405b3eb50cce2a89d314df07d1b7a67090dc4cc7c82eba7014052"
+url = "https://github.com/uutils/coreutils/releases/download/0.12.0/coreutils-0.12.0-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/uutils/coreutils/releases/assets/569200817"
+
+[tools.coreutils."platforms.macos-x64"]
+checksum = "sha256:a845b274f91c23b779f097e15045f4bf7cbcf99d6e62e6878d9db816e6887586"
+checksum_source = "mise-versions"
+url = "https://github.com/uutils/coreutils/releases/download/0.12.0/coreutils-0.12.0-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/uutils/coreutils/releases/assets/569181402"
+
+[tools.coreutils."platforms.macos-x64-baseline"]
+checksum = "sha256:a845b274f91c23b779f097e15045f4bf7cbcf99d6e62e6878d9db816e6887586"
+checksum_source = "mise-versions"
+url = "https://github.com/uutils/coreutils/releases/download/0.12.0/coreutils-0.12.0-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/uutils/coreutils/releases/assets/569181402"
 
 [[tools."github:entireio/cli"]]
 version = "0.12.3-nightly.202610261136.c4f103d8d"
