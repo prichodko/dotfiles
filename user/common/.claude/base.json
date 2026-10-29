@@ -6,9 +6,6 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "skillOverrides": {
-    "trail-create": "user-invocable-only"
-  },
   "enabledPlugins": {
     "pr-review-toolkit@claude-plugins-official": true,
     "figma@claude-plugins-official": false

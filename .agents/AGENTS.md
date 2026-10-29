@@ -38,7 +38,9 @@ Before pushing, run the repository's root lint and typecheck as CI runs them, pl
 
 ## Trails
 
-After finishing and verifying a code-change task in an Entire-enabled repository, create a trail for it with the `trail-create` skill without waiting to be asked. Skip this when the user said to keep the work uncommitted or unpushed, or when the branch already has a trail.
+After finishing and verifying a code-change task in an Entire-enabled repository, open it as a trail with the `trails` skill without waiting to be asked. Skip this when the user said to keep the work uncommitted or unpushed. Use the same skill for any trail findings, readiness, or merge work.
+
+Refer to work by its full trail URL, never by its PR, in reports, recaps, and questions.
 
 ## Browser control
 

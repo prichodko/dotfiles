@@ -1,0 +1,7 @@
+interface:
+  display_name: "trails"
+  short_description: "Open, track, ready, and merge Entire trails"
+  default_prompt: "Use $trails to open the current work as an Entire trail."
+
+policy:
+  allow_implicit_invocation: true
