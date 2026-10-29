@@ -34,7 +34,7 @@ Test the changed behavior and relevant failure paths. For interaction changes, c
 
 Test the real implementation and observable behavior. Mock external boundaries when needed; do not reproduce implementation logic in tests.
 
-Complete required repository checks. Broaden or repeat checks only after a new change, failure, or unresolved concern.
+Before pushing, run the repository's root lint and typecheck as CI runs them, plus only the tests that cover the changed code; leave full test suites to CI. After pushing, wait for CI to finish and fix any failure before reporting the work as done. Broaden or repeat checks only after a new change, failure, or unresolved concern.
 
 ## Trails
 
