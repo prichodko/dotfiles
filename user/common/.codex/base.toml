@@ -8,6 +8,10 @@ sandbox_mode = "workspace-write"
 [features]
 remote_plugin = true
 
+[marketplaces.cloudflare]
+source_type = "git"
+source = "https://github.com/cloudflare/skills.git"
+
 # Keep user-level plugin choices portable. Marketplace caches and service
 # authentication remain machine-local and are recreated by Codex.
 [plugins."google-calendar@openai-curated"]
@@ -19,7 +23,7 @@ enabled = false
 [plugins."figma@openai-curated"]
 enabled = true
 
-[plugins."cloudflare@openai-curated"]
+[plugins."cloudflare@cloudflare"]
 enabled = true
 
 [plugins."pdf@openai-primary-runtime"]
@@ -56,4 +60,82 @@ enabled = true
 enabled = true
 
 [plugins."github@openai-curated"]
+enabled = true
+
+# Keep Cloudflare focused on web/API work; names survive plugin upgrades.
+
+[[skills.config]]
+name = "cloudflare:agents-sdk"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:basin"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:cf-cli"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:cloudflare"
+enabled = true
+
+[[skills.config]]
+name = "cloudflare:cloudflare-email-service"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:cloudflare-one"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:cloudflare-one-migrations"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:durable-objects"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:gateway-workers"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:k2"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:nextjs-on-cloudflare"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:sandbox-migrate-to-next"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:sandbox-next"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:sandbox-stable"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:turnstile-spin"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:web-perf"
+enabled = true
+
+[[skills.config]]
+name = "cloudflare:workers-best-practices"
+enabled = true
+
+[[skills.config]]
+name = "cloudflare:workers-profiling"
+enabled = false
+
+[[skills.config]]
+name = "cloudflare:wrangler"
 enabled = true
